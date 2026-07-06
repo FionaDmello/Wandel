@@ -1,10 +1,12 @@
 import { Filter, Info, Plus } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { PanelHeader } from "@/features/engine/PanelHeader";
 import { PauseOverlay } from "@/features/engine/PauseOverlay";
 import { TakeUpSpaceLog } from "@/features/engine/TakeUpSpaceLog";
+import { TakeUpSpaceReferenceCard } from "@/features/engine/TakeUpSpaceReferenceCard";
 import { TakeUpSpaceTagChips } from "@/features/engine/TakeUpSpaceTagChips";
+import { TakeUpSpaceTagEditor } from "@/features/engine/TakeUpSpaceTagEditor";
 import { useTakeUpSpaceEntries } from "@/hooks/useTakeUpSpace";
 import {
   useSeedDefaultTags,
@@ -16,6 +18,9 @@ interface PanelTakeUpSpaceProps {
 }
 
 export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [referenceOpen, setReferenceOpen] = useState(false);
+
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
   const { data: tags = [] } = useTakeUpSpaceTags(userId);
   const {
@@ -48,6 +53,7 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
           <button
             type="button"
             aria-label="About Take Up Space"
+            onClick={() => setReferenceOpen(true)}
             className="text-rose"
           >
             <Info size={14} />
@@ -62,6 +68,7 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
           </span>
           <button
             type="button"
+            onClick={() => setEditorOpen(true)}
             className="font-sans text-[11px] text-rose font-medium"
           >
             Edit
@@ -99,6 +106,16 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
       />
 
       <PauseOverlay visible={pauseVisible} message="You noticed." />
+
+      {editorOpen && (
+        <TakeUpSpaceTagEditor
+          userId={userId}
+          onClose={() => setEditorOpen(false)}
+        />
+      )}
+      {referenceOpen && (
+        <TakeUpSpaceReferenceCard onClose={() => setReferenceOpen(false)} />
+      )}
     </div>
   );
 }

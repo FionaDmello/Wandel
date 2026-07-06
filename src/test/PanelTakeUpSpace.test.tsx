@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PanelTakeUpSpace } from "@/features/engine/PanelTakeUpSpace";
@@ -40,6 +40,14 @@ function makeTag(name: string): TakeUpSpaceTag {
 let entriesData: TakeUpSpaceEntry[] = [];
 let tagsData: TakeUpSpaceTag[] = [];
 const mockSeedMutate = vi.fn();
+
+vi.mock("@/features/engine/TakeUpSpaceTagEditor", () => ({
+  TakeUpSpaceTagEditor: () => <div>tag-editor</div>,
+}));
+
+vi.mock("@/features/engine/TakeUpSpaceReferenceCard", () => ({
+  TakeUpSpaceReferenceCard: () => <div>reference-card</div>,
+}));
 
 vi.mock("@/hooks/useTakeUpSpace", () => ({
   useTakeUpSpaceEntries: () => ({ data: entriesData }),
@@ -111,5 +119,17 @@ describe("PanelTakeUpSpace", () => {
     render(<PanelTakeUpSpace userId="user-1" />);
     const overlay = screen.getByText("You noticed.");
     expect(overlay.parentElement?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("opens TakeUpSpaceTagEditor when Edit is clicked", () => {
+    render(<PanelTakeUpSpace userId="user-1" />);
+    fireEvent.click(screen.getByText("Edit"));
+    expect(screen.getByText("tag-editor")).toBeInTheDocument();
+  });
+
+  it("opens TakeUpSpaceReferenceCard when info button is clicked", () => {
+    render(<PanelTakeUpSpace userId="user-1" />);
+    fireEvent.click(screen.getByLabelText("About Take Up Space"));
+    expect(screen.getByText("reference-card")).toBeInTheDocument();
   });
 });
