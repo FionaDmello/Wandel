@@ -50,6 +50,26 @@ export function useSeedDefaultTags(userId: string) {
   });
 }
 
+export function useDeleteTag(userId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("take_up_space_tags")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["take_up_space_tags", userId],
+      });
+    },
+  });
+}
+
 export function useSaveTags(userId: string) {
   const queryClient = useQueryClient();
 

@@ -4,16 +4,18 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  useDeleteTag,
   useSaveTags,
   useSeedDefaultTags,
   useTakeUpSpaceTags,
 } from "@/hooks/useTakeUpSpaceTags";
 import type { TakeUpSpaceTag } from "@/types/takeUpSpace";
 
-const { mockOrder, mockInsert, mockSingle } = vi.hoisted(() => ({
+const { mockOrder, mockInsert, mockSingle, mockDelete } = vi.hoisted(() => ({
   mockOrder: vi.fn(),
   mockInsert: vi.fn(),
   mockSingle: vi.fn(),
+  mockDelete: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase", () => {
@@ -26,6 +28,11 @@ vi.mock("@/lib/supabase", () => {
       mockInsert().then(r, j),
   });
   builder.upsert = () => ({ select: () => ({ single: mockSingle }) });
+  const deleteBuilder: Record<string, unknown> = {};
+  deleteBuilder.eq = () => deleteBuilder;
+  deleteBuilder.then = (r: (v: unknown) => void, j: (e: unknown) => void) =>
+    mockDelete().then(r, j);
+  builder.delete = () => deleteBuilder;
   return { supabase: { from: () => builder } };
 });
 
@@ -164,6 +171,32 @@ describe("useSaveTags", () => {
         is_default: true,
         active: true,
       });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+});
+
+describe("useDeleteTag", () => {
+  it("resolves without throwing on success", async () => {
+    mockDelete.mockResolvedValue({ error: null });
+
+    const { result } = renderHook(() => useDeleteTag("user-1"), { wrapper });
+
+    await act(async () => {
+      result.current.mutate("t-1");
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it("throws on error", async () => {
+    mockDelete.mockResolvedValue({ error: { message: "DB error" } });
+
+    const { result } = renderHook(() => useDeleteTag("user-1"), { wrapper });
+
+    await act(async () => {
+      result.current.mutate("t-1");
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
