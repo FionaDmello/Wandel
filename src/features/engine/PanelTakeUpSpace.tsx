@@ -22,7 +22,8 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
   const [referenceOpen, setReferenceOpen] = useState(false);
 
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
-  const { data: tags = [] } = useTakeUpSpaceTags(userId);
+  const { data: tags = [], isLoading: tagsLoading } =
+    useTakeUpSpaceTags(userId);
   const {
     isPending: seedPending,
     isSuccess: seedSuccess,
@@ -30,15 +31,10 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
   } = useSeedDefaultTags(userId);
 
   useEffect(() => {
-    if (
-      tags !== undefined &&
-      tags.length === 0 &&
-      !seedPending &&
-      !seedSuccess
-    ) {
+    if (!tagsLoading && tags.length === 0 && !seedPending && !seedSuccess) {
       seedMutate();
     }
-  }, [tags, seedPending, seedSuccess, seedMutate]);
+  }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
   const pauseVisible = false;
 
