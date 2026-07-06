@@ -2,6 +2,20 @@
 
 Inherits all rules from the global CLAUDE.md.
 
+## Problem-solving pattern
+
+Before any implementation, always work through these layers in order. Never skip ahead. No code until thinking is fully done.
+
+1. **Spec study** — read every relevant file, doc, or zip before any discussion
+2. **Architecture** — full breakdown of moving parts, data flow, and component structure
+3. **Critical review** — explicitly identify weak points, bottlenecks, and simplifications before locking the design
+4. **Decisions** — resolve all UX, data model, and schema questions one at a time
+5. **Clean restatement** — after revisions, produce one stable final architecture document
+6. **Save to memory** — lock the architecture into memory before any implementation begins
+7. **Brainstorm** — design each session's deliverables section by section with approval gates
+8. **Written plan** — convert the approved design into a step-by-step implementation plan
+9. **Execute** — implement against the plan with all decisions already made
+
 ## Branching
 
 - Until the MVP is shipped, all work stays on `main`. No feature branches.

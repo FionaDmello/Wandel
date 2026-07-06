@@ -33,5 +33,8 @@ dist-ssr
 *.sln
 *.sw?
 
-Wandel-*
-MVP_*
+product/*
+
+docs/superpowers/
+docs/design/
+.superpowers/*
