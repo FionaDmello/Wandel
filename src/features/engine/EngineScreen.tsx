@@ -37,7 +37,7 @@ function EngineContent({ userId, initialLogDate }: EngineContentProps) {
         <PanelSelfRespect userId={userId} date={logDate} />
         <PanelSelfLove userId={userId} date={logDate} />
         <PanelSelfWorth userId={userId} date={logDate} />
-        <PanelTakeUpSpace userId={userId} />
+        <PanelTakeUpSpace userId={userId} date={logDate} />
         <WeeklyReviewPrompt
           mostRecentReview={mostRecentReview}
           isSundayToday={isSundayToday}

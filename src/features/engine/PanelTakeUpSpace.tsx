@@ -8,22 +8,30 @@ import { TakeUpSpaceLogger } from "@/features/engine/TakeUpSpaceLogger";
 import { TakeUpSpaceReferenceCard } from "@/features/engine/TakeUpSpaceReferenceCard";
 import { TakeUpSpaceTagChips } from "@/features/engine/TakeUpSpaceTagChips";
 import { TakeUpSpaceTagEditor } from "@/features/engine/TakeUpSpaceTagEditor";
-import { useTakeUpSpaceEntries } from "@/hooks/useTakeUpSpace";
+import {
+  useAbandonDraft,
+  useActiveDraft,
+  useCreateTakeUpSpaceEntry,
+  useTakeUpSpaceEntries,
+} from "@/hooks/useTakeUpSpace";
 import {
   useSeedDefaultTags,
   useTakeUpSpaceTags,
 } from "@/hooks/useTakeUpSpaceTags";
+import type { TakeUpSpaceEntry } from "@/types/takeUpSpace";
 
 interface PanelTakeUpSpaceProps {
   userId: string;
+  date: string;
 }
 
-export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
+export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
-  const [loggerOpen, setLoggerOpen] = useState(false);
+  const [activeEntry, setActiveEntry] = useState<TakeUpSpaceEntry | null>(null);
 
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
+  const { data: draft } = useActiveDraft(userId);
   const { data: tags = [], isLoading: tagsLoading } =
     useTakeUpSpaceTags(userId);
   const {
@@ -31,6 +39,8 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
     isSuccess: seedSuccess,
     mutate: seedMutate,
   } = useSeedDefaultTags(userId);
+  const createEntry = useCreateTakeUpSpaceEntry(userId);
+  const abandonDraft = useAbandonDraft(userId);
 
   useEffect(() => {
     if (!tagsLoading && tags.length === 0 && !seedPending && !seedSuccess) {
@@ -39,6 +49,16 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
   }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
   const pauseVisible = false;
+  const discardPending = abandonDraft.isPending || createEntry.isPending;
+
+  function handleDiscard() {
+    if (!draft) return;
+    abandonDraft.mutate(draft.id, {
+      onSuccess: () => {
+        createEntry.mutate({ date }, { onSuccess: setActiveEntry });
+      },
+    });
+  }
 
   return (
     <div className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-rose px-5 py-4">
@@ -81,6 +101,32 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
         </p>
       )}
 
+      {draft && (
+        <div className="flex flex-col gap-2 bg-canvas rounded-2xl px-4 py-3">
+          <p className="font-serif italic text-[13px] text-violet">
+            You have an entry in progress.
+          </p>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              disabled={discardPending}
+              onClick={() => setActiveEntry(draft)}
+              className="font-sans text-[12px] text-plum font-medium disabled:opacity-50"
+            >
+              Continue
+            </button>
+            <button
+              type="button"
+              disabled={discardPending}
+              onClick={handleDiscard}
+              className="font-sans text-[12px] text-muted disabled:opacity-50"
+            >
+              {discardPending ? "Discarding…" : "Discard"}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center">
         <button
           type="button"
@@ -89,13 +135,18 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
         >
           <Filter size={14} />
         </button>
-        <button
-          type="button"
-          onClick={() => setLoggerOpen(true)}
-          className="bg-rose text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium flex items-center gap-1.5"
-        >
-          <Plus size={13} /> Notice
-        </button>
+        {!draft && (
+          <button
+            type="button"
+            disabled={createEntry.isPending}
+            onClick={() =>
+              createEntry.mutate({ date }, { onSuccess: setActiveEntry })
+            }
+            className="bg-rose text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <Plus size={13} /> Notice
+          </button>
+        )}
       </div>
 
       <TakeUpSpaceLog
@@ -115,7 +166,13 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
       {referenceOpen && (
         <TakeUpSpaceReferenceCard onClose={() => setReferenceOpen(false)} />
       )}
-      {loggerOpen && <TakeUpSpaceLogger onClose={() => setLoggerOpen(false)} />}
+      {activeEntry && (
+        <TakeUpSpaceLogger
+          userId={userId}
+          entry={activeEntry}
+          onClose={() => setActiveEntry(null)}
+        />
+      )}
     </div>
   );
 }
