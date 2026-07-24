@@ -5,15 +5,21 @@ import {
   type TakeUpSpaceQuestion,
 } from "@/constants/takeUpSpaceQuestions";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
-import type { TakeUpSpaceMode } from "@/types/takeUpSpace";
+import { useUpdateTakeUpSpaceEntry } from "@/hooks/useTakeUpSpace";
+import type { TakeUpSpaceEntry, TakeUpSpaceMode } from "@/types/takeUpSpace";
 
 const TOTAL_STEPS = TAKE_UP_SPACE_QUESTIONS.length;
 
 type Answers = Record<TakeUpSpaceQuestion["field"], string>;
 
-function initialAnswers(): Answers {
+function initialStep(entry: TakeUpSpaceEntry): number {
+  const idx = TAKE_UP_SPACE_QUESTIONS.findIndex((q) => entry[q.field] === null);
+  return idx === -1 ? TOTAL_STEPS : idx;
+}
+
+function initialAnswers(entry: TakeUpSpaceEntry): Answers {
   return Object.fromEntries(
-    TAKE_UP_SPACE_QUESTIONS.map((q) => [q.field, ""]),
+    TAKE_UP_SPACE_QUESTIONS.map((q) => [q.field, entry[q.field] ?? ""]),
   ) as Answers;
 }
 
@@ -25,13 +31,21 @@ function resolveText(
 }
 
 interface TakeUpSpaceLoggerProps {
+  userId: string;
+  entry: TakeUpSpaceEntry;
   onClose: () => void;
 }
 
-export function TakeUpSpaceLogger({ onClose }: TakeUpSpaceLoggerProps) {
-  const [step, setStep] = useState(0);
-  const [mode, setMode] = useState<TakeUpSpaceMode>("in_the_moment");
-  const [answers, setAnswers] = useState<Answers>(initialAnswers);
+export function TakeUpSpaceLogger({
+  userId,
+  entry,
+  onClose,
+}: TakeUpSpaceLoggerProps) {
+  const [step, setStep] = useState(() => initialStep(entry));
+  const [mode, setMode] = useState<TakeUpSpaceMode>(entry.mode);
+  const [answers, setAnswers] = useState<Answers>(() => initialAnswers(entry));
+
+  const updateEntry = useUpdateTakeUpSpaceEntry(userId);
 
   const isPlaceholder = step >= TOTAL_STEPS;
   const question = isPlaceholder ? null : TAKE_UP_SPACE_QUESTIONS[step];
@@ -41,6 +55,27 @@ export function TakeUpSpaceLogger({ onClose }: TakeUpSpaceLoggerProps) {
     value: string,
   ) {
     setAnswers((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleNext() {
+    if (!question) return;
+    const value = answers[question.field].trim();
+    if (!value) return;
+
+    const fieldUpdate: Partial<Record<TakeUpSpaceQuestion["field"], string>> = {
+      [question.field]: value,
+    };
+    updateEntry.mutate(
+      { id: entry.id, mode, ...fieldUpdate },
+      { onSuccess: () => setStep((s) => s + 1) },
+    );
+  }
+
+  function handleSkip() {
+    updateEntry.mutate(
+      { id: entry.id, teaching: "", mode },
+      { onSuccess: () => setStep((s) => s + 1) },
+    );
   }
 
   return (
@@ -115,8 +150,9 @@ export function TakeUpSpaceLogger({ onClose }: TakeUpSpaceLoggerProps) {
               {question.optional && (
                 <button
                   type="button"
-                  onClick={() => setStep((s) => s + 1)}
-                  className="font-sans text-[13px] text-muted"
+                  onClick={handleSkip}
+                  disabled={updateEntry.isPending}
+                  className="font-sans text-[13px] text-muted disabled:opacity-50"
                 >
                   Skip
                 </button>
@@ -124,10 +160,13 @@ export function TakeUpSpaceLogger({ onClose }: TakeUpSpaceLoggerProps) {
 
               <button
                 type="button"
-                onClick={() => setStep((s) => s + 1)}
-                className="bg-rose text-canvas rounded-2xl px-6 py-3 font-sans text-[13px] font-medium"
+                onClick={handleNext}
+                disabled={
+                  !answers[question.field].trim() || updateEntry.isPending
+                }
+                className="bg-rose text-canvas rounded-2xl px-6 py-3 font-sans text-[13px] font-medium disabled:opacity-50"
               >
-                Next
+                {updateEntry.isPending ? "Saving…" : "Next"}
               </button>
             </div>
           </div>

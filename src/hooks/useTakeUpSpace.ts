@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabase";
-import type { TakeUpSpaceEntry } from "@/types/takeUpSpace";
+import type { TakeUpSpaceEntry, TakeUpSpaceMode } from "@/types/takeUpSpace";
 
 interface UpdateEntryPayload {
   id: string;
@@ -15,7 +15,7 @@ interface UpdateEntryPayload {
   tag_names?: string[];
   choice_outcome?: string | null;
   panel_tag?: string | null;
-  mode?: string;
+  mode?: TakeUpSpaceMode;
 }
 
 export function useTakeUpSpaceEntries(userId: string) {
