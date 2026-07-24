@@ -49,6 +49,10 @@ vi.mock("@/features/engine/TakeUpSpaceReferenceCard", () => ({
   TakeUpSpaceReferenceCard: () => <div>reference-card</div>,
 }));
 
+vi.mock("@/features/engine/TakeUpSpaceLogger", () => ({
+  TakeUpSpaceLogger: () => <div>tus-logger</div>,
+}));
+
 vi.mock("@/hooks/useTakeUpSpace", () => ({
   useTakeUpSpaceEntries: () => ({ data: entriesData }),
 }));
@@ -113,6 +117,12 @@ describe("PanelTakeUpSpace", () => {
     render(<PanelTakeUpSpace userId="user-1" />);
     expect(screen.getByLabelText("Filter entries")).toBeTruthy();
     expect(screen.getByText("Notice")).toBeTruthy();
+  });
+
+  it("opens TakeUpSpaceLogger when Notice button is clicked", () => {
+    render(<PanelTakeUpSpace userId="user-1" />);
+    fireEvent.click(screen.getByText("Notice"));
+    expect(screen.getByText("tus-logger")).toBeInTheDocument();
   });
 
   it("renders PauseOverlay hidden", () => {

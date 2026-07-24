@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { PanelHeader } from "@/features/engine/PanelHeader";
 import { PauseOverlay } from "@/features/engine/PauseOverlay";
 import { TakeUpSpaceLog } from "@/features/engine/TakeUpSpaceLog";
+import { TakeUpSpaceLogger } from "@/features/engine/TakeUpSpaceLogger";
 import { TakeUpSpaceReferenceCard } from "@/features/engine/TakeUpSpaceReferenceCard";
 import { TakeUpSpaceTagChips } from "@/features/engine/TakeUpSpaceTagChips";
 import { TakeUpSpaceTagEditor } from "@/features/engine/TakeUpSpaceTagEditor";
@@ -20,6 +21,7 @@ interface PanelTakeUpSpaceProps {
 export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
+  const [loggerOpen, setLoggerOpen] = useState(false);
 
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
   const { data: tags = [], isLoading: tagsLoading } =
@@ -89,6 +91,7 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
         </button>
         <button
           type="button"
+          onClick={() => setLoggerOpen(true)}
           className="bg-rose text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium flex items-center gap-1.5"
         >
           <Plus size={13} /> Notice
@@ -112,6 +115,7 @@ export function PanelTakeUpSpace({ userId }: PanelTakeUpSpaceProps) {
       {referenceOpen && (
         <TakeUpSpaceReferenceCard onClose={() => setReferenceOpen(false)} />
       )}
+      {loggerOpen && <TakeUpSpaceLogger onClose={() => setLoggerOpen(false)} />}
     </div>
   );
 }
