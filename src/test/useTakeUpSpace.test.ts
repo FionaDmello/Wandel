@@ -232,7 +232,14 @@ describe("useCompleteEntry", () => {
     });
 
     await act(async () => {
-      await result.current.mutateAsync("e-1");
+      await result.current.mutateAsync({
+        id: "e-1",
+        mode: "in_the_moment",
+        choice_outcome: "paused",
+        panel_tag: null,
+        tag_ids: [],
+        tag_names: [],
+      });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -249,7 +256,14 @@ describe("useCompleteEntry", () => {
     });
 
     await act(async () => {
-      result.current.mutate("e-1");
+      result.current.mutate({
+        id: "e-1",
+        mode: "in_the_moment",
+        choice_outcome: "paused",
+        panel_tag: null,
+        tag_ids: [],
+        tag_names: [],
+      });
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));

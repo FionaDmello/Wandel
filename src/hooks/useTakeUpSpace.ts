@@ -1,7 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabase";
-import type { TakeUpSpaceEntry, TakeUpSpaceMode } from "@/types/takeUpSpace";
+import type {
+  TakeUpSpaceEntry,
+  TakeUpSpaceMode,
+  TakeUpSpaceOutcome,
+  TakeUpSpacePanelTag,
+} from "@/types/takeUpSpace";
 
 interface UpdateEntryPayload {
   id: string;
@@ -98,14 +103,27 @@ export function useUpdateTakeUpSpaceEntry(userId: string) {
   });
 }
 
+interface CompleteEntryPayload {
+  id: string;
+  mode: TakeUpSpaceMode;
+  choice_outcome: TakeUpSpaceOutcome;
+  panel_tag: TakeUpSpacePanelTag | null;
+  tag_ids: string[];
+  tag_names: string[];
+}
+
 export function useCompleteEntry(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async ({ id, ...fields }: CompleteEntryPayload) => {
       const { error } = await supabase
         .from("take_up_space_log")
-        .update({ status: "complete", completed_at: new Date().toISOString() })
+        .update({
+          ...fields,
+          status: "complete",
+          completed_at: new Date().toISOString(),
+        })
         .eq("id", id)
         .eq("user_id", userId);
       if (error) throw error;
