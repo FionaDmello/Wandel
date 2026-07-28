@@ -2,6 +2,7 @@ import { Filter, Info, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { PanelHeader } from "@/features/engine/PanelHeader";
+import { TakeUpSpaceCostEditor } from "@/features/engine/TakeUpSpaceCostEditor";
 import { TakeUpSpaceLog } from "@/features/engine/TakeUpSpaceLog";
 import { TakeUpSpaceLogger } from "@/features/engine/TakeUpSpaceLogger";
 import { TakeUpSpaceReferenceCard } from "@/features/engine/TakeUpSpaceReferenceCard";
@@ -28,6 +29,8 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
   const [activeEntry, setActiveEntry] = useState<TakeUpSpaceEntry | null>(null);
+  const [costEditorEntry, setCostEditorEntry] =
+    useState<TakeUpSpaceEntry | null>(null);
 
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
   const { data: draft } = useActiveDraft(userId);
@@ -154,7 +157,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
       <TakeUpSpaceLog
         entries={entries}
         onContinueDraft={() => {}}
-        onAddToCost={() => {}}
+        onAddToCost={setCostEditorEntry}
       />
 
       {editorOpen && (
@@ -172,6 +175,13 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
           entry={activeEntry}
           onClose={() => setActiveEntry(null)}
           onComplete={handleLogComplete}
+        />
+      )}
+      {costEditorEntry && (
+        <TakeUpSpaceCostEditor
+          userId={userId}
+          entry={costEditorEntry}
+          onClose={() => setCostEditorEntry(null)}
         />
       )}
     </div>

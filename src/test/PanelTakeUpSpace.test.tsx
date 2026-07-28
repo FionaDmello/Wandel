@@ -65,6 +65,17 @@ vi.mock("@/features/engine/TakeUpSpaceLogger", () => ({
   ),
 }));
 
+vi.mock("@/features/engine/TakeUpSpaceCostEditor", () => ({
+  TakeUpSpaceCostEditor: ({ onClose }: { onClose: () => void }) => (
+    <div>
+      cost-editor
+      <button type="button" onClick={onClose}>
+        mock-cost-close
+      </button>
+    </div>
+  ),
+}));
+
 vi.mock("@/hooks/useTakeUpSpace", () => ({
   useTakeUpSpaceEntries: () => ({ data: entriesData }),
   useActiveDraft: () => ({ data: draftData }),
@@ -211,6 +222,23 @@ describe("PanelTakeUpSpace", () => {
 
     fireEvent.click(screen.getByText("mock-log-complete"));
     expect(screen.queryByText("tus-logger")).toBeNull();
+  });
+
+  it("opens TakeUpSpaceCostEditor when Add to this is clicked on a completed entry", () => {
+    entriesData = [{ ...makeEntry(1), cost: "My peace of mind." }];
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByText("Situation 1"));
+    fireEvent.click(screen.getByText("Add to this"));
+    expect(screen.getByText("cost-editor")).toBeInTheDocument();
+  });
+
+  it("closes TakeUpSpaceCostEditor when it calls onClose", () => {
+    entriesData = [{ ...makeEntry(1), cost: "My peace of mind." }];
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByText("Situation 1"));
+    fireEvent.click(screen.getByText("Add to this"));
+    fireEvent.click(screen.getByText("mock-cost-close"));
+    expect(screen.queryByText("cost-editor")).toBeNull();
   });
 
   it("opens TakeUpSpaceTagEditor when Edit is clicked", () => {
