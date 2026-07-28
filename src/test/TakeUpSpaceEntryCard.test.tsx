@@ -203,4 +203,49 @@ describe("TakeUpSpaceEntryCard — completed expanded", () => {
     expect(onAddToCost).toHaveBeenCalledOnce();
     expect(screen.getByText(/WHAT IS HAPPENING/)).toBeInTheDocument();
   });
+
+  it("shows the PANEL row with the resolved label when panel_tag is set", () => {
+    render(
+      <TakeUpSpaceEntryCard
+        entry={BASE_ENTRY}
+        onContinue={vi.fn()}
+        onAddToCost={vi.fn()}
+      />,
+    );
+    fireEvent.click(
+      screen.getByText("I was about to say yes when I meant no."),
+    );
+    expect(screen.getByText("PANEL")).toBeInTheDocument();
+    expect(screen.getByText("Self-Worth")).toBeInTheDocument();
+  });
+
+  it("hides the PANEL row when panel_tag is null", () => {
+    const entry: TakeUpSpaceEntry = { ...BASE_ENTRY, panel_tag: null };
+    render(
+      <TakeUpSpaceEntryCard
+        entry={entry}
+        onContinue={vi.fn()}
+        onAddToCost={vi.fn()}
+      />,
+    );
+    fireEvent.click(
+      screen.getByText("I was about to say yes when I meant no."),
+    );
+    expect(screen.queryByText("PANEL")).not.toBeInTheDocument();
+  });
+
+  it("hides the PANEL row when panel_tag is 'none'", () => {
+    const entry: TakeUpSpaceEntry = { ...BASE_ENTRY, panel_tag: "none" };
+    render(
+      <TakeUpSpaceEntryCard
+        entry={entry}
+        onContinue={vi.fn()}
+        onAddToCost={vi.fn()}
+      />,
+    );
+    fireEvent.click(
+      screen.getByText("I was about to say yes when I meant no."),
+    );
+    expect(screen.queryByText("PANEL")).not.toBeInTheDocument();
+  });
 });

@@ -2,6 +2,7 @@ import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
 import { OUTCOME_COLORS } from "@/constants/takeUpSpaceOutcomeColors";
+import { PANEL_TAG_OPTIONS } from "@/constants/takeUpSpacePanelOptions";
 import type { TakeUpSpaceEntry, TakeUpSpaceOutcome } from "@/types/takeUpSpace";
 
 interface TakeUpSpaceEntryCardProps {
@@ -135,6 +136,20 @@ export function TakeUpSpaceEntryCard({
               </span>
               <p className="font-sans text-[13px] text-plum">
                 {entry.tag_names.join(" · ")}
+              </p>
+            </div>
+          )}
+
+          {entry.panel_tag !== null && entry.panel_tag !== "none" && (
+            <div className="flex flex-col gap-1">
+              <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+                PANEL
+              </span>
+              <p className="font-sans text-[13px] text-plum">
+                {
+                  PANEL_TAG_OPTIONS.find((o) => o.value === entry.panel_tag)
+                    ?.label
+                }
               </p>
             </div>
           )}
