@@ -10,6 +10,24 @@ vi.mock("@/features/protocols/ProtocolModal", () => ({
   ),
 }));
 
+vi.mock("@/features/engine/TakeUpSpaceCategorisationStep", () => ({
+  TakeUpSpaceCategorisationStep: ({
+    mode,
+    onComplete,
+  }: {
+    mode: string;
+    onComplete: () => void;
+  }) => (
+    <div>
+      <span>categorisation-step</span>
+      <span>mode:{mode}</span>
+      <button type="button" onClick={onComplete}>
+        mock-complete
+      </button>
+    </div>
+  ),
+}));
+
 let mockMutate = vi.fn();
 let mockIsPending = false;
 
@@ -61,6 +79,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry()}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     expect(screen.getByText("1 of 6")).toBeInTheDocument();
@@ -75,6 +94,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry({ situation: "Saying yes when I meant no" })}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     expect(screen.getByText("2 of 6")).toBeInTheDocument();
@@ -86,6 +106,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry({ situation: "Saying yes when I meant no" })}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     fireEvent.click(screen.getByText("Back"));
@@ -94,7 +115,7 @@ describe("TakeUpSpaceLogger", () => {
     );
   });
 
-  it("resumes on the end-of-flow placeholder when every field is answered", () => {
+  it("resumes on the categorisation step when every field is answered", () => {
     render(
       <TakeUpSpaceLogger
         userId="user-1"
@@ -107,11 +128,10 @@ describe("TakeUpSpaceLogger", () => {
           teaching: "",
         })}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
-    expect(
-      screen.getByText("Categorisation coming in Session G."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("categorisation-step")).toBeInTheDocument();
   });
 
   it("initializes the mode toggle from entry.mode and applies it to the action question", () => {
@@ -120,6 +140,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry({ mode: "looking_back" })}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     fireEvent.change(screen.getByRole("textbox"), {
@@ -137,6 +158,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry()}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
@@ -156,6 +178,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry()}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     fireEvent.change(screen.getByRole("textbox"), {
@@ -176,6 +199,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry()}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     fireEvent.change(screen.getByRole("textbox"), {
@@ -197,6 +221,7 @@ describe("TakeUpSpaceLogger", () => {
           choice_text: "ct",
         })}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     expect(screen.getByText("6 of 6")).toBeInTheDocument();
@@ -205,9 +230,7 @@ describe("TakeUpSpaceLogger", () => {
       { id: "entry-1", teaching: "", mode: "in_the_moment" },
       expect.objectContaining({ onSuccess: expect.any(Function) }),
     );
-    expect(
-      screen.getByText("Categorisation coming in Session G."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("categorisation-step")).toBeInTheDocument();
   });
 
   it("toggling mode changes what the next Next call saves", () => {
@@ -216,6 +239,7 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry()}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     fireEvent.click(screen.getByText("Looking back"));
@@ -235,14 +259,14 @@ describe("TakeUpSpaceLogger", () => {
         userId="user-1"
         entry={makeEntry({ situation: "Saying yes when I meant no" })}
         onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
     fireEvent.click(screen.getByText("Back"));
     expect(mockMutate).not.toHaveBeenCalled();
   });
 
-  it("calls onClose from the end-of-flow placeholder Close button", () => {
-    const onClose = vi.fn();
+  it("renders the mode toggle on the categorisation step, not just on steps 0-5", () => {
     render(
       <TakeUpSpaceLogger
         userId="user-1"
@@ -254,10 +278,54 @@ describe("TakeUpSpaceLogger", () => {
           choice_text: "ct",
           teaching: "",
         })}
-        onClose={onClose}
+        onClose={vi.fn()}
+        onComplete={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByText("Close"));
-    expect(onClose).toHaveBeenCalledOnce();
+    expect(screen.getByText("In the moment")).toBeInTheDocument();
+    expect(screen.getByText("Looking back")).toBeInTheDocument();
+    expect(screen.getByText("categorisation-step")).toBeInTheDocument();
+  });
+
+  it("toggling mode on the categorisation step updates the mode passed to TakeUpSpaceCategorisationStep", () => {
+    render(
+      <TakeUpSpaceLogger
+        userId="user-1"
+        entry={makeEntry({
+          situation: "s",
+          action: "a",
+          cost: "c",
+          need: "n",
+          choice_text: "ct",
+          teaching: "",
+        })}
+        onClose={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("mode:in_the_moment")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Looking back"));
+    expect(screen.getByText("mode:looking_back")).toBeInTheDocument();
+  });
+
+  it("forwards onComplete through to TakeUpSpaceCategorisationStep unchanged", () => {
+    const onComplete = vi.fn();
+    render(
+      <TakeUpSpaceLogger
+        userId="user-1"
+        entry={makeEntry({
+          situation: "s",
+          action: "a",
+          cost: "c",
+          need: "n",
+          choice_text: "ct",
+          teaching: "",
+        })}
+        onClose={vi.fn()}
+        onComplete={onComplete}
+      />,
+    );
+    fireEvent.click(screen.getByText("mock-complete"));
+    expect(onComplete).toHaveBeenCalledOnce();
   });
 });
