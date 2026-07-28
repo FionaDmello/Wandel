@@ -1,8 +1,7 @@
 import { Filter, Info, Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { PanelHeader } from "@/features/engine/PanelHeader";
-import { PauseOverlay } from "@/features/engine/PauseOverlay";
 import { TakeUpSpaceLog } from "@/features/engine/TakeUpSpaceLog";
 import { TakeUpSpaceLogger } from "@/features/engine/TakeUpSpaceLogger";
 import { TakeUpSpaceReferenceCard } from "@/features/engine/TakeUpSpaceReferenceCard";
@@ -29,7 +28,6 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
   const [activeEntry, setActiveEntry] = useState<TakeUpSpaceEntry | null>(null);
-  const [pauseVisible, setPauseVisible] = useState(false);
 
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
   const { data: draft } = useActiveDraft(userId);
@@ -49,14 +47,6 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
     }
   }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
-  const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
-    };
-  }, []);
-
   const discardPending = abandonDraft.isPending || createEntry.isPending;
 
   function handleDiscard() {
@@ -70,8 +60,6 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
 
   function handleLogComplete() {
     setActiveEntry(null);
-    setPauseVisible(true);
-    pauseTimeoutRef.current = setTimeout(() => setPauseVisible(false), 500);
   }
 
   return (
@@ -168,8 +156,6 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
         onContinueDraft={() => {}}
         onAddToCost={() => {}}
       />
-
-      <PauseOverlay visible={pauseVisible} message="You noticed." />
 
       {editorOpen && (
         <TakeUpSpaceTagEditor

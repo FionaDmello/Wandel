@@ -1,5 +1,5 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PanelTakeUpSpace } from "@/features/engine/PanelTakeUpSpace";
 import type { TakeUpSpaceEntry, TakeUpSpaceTag } from "@/types/takeUpSpace";
@@ -109,10 +109,6 @@ beforeEach(() => {
   mockAbandonIsPending = false;
 });
 
-afterEach(() => {
-  vi.useRealTimers();
-});
-
 describe("PanelTakeUpSpace", () => {
   it("renders the panel header title, subtitle, and number", () => {
     render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
@@ -208,28 +204,13 @@ describe("PanelTakeUpSpace", () => {
     expect(screen.getByText("Discarding…")).toBeInTheDocument();
   });
 
-  it("renders PauseOverlay hidden", () => {
-    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
-    const overlay = screen.getByText("You noticed.");
-    expect(overlay.parentElement?.getAttribute("aria-hidden")).toBe("true");
-  });
-
-  it("closes the logger and shows the PauseOverlay for 500ms when the logger completes", () => {
-    vi.useFakeTimers();
+  it("closes the logger immediately when it completes, with no pause overlay", () => {
     render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
     fireEvent.click(screen.getByText("Notice"));
     expect(screen.getByText("tus-logger")).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("mock-log-complete"));
     expect(screen.queryByText("tus-logger")).toBeNull();
-
-    const overlay = screen.getByText("You noticed.");
-    expect(overlay.parentElement?.getAttribute("aria-hidden")).toBe("false");
-
-    act(() => {
-      vi.advanceTimersByTime(500);
-    });
-    expect(overlay.parentElement?.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("opens TakeUpSpaceTagEditor when Edit is clicked", () => {
