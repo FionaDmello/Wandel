@@ -1,8 +1,11 @@
 import { Filter, Info, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { EMPTY_TAKE_UP_SPACE_FILTERS } from "@/constants/takeUpSpaceFilters";
+import { filterTakeUpSpaceEntries } from "@/features/engine/filterTakeUpSpaceEntries";
 import { PanelHeader } from "@/features/engine/PanelHeader";
 import { TakeUpSpaceCostEditor } from "@/features/engine/TakeUpSpaceCostEditor";
+import { TakeUpSpaceFilterSheet } from "@/features/engine/TakeUpSpaceFilterSheet";
 import { TakeUpSpaceLog } from "@/features/engine/TakeUpSpaceLog";
 import { TakeUpSpaceLogger } from "@/features/engine/TakeUpSpaceLogger";
 import { TakeUpSpaceReferenceCard } from "@/features/engine/TakeUpSpaceReferenceCard";
@@ -18,7 +21,7 @@ import {
   useSeedDefaultTags,
   useTakeUpSpaceTags,
 } from "@/hooks/useTakeUpSpaceTags";
-import type { TakeUpSpaceEntry } from "@/types/takeUpSpace";
+import type { TakeUpSpaceEntry, TakeUpSpaceFilters } from "@/types/takeUpSpace";
 
 interface PanelTakeUpSpaceProps {
   userId: string;
@@ -31,6 +34,10 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   const [activeEntry, setActiveEntry] = useState<TakeUpSpaceEntry | null>(null);
   const [costEditorEntry, setCostEditorEntry] =
     useState<TakeUpSpaceEntry | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filters, setFilters] = useState<TakeUpSpaceFilters>(
+    EMPTY_TAKE_UP_SPACE_FILTERS,
+  );
 
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
   const { data: draft } = useActiveDraft(userId);
@@ -51,6 +58,13 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
   const discardPending = abandonDraft.isPending || createEntry.isPending;
+  const filteredEntries = filterTakeUpSpaceEntries(entries, filters);
+  const hasActiveFilters =
+    filters.outcomes.length > 0 ||
+    filters.modes.length > 0 ||
+    filters.panelTags.length > 0 ||
+    filters.tagNames.length > 0 ||
+    filters.noTags;
 
   function handleDiscard() {
     if (!draft) return;
@@ -136,7 +150,8 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
         <button
           type="button"
           aria-label="Filter entries"
-          className="text-muted"
+          onClick={() => setFilterOpen(true)}
+          className={hasActiveFilters ? "text-rose" : "text-muted"}
         >
           <Filter size={14} />
         </button>
@@ -155,10 +170,16 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
       </div>
 
       <TakeUpSpaceLog
-        entries={entries}
+        entries={filteredEntries}
         onContinueDraft={() => {}}
         onAddToCost={setCostEditorEntry}
       />
+
+      {entries.length > 0 && filteredEntries.length === 0 && (
+        <p className="font-sans text-[12px] text-muted">
+          Nothing matches these filters.
+        </p>
+      )}
 
       {editorOpen && (
         <TakeUpSpaceTagEditor
@@ -182,6 +203,14 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
           userId={userId}
           entry={costEditorEntry}
           onClose={() => setCostEditorEntry(null)}
+        />
+      )}
+      {filterOpen && (
+        <TakeUpSpaceFilterSheet
+          entries={entries}
+          filters={filters}
+          onChange={setFilters}
+          onClose={() => setFilterOpen(false)}
         />
       )}
     </div>

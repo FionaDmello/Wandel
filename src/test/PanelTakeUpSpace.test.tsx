@@ -2,7 +2,11 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PanelTakeUpSpace } from "@/features/engine/PanelTakeUpSpace";
-import type { TakeUpSpaceEntry, TakeUpSpaceTag } from "@/types/takeUpSpace";
+import type {
+  TakeUpSpaceEntry,
+  TakeUpSpaceFilters,
+  TakeUpSpaceTag,
+} from "@/types/takeUpSpace";
 
 function makeEntry(n: number): TakeUpSpaceEntry {
   return {
@@ -71,6 +75,37 @@ vi.mock("@/features/engine/TakeUpSpaceCostEditor", () => ({
       cost-editor
       <button type="button" onClick={onClose}>
         mock-cost-close
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock("@/features/engine/TakeUpSpaceFilterSheet", () => ({
+  TakeUpSpaceFilterSheet: ({
+    onChange,
+    onClose,
+  }: {
+    onChange: (filters: TakeUpSpaceFilters) => void;
+    onClose: () => void;
+  }) => (
+    <div>
+      filter-sheet
+      <button
+        type="button"
+        onClick={() =>
+          onChange({
+            outcomes: ["override"],
+            modes: [],
+            panelTags: [],
+            tagNames: [],
+            noTags: false,
+          })
+        }
+      >
+        mock-set-filter
+      </button>
+      <button type="button" onClick={onClose}>
+        mock-filter-close
       </button>
     </div>
   ),
@@ -239,6 +274,51 @@ describe("PanelTakeUpSpace", () => {
     fireEvent.click(screen.getByText("Add to this"));
     fireEvent.click(screen.getByText("mock-cost-close"));
     expect(screen.queryByText("cost-editor")).toBeNull();
+  });
+
+  it("opens TakeUpSpaceFilterSheet when the Filter button is clicked", () => {
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByLabelText("Filter entries"));
+    expect(screen.getByText("filter-sheet")).toBeInTheDocument();
+  });
+
+  it("Filter icon is muted with no active filters, rose once a filter is set", () => {
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    expect(screen.getByLabelText("Filter entries")).toHaveClass("text-muted");
+
+    fireEvent.click(screen.getByLabelText("Filter entries"));
+    fireEvent.click(screen.getByText("mock-set-filter"));
+    expect(screen.getByLabelText("Filter entries")).toHaveClass("text-rose");
+  });
+
+  it("passes the filtered entries list to the log, excluding entries that no longer match", () => {
+    entriesData = [
+      { ...makeEntry(1), choice_outcome: "override" },
+      { ...makeEntry(2), choice_outcome: "paused" },
+    ];
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByLabelText("Filter entries"));
+    fireEvent.click(screen.getByText("mock-set-filter"));
+    expect(screen.getByText("Situation 1")).toBeInTheDocument();
+    expect(screen.queryByText("Situation 2")).toBeNull();
+  });
+
+  it("shows a no-matches message when entries exist but none survive the filter", () => {
+    entriesData = [{ ...makeEntry(1), choice_outcome: "paused" }];
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByLabelText("Filter entries"));
+    fireEvent.click(screen.getByText("mock-set-filter"));
+    expect(
+      screen.getByText("Nothing matches these filters."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("What you notice lives here.")).toBeNull();
+  });
+
+  it("does not show the no-matches message when there are no entries at all", () => {
+    entriesData = [];
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    expect(screen.queryByText("Nothing matches these filters.")).toBeNull();
+    expect(screen.getByText("What you notice lives here.")).toBeInTheDocument();
   });
 
   it("opens TakeUpSpaceTagEditor when Edit is clicked", () => {
