@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
+import { MODE_LABELS } from "@/constants/takeUpSpaceModeLabels";
 import { OUTCOME_COLORS } from "@/constants/takeUpSpaceOutcomeColors";
 import { PANEL_TAG_OPTIONS } from "@/constants/takeUpSpacePanelOptions";
 import type { TakeUpSpaceEntry, TakeUpSpaceOutcome } from "@/types/takeUpSpace";
@@ -35,11 +36,6 @@ const FIELD_LABELS: Record<FieldKey, string> = {
   need: "WHAT I ACTUALLY NEED",
   choice_text: "WHAT I CHOOSE",
   teaching: "WHAT THIS MOMENT IS TEACHING ME",
-};
-
-const MODE_LABELS: Record<string, string> = {
-  in_the_moment: "In the moment",
-  looking_back: "Looking back",
 };
 
 export function TakeUpSpaceEntryCard({

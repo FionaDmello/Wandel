@@ -40,3 +40,11 @@ export interface TakeUpSpaceEntry {
   created_at: string;
   completed_at: string | null;
 }
+
+export interface TakeUpSpaceFilters {
+  outcomes: TakeUpSpaceOutcome[];
+  modes: TakeUpSpaceMode[];
+  panelTags: TakeUpSpacePanelTag[];
+  tagNames: string[];
+  noTags: boolean;
+}
