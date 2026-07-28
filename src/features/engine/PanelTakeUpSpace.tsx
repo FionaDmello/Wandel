@@ -1,5 +1,5 @@
 import { Filter, Info, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { PanelHeader } from "@/features/engine/PanelHeader";
 import { PauseOverlay } from "@/features/engine/PauseOverlay";
@@ -49,6 +49,14 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
     }
   }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
+  const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    };
+  }, []);
+
   const discardPending = abandonDraft.isPending || createEntry.isPending;
 
   function handleDiscard() {
@@ -63,7 +71,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   function handleLogComplete() {
     setActiveEntry(null);
     setPauseVisible(true);
-    setTimeout(() => setPauseVisible(false), 500);
+    pauseTimeoutRef.current = setTimeout(() => setPauseVisible(false), 500);
   }
 
   return (

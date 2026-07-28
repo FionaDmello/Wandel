@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PanelTakeUpSpace } from "@/features/engine/PanelTakeUpSpace";
 import type { TakeUpSpaceEntry, TakeUpSpaceTag } from "@/types/takeUpSpace";
@@ -107,6 +107,10 @@ beforeEach(() => {
     },
   );
   mockAbandonIsPending = false;
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("PanelTakeUpSpace", () => {
@@ -226,8 +230,6 @@ describe("PanelTakeUpSpace", () => {
       vi.advanceTimersByTime(500);
     });
     expect(overlay.parentElement?.getAttribute("aria-hidden")).toBe("true");
-
-    vi.useRealTimers();
   });
 
   it("opens TakeUpSpaceTagEditor when Edit is clicked", () => {

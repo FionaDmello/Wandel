@@ -13,14 +13,19 @@ vi.mock("@/features/protocols/ProtocolModal", () => ({
 vi.mock("@/features/engine/TakeUpSpaceCategorisationStep", () => ({
   TakeUpSpaceCategorisationStep: ({
     mode,
+    onBack,
     onComplete,
   }: {
     mode: string;
+    onBack: () => void;
     onComplete: () => void;
   }) => (
     <div>
       <span>categorisation-step</span>
       <span>mode:{mode}</span>
+      <button type="button" onClick={onBack}>
+        mock-back
+      </button>
       <button type="button" onClick={onComplete}>
         mock-complete
       </button>
@@ -327,5 +332,27 @@ describe("TakeUpSpaceLogger", () => {
     );
     fireEvent.click(screen.getByText("mock-complete"));
     expect(onComplete).toHaveBeenCalledOnce();
+  });
+
+  it("Back on the categorisation step returns to step 6 of 6", () => {
+    render(
+      <TakeUpSpaceLogger
+        userId="user-1"
+        entry={makeEntry({
+          situation: "s",
+          action: "a",
+          cost: "c",
+          need: "n",
+          choice_text: "ct",
+          teaching: "",
+        })}
+        onClose={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("categorisation-step")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("mock-back"));
+    expect(screen.getByText("6 of 6")).toBeInTheDocument();
+    expect(screen.queryByText("categorisation-step")).not.toBeInTheDocument();
   });
 });
