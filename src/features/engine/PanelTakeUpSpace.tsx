@@ -29,6 +29,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [referenceOpen, setReferenceOpen] = useState(false);
   const [activeEntry, setActiveEntry] = useState<TakeUpSpaceEntry | null>(null);
+  const [pauseVisible, setPauseVisible] = useState(false);
 
   const { data: entries = [] } = useTakeUpSpaceEntries(userId);
   const { data: draft } = useActiveDraft(userId);
@@ -48,7 +49,6 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
     }
   }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
-  const pauseVisible = false;
   const discardPending = abandonDraft.isPending || createEntry.isPending;
 
   function handleDiscard() {
@@ -58,6 +58,12 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
         createEntry.mutate({ date }, { onSuccess: setActiveEntry });
       },
     });
+  }
+
+  function handleLogComplete() {
+    setActiveEntry(null);
+    setPauseVisible(true);
+    setTimeout(() => setPauseVisible(false), 500);
   }
 
   return (
@@ -171,6 +177,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
           userId={userId}
           entry={activeEntry}
           onClose={() => setActiveEntry(null)}
+          onComplete={handleLogComplete}
         />
       )}
     </div>
