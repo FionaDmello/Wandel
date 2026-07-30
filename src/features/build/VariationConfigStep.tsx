@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
+import { isDuplicateVariationName } from "@/features/build/isDuplicateVariationName";
 
 interface VariationValues {
   anchor: string;
@@ -51,6 +52,9 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
   );
   const [error, setError] = useState<string | null>(null);
 
+  const inputClass =
+    "w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted";
+
   const handleNext = () => {
     if (
       !anchor.trim() ||
@@ -74,11 +78,7 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
         setError("Give this variation a name.");
         return;
       }
-      if (
-        props.existingNames.some(
-          (existing) => existing.toLowerCase() === trimmedName.toLowerCase(),
-        )
-      ) {
+      if (isDuplicateVariationName(props.existingNames, trimmedName)) {
         setError("A variation with this name already exists.");
         return;
       }
@@ -111,7 +111,7 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
                 setError(null);
               }}
               placeholder="e.g. Yoga"
-              className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted"
+              className={inputClass}
               autoFocus
             />
           </div>
@@ -127,7 +127,7 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
               setError(null);
             }}
             placeholder="e.g. After morning coffee"
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted"
+            className={inputClass}
           />
         </div>
 
@@ -141,7 +141,7 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
               setError(null);
             }}
             placeholder="e.g. 5 sun salutations"
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted"
+            className={inputClass}
           />
         </div>
 
@@ -155,7 +155,7 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
               setError(null);
             }}
             placeholder="e.g. 20 minute flow"
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted"
+            className={inputClass}
           />
         </div>
 
@@ -169,7 +169,7 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
               setError(null);
             }}
             placeholder="e.g. 60 minute practice"
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted"
+            className={inputClass}
           />
         </div>
       </div>
