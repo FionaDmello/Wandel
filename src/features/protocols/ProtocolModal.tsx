@@ -3,10 +3,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 interface ProtocolModalProps {
   children: React.ReactNode;
   onClose?: () => void;
+  dismissible?: boolean;
 }
 
-export function ProtocolModal({ children, onClose }: ProtocolModalProps) {
+export function ProtocolModal({
+  children,
+  onClose,
+  dismissible = true,
+}: ProtocolModalProps) {
   const [visible, setVisible] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
+  const [closed, setClosed] = useState(false);
+  const hasClosedRef = useRef(false);
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const dragDelta = useRef(0);
@@ -16,11 +24,19 @@ export function ProtocolModal({ children, onClose }: ProtocolModalProps) {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const dismiss = useCallback(() => {
-    if (!onClose) return;
-    setVisible(false);
-    setTimeout(onClose, 380);
+  const finishDismiss = useCallback(() => {
+    if (hasClosedRef.current) return;
+    hasClosedRef.current = true;
+    setClosed(true);
+    onClose?.();
   }, [onClose]);
+
+  const dismiss = useCallback(() => {
+    if (!dismissible) return;
+    setVisible(false);
+    setDismissing(true);
+    setTimeout(finishDismiss, 380);
+  }, [dismissible, finishDismiss]);
 
   function handleTouchStart(e: React.TouchEvent) {
     if (sheetRef.current) sheetRef.current.style.transition = "none";
@@ -39,10 +55,11 @@ export function ProtocolModal({ children, onClose }: ProtocolModalProps) {
   function handleTouchEnd() {
     if (!sheetRef.current) return;
     const easing = "cubic-bezier(0.22, 1, 0.36, 1)";
-    if (dragDelta.current > 80) {
+    if (dismissible && dragDelta.current > 80) {
       sheetRef.current.style.transition = `transform 380ms ${easing}`;
       sheetRef.current.style.transform = "translateX(-50%) translateY(100%)";
-      if (onClose) setTimeout(onClose, 380);
+      setDismissing(true);
+      setTimeout(finishDismiss, 380);
     } else {
       sheetRef.current.style.transition = `transform 320ms ${easing}`;
       sheetRef.current.style.transform = "";
@@ -51,12 +68,14 @@ export function ProtocolModal({ children, onClose }: ProtocolModalProps) {
     dragDelta.current = 0;
   }
 
+  if (closed) return null;
+
   return (
     <>
       <div
         className="fixed inset-0 z-[300] bg-plum/35"
         aria-hidden="true"
-        onClick={onClose ? dismiss : undefined}
+        onClick={dismiss}
       />
 
       <div
@@ -66,7 +85,7 @@ export function ProtocolModal({ children, onClose }: ProtocolModalProps) {
         onTouchEnd={handleTouchEnd}
         className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[301] bg-canvas rounded-t-[22px] max-h-[90dvh] overflow-y-auto transition-protocol-sheet ${
           visible ? "translate-y-0" : "translate-y-full"
-        }`}
+        } ${dismissing ? "pointer-events-none" : ""}`}
       >
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full bg-border" />

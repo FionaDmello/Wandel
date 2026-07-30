@@ -20,6 +20,10 @@ interface InnerProps {
   profile: Profile;
 }
 
+function protocolKey(p: PendingProtocol): string {
+  return p.habitId ?? p.id;
+}
+
 function OrchestratorInner({ userId, profile }: InnerProps) {
   const pendingQuery = usePendingProtocols(userId);
   const existingPending = pendingQuery.data ?? [];
@@ -40,7 +44,7 @@ function OrchestratorInner({ userId, profile }: InnerProps) {
     if (isChecking || !isPendingLoaded || didSetup.current) return;
     didSetup.current = true;
 
-    const existingKeys = new Set(existingPending.map((p) => p.habitId ?? p.id));
+    const existingKeys = new Set(existingPending.map(protocolKey));
     const newOnes = detected.filter(
       (p) => !existingKeys.has(p.habitId ?? p.id),
     );
@@ -77,6 +81,7 @@ function OrchestratorInner({ userId, profile }: InnerProps) {
   if (activeProtocol.id === "engine_slip") {
     return (
       <EngineSlipModal
+        key={protocolKey(activeProtocol)}
         protocol={activeProtocol}
         userId={userId}
         onDismiss={handleDismiss}
@@ -88,6 +93,7 @@ function OrchestratorInner({ userId, profile }: InnerProps) {
   if (activeProtocol.id === "engine_drift") {
     return (
       <EngineDriftModal
+        key={protocolKey(activeProtocol)}
         protocol={activeProtocol}
         userId={userId}
         onDismiss={handleDismiss}
@@ -99,6 +105,7 @@ function OrchestratorInner({ userId, profile }: InnerProps) {
   if (activeProtocol.id === "habit_drift") {
     return (
       <HabitDriftModal
+        key={protocolKey(activeProtocol)}
         protocol={activeProtocol}
         userId={userId}
         onDismiss={handleDismiss}
