@@ -10,21 +10,35 @@ interface VariationValues {
   fullVersion: string;
 }
 
-interface VariationConfigStepProps {
+interface BaseVariationConfigStepProps {
   habitName: string;
   initialValues?: Partial<VariationValues>;
   submitLabel?: string;
-  onNext: (values: VariationValues) => void;
   onCancel?: () => void;
 }
 
-export function VariationConfigStep({
-  habitName,
-  initialValues = {},
-  submitLabel = "Next",
-  onNext,
-  onCancel,
-}: VariationConfigStepProps) {
+interface NamedVariationConfigStepProps extends BaseVariationConfigStepProps {
+  existingNames: string[];
+  onNext: (name: string, values: VariationValues) => void;
+}
+
+interface UnnamedVariationConfigStepProps extends BaseVariationConfigStepProps {
+  existingNames?: undefined;
+  onNext: (values: VariationValues) => void;
+}
+
+type VariationConfigStepProps =
+  | NamedVariationConfigStepProps
+  | UnnamedVariationConfigStepProps;
+
+export function VariationConfigStep(props: VariationConfigStepProps) {
+  const {
+    habitName,
+    initialValues = {},
+    submitLabel = "Next",
+    onCancel,
+  } = props;
+  const [name, setName] = useState("");
   const [anchor, setAnchor] = useState(initialValues.anchor ?? "");
   const [nonNegotiable, setNonNegotiable] = useState(
     initialValues.nonNegotiable ?? "",
@@ -47,12 +61,27 @@ export function VariationConfigStep({
       setError("Fill in all fields to continue.");
       return;
     }
-    onNext({
+    const values = {
       anchor: anchor.trim(),
       nonNegotiable: nonNegotiable.trim(),
       minimumVersion: minimumVersion.trim(),
       fullVersion: fullVersion.trim(),
-    });
+    };
+
+    if (props.existingNames !== undefined) {
+      const trimmedName = name.trim();
+      if (!trimmedName) {
+        setError("Give this variation a name.");
+        return;
+      }
+      if (props.existingNames.includes(trimmedName)) {
+        setError("A variation with this name already exists.");
+        return;
+      }
+      props.onNext(trimmedName, values);
+      return;
+    }
+    props.onNext(values);
   };
 
   return (
@@ -67,6 +96,23 @@ export function VariationConfigStep({
       </div>
 
       <div className="flex flex-col gap-5">
+        {props.existingNames !== undefined && (
+          <div className="flex flex-col gap-2">
+            <Label>Variation name</Label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError(null);
+              }}
+              placeholder="e.g. Yoga"
+              className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted"
+              autoFocus
+            />
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
           <Label>Anchor — when will you do this?</Label>
           <input

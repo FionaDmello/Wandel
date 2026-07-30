@@ -163,10 +163,11 @@ export function BuildConfigPanel({
 
         <VariationConfigStep
           habitName={habitName}
+          existingNames={subTypes}
           submitLabel={isAdding ? "Adding…" : "Add variation"}
-          onNext={(values) => {
+          onNext={(name, values) => {
             addSubType(
-              { habitId, subType: habitName, ...values },
+              { habitId, subType: name, ...values },
               { onSuccess: () => setView({ mode: "list" }) },
             );
           }}
