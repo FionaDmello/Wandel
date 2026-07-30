@@ -111,6 +111,7 @@ function BuildHabitContent({
               trackName: habit.name,
             }}
             userId={userId}
+            onDismiss={() => setShowSlipModal(false)}
             onComplete={() => setShowSlipModal(false)}
           />
         )}

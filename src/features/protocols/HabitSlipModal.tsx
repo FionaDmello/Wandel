@@ -23,12 +23,14 @@ export interface HabitSlipContext {
 interface HabitSlipModalProps {
   habit: HabitSlipContext;
   userId: string;
+  onDismiss: () => void;
   onComplete: () => void;
 }
 
 export function HabitSlipModal({
   habit,
   userId,
+  onDismiss,
   onComplete,
 }: HabitSlipModalProps) {
   const isBreak = habit.trackType === "break";
@@ -136,7 +138,7 @@ export function HabitSlipModal({
   };
 
   return (
-    <ProtocolModal>
+    <ProtocolModal onClose={onDismiss} dismissible={!isSaving}>
       <div className="px-6 pt-5 pb-1">
         <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
           {habit.trackName}
@@ -153,6 +155,14 @@ export function HabitSlipModal({
           <Button variant="primary" onClick={() => setPhase(2)}>
             Continue
           </Button>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+          >
+            Skip for now
+          </button>
         </div>
       )}
 
@@ -218,6 +228,14 @@ export function HabitSlipModal({
           <Button variant="primary" onClick={() => setPhase(3)}>
             Continue
           </Button>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+          >
+            Skip for now
+          </button>
         </div>
       )}
 
@@ -271,6 +289,14 @@ export function HabitSlipModal({
           >
             Continue
           </Button>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+          >
+            Skip for now
+          </button>
         </div>
       )}
 
@@ -298,6 +324,14 @@ export function HabitSlipModal({
           >
             {isSaving ? "Saving…" : "One slip is weather."}
           </Button>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+          >
+            Skip for now
+          </button>
         </div>
       )}
     </ProtocolModal>
