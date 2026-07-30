@@ -74,7 +74,11 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
         setError("Give this variation a name.");
         return;
       }
-      if (props.existingNames.includes(trimmedName)) {
+      if (
+        props.existingNames.some(
+          (existing) => existing.toLowerCase() === trimmedName.toLowerCase(),
+        )
+      ) {
         setError("A variation with this name already exists.");
         return;
       }

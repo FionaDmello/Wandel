@@ -98,6 +98,48 @@ describe("VariationConfigStep", () => {
     expect(onNext).not.toHaveBeenCalled();
   });
 
+  it("blocks submit when the name duplicates an existing variation with different casing", () => {
+    const onNext = vi.fn();
+    render(
+      <VariationConfigStep
+        habitName="Workout"
+        existingNames={["Gym", "Yoga"]}
+        onNext={onNext}
+        onCancel={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByPlaceholderText("e.g. Yoga"), {
+      target: { value: "gym" },
+    });
+    fillConfigFields();
+    fireEvent.click(screen.getByText("Next"));
+    expect(
+      screen.getByText("A variation with this name already exists."),
+    ).toBeInTheDocument();
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
+  it("blocks submit when the name duplicates the parent habit name", () => {
+    const onNext = vi.fn();
+    render(
+      <VariationConfigStep
+        habitName="Workout"
+        existingNames={["Gym", "Workout"]}
+        onNext={onNext}
+        onCancel={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByPlaceholderText("e.g. Yoga"), {
+      target: { value: "Workout" },
+    });
+    fillConfigFields();
+    fireEvent.click(screen.getByText("Next"));
+    expect(
+      screen.getByText("A variation with this name already exists."),
+    ).toBeInTheDocument();
+    expect(onNext).not.toHaveBeenCalled();
+  });
+
   it("calls onNext with the trimmed name and values when valid", () => {
     const onNext = vi.fn();
     render(
