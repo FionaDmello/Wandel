@@ -18,11 +18,12 @@ Before any implementation, always work through these layers in order. Never skip
 
 ## Branching
 
-- Until the MVP is shipped, all work stays on `main`. No feature branches.
+- Each GitHub issue gets its own branch, named `<type>/<issue-number>-<short-slug>` (e.g. `fix/11-variation-name`).
+- Open a PR back to `main` per issue rather than merging directly.
 
 ## Commit and push workflow
 
-- After each step within a phase is completed, automatically stage the relevant files, create a conventional commit, and push to `origin main`.
+- After each step within a phase is completed, automatically stage the relevant files, create a conventional commit, and push to the issue's branch (`origin <branch>`).
 - Before every push: run the build and the full test suite. If either fails, stop, fix the issue, and re-run before pushing. Never push broken code.
 - Always show the staged files and commit message before committing so the user can confirm.
 
