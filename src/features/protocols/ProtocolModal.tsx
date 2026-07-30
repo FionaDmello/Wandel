@@ -12,6 +12,7 @@ export function ProtocolModal({
   dismissible = true,
 }: ProtocolModalProps) {
   const [visible, setVisible] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
   const [closed, setClosed] = useState(false);
   const hasClosedRef = useRef(false);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,7 @@ export function ProtocolModal({
   const dismiss = useCallback(() => {
     if (!dismissible) return;
     setVisible(false);
+    setDismissing(true);
     setTimeout(finishDismiss, 380);
   }, [dismissible, finishDismiss]);
 
@@ -56,6 +58,7 @@ export function ProtocolModal({
     if (dismissible && dragDelta.current > 80) {
       sheetRef.current.style.transition = `transform 380ms ${easing}`;
       sheetRef.current.style.transform = "translateX(-50%) translateY(100%)";
+      setDismissing(true);
       setTimeout(finishDismiss, 380);
     } else {
       sheetRef.current.style.transition = `transform 320ms ${easing}`;
@@ -82,7 +85,7 @@ export function ProtocolModal({
         onTouchEnd={handleTouchEnd}
         className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[301] bg-canvas rounded-t-[22px] max-h-[90dvh] overflow-y-auto transition-protocol-sheet ${
           visible ? "translate-y-0" : "translate-y-full"
-        }`}
+        } ${dismissing ? "pointer-events-none" : ""}`}
       >
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-9 h-1 rounded-full bg-border" />

@@ -137,6 +137,48 @@ describe("ProtocolModal", () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
+  it("disables pointer events on the sheet during the closing animation after backdrop click", () => {
+    const { container } = render(
+      <ProtocolModal onClose={vi.fn()}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+    const backdrop = container.querySelector<HTMLDivElement>(".bg-plum\\/35")!;
+    const sheet = container.querySelector<HTMLDivElement>(
+      ".transition-protocol-sheet",
+    )!;
+
+    expect(sheet.className).not.toContain("pointer-events-none");
+
+    fireEvent.click(backdrop);
+
+    expect(sheet.className).toContain("pointer-events-none");
+
+    act(() => {
+      vi.advanceTimersByTime(379);
+    });
+    expect(sheet.className).toContain("pointer-events-none");
+  });
+
+  it("disables pointer events on the sheet during the closing animation after a swipe past threshold", () => {
+    const { container } = render(
+      <ProtocolModal onClose={vi.fn()}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+    const sheet = container.querySelector<HTMLDivElement>(
+      ".transition-protocol-sheet",
+    )!;
+
+    expect(sheet.className).not.toContain("pointer-events-none");
+
+    fireEvent.touchStart(sheet, { touches: [{ clientY: 0 }] });
+    fireEvent.touchMove(sheet, { touches: [{ clientY: 100 }] });
+    fireEvent.touchEnd(sheet);
+
+    expect(sheet.className).toContain("pointer-events-none");
+  });
+
   it("stays closed after rerender once dismissed", () => {
     const onClose = vi.fn();
     const { container, rerender } = render(
