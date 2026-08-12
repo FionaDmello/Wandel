@@ -628,7 +628,6 @@ export type ProfileReminder =
   Database["public"]["Tables"]["profile_reminders"]["Row"];
 export type Habit = Database["public"]["Tables"]["habits"]["Row"];
 export type HabitConfig = Database["public"]["Tables"]["habit_configs"]["Row"];
-export type EngineMark = Database["public"]["Tables"]["engine_marks"]["Row"];
 export type BreakObservation =
   Database["public"]["Tables"]["break_observations"]["Row"];
 export type BreakObservationEmotion =
