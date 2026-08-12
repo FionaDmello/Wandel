@@ -11,6 +11,10 @@ interface PanelSliderProps {
   accent: AccentColor;
 }
 
+function stopPropagation(e: React.TouchEvent<HTMLInputElement>) {
+  e.stopPropagation();
+}
+
 export function PanelSlider({
   value,
   onChange,
@@ -35,6 +39,9 @@ export function PanelSlider({
           max={10}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
+          onTouchStart={stopPropagation}
+          onTouchMove={stopPropagation}
+          onTouchEnd={stopPropagation}
           className={`panel-slider ${ACCENT_SLIDER[accent]} flex-1`}
           aria-label="Panel rating"
         />
