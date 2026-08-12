@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { DEFAULT_QUALITIES } from "@/constants/defaultQualities";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import type { SetupDraft } from "@/types/setup";
 
 interface QualitiesStepProps {
@@ -107,7 +108,7 @@ export function QualitiesStep({ values, onNext }: QualitiesStepProps) {
               }}
               onBlur={confirmCustom}
               placeholder="Type a quality"
-              className="bg-transparent border-none outline-none font-sans text-[11px] text-canvas placeholder:text-canvas/60 w-24"
+              className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} text-canvas placeholder:text-canvas/60 w-24`}
             />
           </div>
         ) : (

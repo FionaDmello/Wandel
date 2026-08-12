@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { DEFAULT_REMINDERS } from "@/constants/defaultReminders";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import type { SetupDraft } from "@/types/setup";
 
 interface RemindersStepProps {
@@ -64,7 +65,7 @@ export function RemindersStep({ values, onNext }: RemindersStepProps) {
               value={reminder}
               onChange={(e) => update(index, e.target.value)}
               rows={2}
-              className="flex-1 bg-transparent border-none outline-none resize-none font-serif italic text-[15px] text-violet leading-snug placeholder:text-muted"
+              className={`flex-1 bg-transparent border-none outline-none resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
               placeholder="Write a reminder..."
             />
             {reminders.length > 1 && (
