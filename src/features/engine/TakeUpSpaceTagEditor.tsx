@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import {
   useDeleteTag,
@@ -125,7 +126,7 @@ export function TakeUpSpaceTagEditor({
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Tag name"
-            className="w-full bg-card rounded-2xl px-4 py-3 font-sans text-[13px] text-plum placeholder:text-muted focus:outline-none"
+            className={`w-full bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
           />
           {isDuplicate && newName.trim() && (
             <span className="font-sans text-[11px] text-muted">

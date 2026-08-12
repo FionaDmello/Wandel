@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { TAKE_UP_SPACE_QUESTIONS } from "@/constants/takeUpSpaceQuestions";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useUpdateCostField } from "@/hooks/useTakeUpSpace";
@@ -53,7 +54,7 @@ export function TakeUpSpaceCostEditor({
           value={cost}
           onChange={(e) => setCost(e.target.value)}
           rows={4}
-          className="w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans text-[13px] text-plum placeholder:text-muted focus:outline-none"
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
 
         <button
