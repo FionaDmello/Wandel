@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { EMOTIONS } from "@/constants/emotions";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
 import { useLogBreakObservation } from "@/hooks/useBreakObservations";
@@ -312,7 +313,7 @@ export function HabitSlipModal({
             onChange={(e) => setProudThing(e.target.value)}
             rows={3}
             placeholder="Optional."
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none resize-none placeholder:text-muted"
+            className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none resize-none placeholder:text-muted`}
           />
 
           <Button
