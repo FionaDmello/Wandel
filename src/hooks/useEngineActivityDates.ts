@@ -57,10 +57,11 @@ export async function fetchEngineActivityDates(
 export function useEngineActivityDates(
   userId: string,
   range: { from: string; to: string },
+  options?: { enabled?: boolean },
 ) {
   return useQuery({
     queryKey: ["engine_activity_dates", userId, range.from, range.to],
     queryFn: () => fetchEngineActivityDates(userId, range),
-    enabled: !!userId,
+    enabled: (options?.enabled ?? true) && !!userId,
   });
 }

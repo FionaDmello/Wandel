@@ -29,10 +29,11 @@ export function useProtocolDetection(
   const since = format(subDays(new Date(), 10), "yyyy-MM-dd");
 
   const { data: engineActivityDates = [], isLoading: engineLoading } =
-    useEngineActivityDates(shouldDetect ? userId : "", {
-      from: since,
-      to: today,
-    });
+    useEngineActivityDates(
+      userId,
+      { from: since, to: today },
+      { enabled: shouldDetect },
+    );
 
   const hasActiveBreak = breakHabits.some((h) => h.status === "active");
   const hasActiveBuild = buildHabits.some((h) => h.status === "active");
