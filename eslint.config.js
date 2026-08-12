@@ -27,6 +27,15 @@ export default defineConfig([
       "@typescript-eslint/no-explicit-any": "error",
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "JSXOpeningElement[name.name=/^(input|textarea)$/] JSXAttribute[name.name='className'] Literal[value=/text-\\[(?:[1-9]|1[0-5])px\\]/]",
+          message:
+            "Font-size below 16px on a form control triggers iOS Safari's auto-zoom-on-focus (issue #5). Use INPUT_TEXT_SIZE from @/constants/inputClasses instead.",
+        },
+      ],
     },
   },
   {

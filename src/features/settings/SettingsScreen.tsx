@@ -8,6 +8,7 @@ import { Chip } from "@/components/ui/Chip";
 import { Divider } from "@/components/ui/Divider";
 import { Label } from "@/components/ui/Label";
 import { DEFAULT_QUALITIES } from "@/constants/defaultQualities";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import {
   useProfile,
   useProfileQualities,
@@ -128,7 +129,7 @@ function SettingsForm({
               setWhyStatement(e.target.value);
             }}
             rows={3}
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-serif italic text-[15px] text-violet leading-snug outline-none resize-none placeholder:text-muted"
+            className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug outline-none resize-none placeholder:text-muted`}
             placeholder="Why are you doing this?"
           />
         </div>
@@ -171,7 +172,7 @@ function SettingsForm({
                   }}
                   onBlur={confirmCustomQuality}
                   placeholder="Type a quality"
-                  className="bg-transparent border-none outline-none font-sans text-[11px] text-canvas placeholder:text-canvas/60 w-24"
+                  className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} text-canvas placeholder:text-canvas/60 w-24`}
                 />
               </div>
             ) : (
@@ -202,7 +203,7 @@ function SettingsForm({
                   value={reminder}
                   onChange={(e) => updateReminder(index, e.target.value)}
                   rows={1}
-                  className="flex-1 bg-transparent border-none outline-none resize-none font-serif italic text-[15px] text-violet leading-snug placeholder:text-muted"
+                  className={`flex-1 bg-transparent border-none outline-none resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
                   placeholder="Write a reminder..."
                 />
                 {reminders.length > 1 && (

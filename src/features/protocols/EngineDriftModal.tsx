@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useProfile, useProfileQualities } from "@/hooks/useProfile";
 import {
@@ -99,7 +100,7 @@ export function EngineDriftModal({
             onChange={(e) => setFreetext(e.target.value)}
             rows={2}
             placeholder="What got in the way? (optional)"
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none resize-none placeholder:text-muted"
+            className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none resize-none placeholder:text-muted`}
           />
 
           <Button variant="primary" onClick={advanceFromPhase1}>
@@ -186,7 +187,7 @@ export function EngineDriftModal({
             onChange={(e) => setForwardThing(e.target.value)}
             rows={3}
             placeholder="Optional."
-            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none resize-none placeholder:text-muted"
+            className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none resize-none placeholder:text-muted`}
           />
 
           {showCoachingSuggestion && (

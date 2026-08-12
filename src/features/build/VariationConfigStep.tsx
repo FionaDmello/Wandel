@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { isDuplicateVariationName } from "@/features/build/isDuplicateVariationName";
 
 interface VariationValues {
@@ -52,8 +53,7 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
   );
   const [error, setError] = useState<string | null>(null);
 
-  const inputClass =
-    "w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted";
+  const inputClass = `w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none placeholder:text-muted`;
 
   const handleNext = () => {
     if (

@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useAddEvidence } from "@/hooks/useSelfWorthEvidence";
 
@@ -51,7 +52,7 @@ export function EvidenceEditor({
           onChange={(e) => setTitle(e.target.value)}
           placeholder="What would you title this moment?"
           rows={1}
-          className="w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans text-[13px] text-plum placeholder:text-muted focus:outline-none"
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
 
         <textarea
@@ -59,7 +60,7 @@ export function EvidenceEditor({
           onChange={(e) => setSituation(e.target.value)}
           placeholder="What was happening?"
           rows={3}
-          className="w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans text-[13px] text-plum placeholder:text-muted focus:outline-none"
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
 
         <textarea
@@ -67,7 +68,7 @@ export function EvidenceEditor({
           onChange={(e) => setDidWell(e.target.value)}
           placeholder="What did you actually do well here?"
           rows={3}
-          className="w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans text-[13px] text-plum placeholder:text-muted focus:outline-none"
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
 
         <button
