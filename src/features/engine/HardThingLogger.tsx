@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { PanelSlider } from "@/features/engine/PanelSlider";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useLogHardThing } from "@/hooks/useHardThings";
@@ -60,7 +61,7 @@ export function HardThingLogger({
           onChange={(e) => setWhat(e.target.value)}
           placeholder="What did you show up for?"
           rows={2}
-          className="w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans text-[13px] text-plum placeholder:text-muted focus:outline-none"
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
 
         <div className="flex flex-col gap-2">
@@ -107,7 +108,7 @@ export function HardThingLogger({
           onChange={(e) => setNote(e.target.value)}
           placeholder="What made this hard — and what stays with you?"
           rows={3}
-          className="w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans text-[13px] text-plum placeholder:text-muted focus:outline-none"
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
 
         <button
