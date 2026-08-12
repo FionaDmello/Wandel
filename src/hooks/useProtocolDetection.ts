@@ -8,6 +8,7 @@ import {
 } from "@/features/protocols/detectProtocol";
 import { useBreakHabits } from "@/hooks/useBreakHabits";
 import { useBuildHabits } from "@/hooks/useBuildHabits";
+import { useEngineActivityDates } from "@/hooks/useEngineActivityDates";
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/types/database";
 import type { PendingProtocol } from "@/types/protocols";
@@ -27,19 +28,12 @@ export function useProtocolDetection(
 
   const since = format(subDays(new Date(), 10), "yyyy-MM-dd");
 
-  const { data: engineMarks = [], isLoading: engineLoading } = useQuery({
-    queryKey: ["engine_marks_recent", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("engine_marks")
-        .select("date")
-        .eq("user_id", userId)
-        .gte("date", since);
-      if (error) throw error;
-      return (data ?? []) as { date: string }[];
-    },
-    enabled: shouldDetect,
-  });
+  const { data: engineActivityDates = [], isLoading: engineLoading } =
+    useEngineActivityDates(
+      userId,
+      { from: since, to: today },
+      { enabled: shouldDetect },
+    );
 
   const hasActiveBreak = breakHabits.some((h) => h.status === "active");
   const hasActiveBuild = buildHabits.some((h) => h.status === "active");
@@ -117,7 +111,7 @@ export function useProtocolDetection(
     );
 
     const engineProtocol = detectEngineDrift(
-      new Set(engineMarks.map((m) => m.date)),
+      new Set(engineActivityDates),
       today,
     );
 
@@ -133,7 +127,7 @@ export function useProtocolDetection(
     buildHabits,
     breakObsRecent,
     buildObsRecent,
-    engineMarks,
+    engineActivityDates,
     today,
   ]);
 

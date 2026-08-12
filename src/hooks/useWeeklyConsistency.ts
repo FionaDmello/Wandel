@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, subDays } from "date-fns";
 
+import { fetchEngineActivityDates } from "@/hooks/useEngineActivityDates";
 import { supabase } from "@/lib/supabase";
 import type { WeeklyConsistencyData } from "@/types/review";
 
@@ -27,36 +28,31 @@ export function useWeeklyConsistency(userId: string, weekEnding: string) {
     queryKey: ["weekly_consistency", userId, weekEnding],
     queryFn: async (): Promise<WeeklyConsistencyData> => {
       const start = weekStart(weekEnding);
-      const [engineResult, breakResult, buildResult] = await Promise.all([
-        supabase
-          .from("engine_marks")
-          .select("date")
-          .eq("user_id", userId)
-          .gte("date", start)
-          .lte("date", weekEnding)
-          .order("date"),
-        supabase
-          .from("break_observations")
-          .select("habit_id, logged_at")
-          .eq("user_id", userId)
-          .gte("logged_at", `${start}T00:00:00`)
-          .lte("logged_at", `${weekEnding}T23:59:59`)
-          .order("logged_at"),
-        supabase
-          .from("build_observations")
-          .select("habit_id, date")
-          .eq("user_id", userId)
-          .gte("date", start)
-          .lte("date", weekEnding)
-          .order("date"),
-      ]);
+      const [engineActivityDates, breakResult, buildResult] = await Promise.all(
+        [
+          fetchEngineActivityDates(userId, { from: start, to: weekEnding }),
+          supabase
+            .from("break_observations")
+            .select("habit_id, logged_at")
+            .eq("user_id", userId)
+            .gte("logged_at", `${start}T00:00:00`)
+            .lte("logged_at", `${weekEnding}T23:59:59`)
+            .order("logged_at"),
+          supabase
+            .from("build_observations")
+            .select("habit_id, date")
+            .eq("user_id", userId)
+            .gte("date", start)
+            .lte("date", weekEnding)
+            .order("date"),
+        ],
+      );
 
-      if (engineResult.error) throw engineResult.error;
       if (breakResult.error) throw breakResult.error;
       if (buildResult.error) throw buildResult.error;
 
       return {
-        engineMarked: engineResult.data.length,
+        engineMarked: engineActivityDates.length,
         breakObsDaysByHabit: countDistinctDaysByHabit(breakResult.data),
         buildObsDaysByHabit: countDistinctDaysByHabit(buildResult.data),
       };

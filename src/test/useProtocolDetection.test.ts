@@ -21,7 +21,9 @@ vi.mock("@/lib/supabase", () => ({
     from: () => ({
       select: () => ({
         eq: () => ({
-          gte: () => Promise.resolve({ data: [], error: null }),
+          gte: () => ({
+            lte: () => Promise.resolve({ data: [], error: null }),
+          }),
         }),
       }),
     }),

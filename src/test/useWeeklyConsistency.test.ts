@@ -5,14 +5,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useWeeklyConsistency } from "@/hooks/useWeeklyConsistency";
 
-const { mockEngineOrder, mockBreakOrder, mockBuildOrder } = vi.hoisted(() => ({
-  mockEngineOrder: vi.fn(),
-  mockBreakOrder: vi.fn(),
-  mockBuildOrder: vi.fn(),
-}));
+const { mockEngineActivity, mockBreakOrder, mockBuildOrder } = vi.hoisted(
+  () => ({
+    mockEngineActivity: vi.fn(),
+    mockBreakOrder: vi.fn(),
+    mockBuildOrder: vi.fn(),
+  }),
+);
 
 vi.mock("@/lib/supabase", () => {
-  const makeBuilder = (mockOrder: ReturnType<typeof vi.fn>) => {
+  const makeOrderBuilder = (mockOrder: ReturnType<typeof vi.fn>) => {
     const b: Record<string, unknown> = {};
     b.select = () => b;
     b.eq = () => b;
@@ -21,12 +23,30 @@ vi.mock("@/lib/supabase", () => {
     b.order = mockOrder;
     return b;
   };
+  const makeEngineActivityBuilder = (mockLte: ReturnType<typeof vi.fn>) => {
+    const b: Record<string, unknown> = {};
+    b.select = () => b;
+    b.eq = () => b;
+    b.gte = () => b;
+    b.lte = mockLte;
+    return b;
+  };
+  const ENGINE_ACTIVITY_TABLES = new Set([
+    "hard_things_log",
+    "self_love_log",
+    "self_worth_evidence",
+    "take_up_space_log",
+  ]);
   return {
     supabase: {
       from: (table: string) => {
-        if (table === "engine_marks") return makeBuilder(mockEngineOrder);
-        if (table === "break_observations") return makeBuilder(mockBreakOrder);
-        return makeBuilder(mockBuildOrder);
+        if (table === "break_observations")
+          return makeOrderBuilder(mockBreakOrder);
+        if (table === "build_observations")
+          return makeOrderBuilder(mockBuildOrder);
+        if (ENGINE_ACTIVITY_TABLES.has(table))
+          return makeEngineActivityBuilder(mockEngineActivity);
+        throw new Error(`Unexpected table in test mock: ${table}`);
       },
     },
   };
@@ -42,8 +62,8 @@ function wrapper({ children }: { children: React.ReactNode }) {
 beforeEach(() => vi.clearAllMocks());
 
 describe("useWeeklyConsistency", () => {
-  it("counts engine marks for the week", async () => {
-    mockEngineOrder.mockResolvedValue({
+  it("counts distinct dates with engine panel activity for the week", async () => {
+    mockEngineActivity.mockResolvedValue({
       data: [{ date: "2026-05-11" }, { date: "2026-05-12" }],
       error: null,
     });
@@ -60,7 +80,7 @@ describe("useWeeklyConsistency", () => {
   });
 
   it("counts distinct days with break observations per habit", async () => {
-    mockEngineOrder.mockResolvedValue({ data: [], error: null });
+    mockEngineActivity.mockResolvedValue({ data: [], error: null });
     mockBreakOrder.mockResolvedValue({
       data: [
         { habit_id: "h1", logged_at: "2026-05-12T10:00:00Z" },
@@ -82,7 +102,7 @@ describe("useWeeklyConsistency", () => {
   });
 
   it("counts distinct logged dates for build observations per habit", async () => {
-    mockEngineOrder.mockResolvedValue({ data: [], error: null });
+    mockEngineActivity.mockResolvedValue({ data: [], error: null });
     mockBreakOrder.mockResolvedValue({ data: [], error: null });
     mockBuildOrder.mockResolvedValue({
       data: [
@@ -103,7 +123,7 @@ describe("useWeeklyConsistency", () => {
   });
 
   it("throws when any query errors", async () => {
-    mockEngineOrder.mockResolvedValue({
+    mockEngineActivity.mockResolvedValue({
       data: null,
       error: { message: "fail" },
     });
@@ -125,6 +145,6 @@ describe("useWeeklyConsistency", () => {
     );
 
     expect(result.current.fetchStatus).toBe("idle");
-    expect(mockEngineOrder).not.toHaveBeenCalled();
+    expect(mockEngineActivity).not.toHaveBeenCalled();
   });
 });
