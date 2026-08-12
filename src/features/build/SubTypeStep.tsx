@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import type { SubTypeConfig } from "@/hooks/useBuildHabits";
 
 interface SubTypeCardProps {
@@ -84,8 +85,7 @@ export function SubTypeStep({ habitName, onNext, onCancel }: SubTypeStepProps) {
     resetForm();
   };
 
-  const inputClass =
-    "w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none placeholder:text-muted";
+  const inputClass = `w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none placeholder:text-muted`;
 
   return (
     <ScreenWrap>

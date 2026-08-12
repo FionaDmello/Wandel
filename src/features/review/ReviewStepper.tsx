@@ -2,6 +2,7 @@ import { format, parseISO, subDays } from "date-fns";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
+import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { useSubmitWeeklyReview } from "@/hooks/useSubmitWeeklyReview";
 import { useWeeklyConsistency } from "@/hooks/useWeeklyConsistency";
 import type { Habit, StandingUpEntry } from "@/types/database";
@@ -152,8 +153,7 @@ export function ReviewStepper({
     );
   };
 
-  const TEXTAREA =
-    "w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none resize-none placeholder:text-muted";
+  const TEXTAREA = `w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none resize-none placeholder:text-muted`;
   const CANCEL =
     "font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer";
 
