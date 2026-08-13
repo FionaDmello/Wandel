@@ -25,15 +25,19 @@ export function useUpdateBreakObservation(userId: string) {
 
       if (error) throw error;
 
-      await supabase
+      const { error: deleteError } = await supabase
         .from("break_observation_emotions")
         .delete()
         .eq("observation_id", id);
 
+      if (deleteError) throw deleteError;
+
       if (emotions.length > 0) {
-        await supabase
+        const { error: emotionsError } = await supabase
           .from("break_observation_emotions")
           .insert(emotions.map((value) => ({ observation_id: id, value })));
+
+        if (emotionsError) throw emotionsError;
       }
 
       return data as BreakObservation;

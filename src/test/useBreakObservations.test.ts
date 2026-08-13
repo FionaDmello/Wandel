@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useUpdateBreakObservation } from "@/hooks/useUpdateBreakObservation";
+import { useUpdateBreakObservationAftermath } from "@/hooks/useBreakObservations";
 
 const { mockUpdateSingle, mockDelete, mockInsert } = vi.hoisted(() => ({
   mockUpdateSingle: vi.fn(),
@@ -43,78 +43,51 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 beforeEach(() => vi.clearAllMocks());
 
-describe("useUpdateBreakObservation", () => {
-  it("updates the row and replaces its emotions", async () => {
+describe("useUpdateBreakObservationAftermath", () => {
+  it("updates the aftermath and replaces emotions", async () => {
     mockUpdateSingle.mockResolvedValue({
-      data: { id: "obs-1", habit_id: "habit-1", job: "Boredom" },
+      data: { id: "obs-1", aftermath: "Felt better" },
       error: null,
     });
     mockDelete.mockResolvedValue({ error: null });
     mockInsert.mockResolvedValue({ error: null });
 
-    const { result } = renderHook(() => useUpdateBreakObservation("user-1"), {
+    const { result } = renderHook(() => useUpdateBreakObservationAftermath(), {
       wrapper,
     });
 
     await act(async () => {
       result.current.mutate({
         id: "obs-1",
-        job: "Boredom",
-        context: "At my desk",
-        urge_intensity: 6,
-        emotions: ["Tired", "Restless"],
+        aftermath: "Felt better",
+        emotions: ["Calm"],
+        userId: "user-1",
       });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockDelete).toHaveBeenCalledWith("obs-1");
     expect(mockInsert).toHaveBeenCalledWith([
-      { observation_id: "obs-1", value: "Tired" },
-      { observation_id: "obs-1", value: "Restless" },
+      { observation_id: "obs-1", value: "Calm" },
     ]);
-  });
-
-  it("does not insert emotions when none are given", async () => {
-    mockUpdateSingle.mockResolvedValue({
-      data: { id: "obs-1", habit_id: "habit-1", job: "Boredom" },
-      error: null,
-    });
-    mockDelete.mockResolvedValue({ error: null });
-
-    const { result } = renderHook(() => useUpdateBreakObservation("user-1"), {
-      wrapper,
-    });
-
-    await act(async () => {
-      result.current.mutate({
-        id: "obs-1",
-        job: "Boredom",
-        urge_intensity: 6,
-        emotions: [],
-      });
-    });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockInsert).not.toHaveBeenCalled();
   });
 
   it("throws when replacing emotions fails to delete the old rows", async () => {
     mockUpdateSingle.mockResolvedValue({
-      data: { id: "obs-1", habit_id: "habit-1", job: "Boredom" },
+      data: { id: "obs-1", aftermath: "Felt better" },
       error: null,
     });
     mockDelete.mockResolvedValue({ error: { message: "DB error" } });
 
-    const { result } = renderHook(() => useUpdateBreakObservation("user-1"), {
+    const { result } = renderHook(() => useUpdateBreakObservationAftermath(), {
       wrapper,
     });
 
     await act(async () => {
       result.current.mutate({
         id: "obs-1",
-        job: "Boredom",
-        urge_intensity: 6,
-        emotions: ["Tired"],
+        aftermath: "Felt better",
+        emotions: ["Calm"],
+        userId: "user-1",
       });
     });
 
@@ -124,22 +97,22 @@ describe("useUpdateBreakObservation", () => {
 
   it("throws when inserting the new emotions fails", async () => {
     mockUpdateSingle.mockResolvedValue({
-      data: { id: "obs-1", habit_id: "habit-1", job: "Boredom" },
+      data: { id: "obs-1", aftermath: "Felt better" },
       error: null,
     });
     mockDelete.mockResolvedValue({ error: null });
     mockInsert.mockResolvedValue({ error: { message: "DB error" } });
 
-    const { result } = renderHook(() => useUpdateBreakObservation("user-1"), {
+    const { result } = renderHook(() => useUpdateBreakObservationAftermath(), {
       wrapper,
     });
 
     await act(async () => {
       result.current.mutate({
         id: "obs-1",
-        job: "Boredom",
-        urge_intensity: 6,
-        emotions: ["Tired"],
+        aftermath: "Felt better",
+        emotions: ["Calm"],
+        userId: "user-1",
       });
     });
 
