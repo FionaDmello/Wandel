@@ -125,7 +125,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
 
       <div className="flex items-center justify-center gap-4 px-4 pt-2 pb-1">
         <div className="flex items-center gap-1.5">
-          <span className="w-[5px] h-[5px] rounded-full bg-amber" />
+          <span className="w-[5px] h-[5px] rounded-full bg-gold" />
           <span className="font-sans text-[10px] text-muted">Engine</span>
         </div>
         <div className="flex items-center gap-1.5">
