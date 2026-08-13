@@ -82,7 +82,40 @@ describe("BuildJournal", () => {
     expect(mockNavigate).toHaveBeenCalledWith({
       to: "/build/$habitId/log",
       params: { habitId: "habit-1" },
-      search: { date: "2026-05-14" },
+      search: { date: "2026-05-14", subType: "Reading" },
+    });
+  });
+
+  it("passes no subType when editing an entry with no variation", () => {
+    vi.mocked(useBuildHabitObservations).mockReturnValue({
+      data: [
+        {
+          id: "obs-1",
+          user_id: "user-1",
+          habit_id: "habit-1",
+          date: "2026-05-14",
+          sub_type: null,
+          mark_type: "full",
+          mark_label: "Full",
+          note: null,
+        },
+      ],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useBuildHabitObservations>);
+    vi.mocked(useBuildSlipEvents).mockReturnValue({
+      data: [],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useBuildSlipEvents>);
+
+    render(<BuildJournal userId="user-1" habitId="habit-1" />, { wrapper });
+
+    fireEvent.click(screen.getByText("Full"));
+    fireEvent.click(screen.getByText("Edit"));
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: "/build/$habitId/log",
+      params: { habitId: "habit-1" },
+      search: { date: "2026-05-14", subType: undefined },
     });
   });
 

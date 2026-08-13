@@ -83,7 +83,10 @@ export function BuildJournal({ userId, habitId }: BuildJournalProps) {
                   navigate({
                     to: "/build/$habitId/log",
                     params: { habitId },
-                    search: { date: day.date },
+                    search: {
+                      date: day.date,
+                      subType: o.sub_type ?? undefined,
+                    },
                   })
                 }
                 className="font-sans text-[11px] font-medium text-amber text-left bg-transparent border-none cursor-pointer pt-1"

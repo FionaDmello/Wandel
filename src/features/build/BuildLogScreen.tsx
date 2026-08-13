@@ -15,12 +15,14 @@ interface BuildLogContentProps {
   userId: string;
   habit: HabitWithConfigs;
   logDate?: string;
+  subType?: string;
 }
 
 function BuildLogContent({
   userId,
   habit,
   logDate: initialLogDate,
+  subType,
 }: BuildLogContentProps) {
   const [logDate, setLogDate] = useState(
     initialLogDate ?? format(new Date(), "yyyy-MM-dd"),
@@ -59,6 +61,7 @@ function BuildLogContent({
               habitName={habit.name}
               configs={habit.configs ?? []}
               date={logDate}
+              initialSubType={subType}
             />
           </>
         ) : (
@@ -73,7 +76,10 @@ function BuildLogContent({
 
 export function BuildLogScreen() {
   const { habitId } = useParams({ strict: false });
-  const search = useSearch({ strict: false }) as { date?: string };
+  const search = useSearch({ strict: false }) as {
+    date?: string;
+    subType?: string;
+  };
   const { session, loading } = useSession();
   const userId = session?.user.id ?? "";
   const habitQuery = useBuildHabit(userId, habitId ?? "");
@@ -103,6 +109,7 @@ export function BuildLogScreen() {
       userId={userId}
       habit={habitQuery.data}
       logDate={search.date}
+      subType={search.subType}
     />
   );
 }

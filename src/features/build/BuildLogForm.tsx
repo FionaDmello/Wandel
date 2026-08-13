@@ -181,6 +181,7 @@ interface BuildLogFormProps {
   habitName: string;
   configs: HabitConfig[];
   date?: string;
+  initialSubType?: string;
 }
 
 export function BuildLogForm({
@@ -189,12 +190,15 @@ export function BuildLogForm({
   habitName,
   configs,
   date,
+  initialSubType,
 }: BuildLogFormProps) {
   const safeConfigs = configs ?? [];
   const subTypes = getSubTypes(safeConfigs);
   const hasSubTypes = subTypes.length > 0;
 
-  const [selectedSubType, setSelectedSubType] = useState<string | null>(null);
+  const [selectedSubType, setSelectedSubType] = useState<string | null>(
+    initialSubType ?? null,
+  );
 
   const todayObsQuery = useHabitDayObservations(userId, habitId, date);
   const todayObs = todayObsQuery.data ?? [];
