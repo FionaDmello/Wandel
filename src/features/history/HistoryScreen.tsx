@@ -11,6 +11,7 @@ import {
 } from "@/hooks/useMonthData";
 import { useSession } from "@/hooks/useSession";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
+import { useSyncBreakStandingUp } from "@/hooks/useSyncBreakStandingUp";
 import type { StandingUpEntry } from "@/types/database";
 
 import { CalendarGrid } from "./CalendarGrid";
@@ -34,6 +35,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
   const breakHabitsQuery = useBreakHabits(userId);
   const buildHabitsQuery = useBuildHabits(userId);
   const allStandingUpQuery = useAllStandingUpEntries(userId);
+  useSyncBreakStandingUp(userId);
 
   const engineActivitySet = new Set(engineActivityQuery.data ?? []);
   const breakObs = breakObsQuery.data ?? [];
