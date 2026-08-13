@@ -5,10 +5,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useWeeklyConsistency } from "@/hooks/useWeeklyConsistency";
 
-const { mockEngineActivity, mockBreakOrder, mockBuildOrder } = vi.hoisted(
+const { mockEngineActivity, mockBreakSlipOrder, mockBuildOrder } = vi.hoisted(
   () => ({
     mockEngineActivity: vi.fn(),
-    mockBreakOrder: vi.fn(),
+    mockBreakSlipOrder: vi.fn(),
     mockBuildOrder: vi.fn(),
   }),
 );
@@ -40,8 +40,8 @@ vi.mock("@/lib/supabase", () => {
   return {
     supabase: {
       from: (table: string) => {
-        if (table === "break_observations")
-          return makeOrderBuilder(mockBreakOrder);
+        if (table === "slip_drift_log")
+          return makeOrderBuilder(mockBreakSlipOrder);
         if (table === "build_observations")
           return makeOrderBuilder(mockBuildOrder);
         if (ENGINE_ACTIVITY_TABLES.has(table))
@@ -67,7 +67,7 @@ describe("useWeeklyConsistency", () => {
       data: [{ date: "2026-05-11" }, { date: "2026-05-12" }],
       error: null,
     });
-    mockBreakOrder.mockResolvedValue({ data: [], error: null });
+    mockBreakSlipOrder.mockResolvedValue({ data: [], error: null });
     mockBuildOrder.mockResolvedValue({ data: [], error: null });
 
     const { result } = renderHook(
@@ -79,14 +79,15 @@ describe("useWeeklyConsistency", () => {
     expect(result.current.data?.engineMarked).toBe(2);
   });
 
-  it("counts distinct days with break observations per habit", async () => {
+  it("counts distinct days with break slips per habit", async () => {
     mockEngineActivity.mockResolvedValue({ data: [], error: null });
-    mockBreakOrder.mockResolvedValue({
+    mockBreakSlipOrder.mockResolvedValue({
       data: [
-        { habit_id: "h1", logged_at: "2026-05-12T10:00:00Z" },
-        { habit_id: "h1", logged_at: "2026-05-12T14:00:00Z" }, // same day — counts once
-        { habit_id: "h1", logged_at: "2026-05-13T09:00:00Z" },
-        { habit_id: "h2", logged_at: "2026-05-11T08:00:00Z" },
+        { habit_id: "h1", triggered_at: "2026-05-12T10:00:00Z" },
+        { habit_id: "h1", triggered_at: "2026-05-12T14:00:00Z" }, // same day — counts once
+        { habit_id: "h1", triggered_at: "2026-05-13T09:00:00Z" },
+        { habit_id: "h2", triggered_at: "2026-05-11T08:00:00Z" },
+        { habit_id: null, triggered_at: "2026-05-11T09:00:00Z" },
       ],
       error: null,
     });
@@ -103,7 +104,7 @@ describe("useWeeklyConsistency", () => {
 
   it("counts distinct logged dates for build observations per habit", async () => {
     mockEngineActivity.mockResolvedValue({ data: [], error: null });
-    mockBreakOrder.mockResolvedValue({ data: [], error: null });
+    mockBreakSlipOrder.mockResolvedValue({ data: [], error: null });
     mockBuildOrder.mockResolvedValue({
       data: [
         { habit_id: "h3", date: "2026-05-12" },
@@ -127,7 +128,7 @@ describe("useWeeklyConsistency", () => {
       data: null,
       error: { message: "fail" },
     });
-    mockBreakOrder.mockResolvedValue({ data: [], error: null });
+    mockBreakSlipOrder.mockResolvedValue({ data: [], error: null });
     mockBuildOrder.mockResolvedValue({ data: [], error: null });
 
     const { result } = renderHook(
