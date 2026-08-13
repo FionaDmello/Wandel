@@ -2,17 +2,12 @@ import { format, parseISO } from "date-fns";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
+import { formatGapLabel } from "@/features/history/formatGapLabel";
 import type { StandingUpEntry } from "@/types/database";
 
 interface StandingUpSectionProps {
   trackName: string;
   entries: StandingUpEntry[];
-}
-
-function formatGapLabel(gapDays: number): string {
-  if (gapDays === 0) return "Same day";
-  if (gapDays === 1) return "Next morning";
-  return `${gapDays} days`;
 }
 
 function buildSummary(entries: StandingUpEntry[]): string {
