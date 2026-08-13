@@ -70,8 +70,8 @@ export function DaySheet({
           {/* Engine */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose shrink-0" />
-              <p className="font-sans text-[11px] font-medium text-rose uppercase tracking-[0.08em]">
+              <span className="w-2 h-2 rounded-full bg-blue shrink-0" />
+              <p className="font-sans text-[11px] font-medium text-blue uppercase tracking-[0.08em]">
                 Engine
               </p>
             </div>
@@ -88,7 +88,7 @@ export function DaySheet({
                   <button
                     type="button"
                     onClick={goToEngine}
-                    className="font-sans text-[11px] font-medium text-rose bg-transparent border-none cursor-pointer"
+                    className="font-sans text-[11px] font-medium text-blue bg-transparent border-none cursor-pointer"
                   >
                     Go to Engine →
                   </button>
