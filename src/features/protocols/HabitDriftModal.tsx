@@ -1,12 +1,9 @@
-import { format, subDays } from "date-fns";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
-import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
-import { useLogStandingUp } from "@/hooks/useStandingUpLog";
 import type { PendingProtocol } from "@/types/protocols";
 
 type Phase = 1 | 2 | 3;
@@ -32,7 +29,6 @@ export function HabitDriftModal({
   const [selectedCause, setSelectedCause] = useState<CauseCategory | null>(
     null,
   );
-  const [isSaving, setIsSaving] = useState(false);
 
   const { data: buildHabit } = useBuildHabit(
     userId,
@@ -44,9 +40,6 @@ export function HabitDriftModal({
     buildConfigs.find(
       (c) => c.key === "non_negotiable" && c.sub_type === null,
     ) ?? buildConfigs.find((c) => c.key === "non_negotiable");
-
-  const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
-  const { mutateAsync: logStandingUp } = useLogStandingUp(userId);
 
   const causeAdjustment =
     selectedCause === "distress_tolerance"
@@ -61,47 +54,8 @@ export function HabitDriftModal({
     setSelectedCause((prev) => (prev === cause ? null : cause));
   };
 
-  const handleComplete = async () => {
-    setIsSaving(true);
-    const today = format(new Date(), "yyyy-MM-dd");
-
-    try {
-      if (isBreak) {
-        await Promise.all([
-          logSlipDrift({
-            track_type: "break",
-            type: "drift",
-            habit_id: protocol.habitId,
-            cause_category: selectedCause,
-            protocol_completed: true,
-          }),
-          logStandingUp({
-            track_type: "break",
-            track_name: protocol.trackName,
-            protocol: "drift",
-            habit_id: protocol.habitId,
-            gap_days: driftDays,
-            fall_date: format(subDays(new Date(), driftDays), "yyyy-MM-dd"),
-            return_date: today,
-          }),
-        ]);
-      } else {
-        await logSlipDrift({
-          track_type: "build",
-          type: "drift",
-          habit_id: protocol.habitId,
-          cause_category: selectedCause,
-          protocol_completed: true,
-        });
-      }
-      onComplete();
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
-    <ProtocolModal onClose={onDismiss} dismissible={!isSaving}>
+    <ProtocolModal onClose={onDismiss}>
       <div className="px-6 pt-5 pb-1">
         <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
           {protocol.trackName}
@@ -195,14 +149,8 @@ export function HabitDriftModal({
             </>
           )}
 
-          <Button
-            variant="accent"
-            onClick={() => {
-              void handleComplete();
-            }}
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving…" : "I am returning."}
+          <Button variant="accent" onClick={onComplete}>
+            I am returning.
           </Button>
 
           <button

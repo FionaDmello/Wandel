@@ -279,7 +279,14 @@ export interface Database {
           gap_days: number;
           protocol: "slip" | "drift";
         };
-        Update: Record<string, never>;
+        Update: {
+          track_type?: "engine" | "break" | "build";
+          track_name?: string;
+          fall_date?: string;
+          return_date?: string;
+          gap_days?: number;
+          protocol?: "slip" | "drift";
+        };
         Relationships: [];
       };
       weekly_reviews: {

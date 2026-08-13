@@ -12,21 +12,23 @@ import {
 } from "vitest";
 
 import { useProtocolDetection } from "@/hooks/useProtocolDetection";
-import type { Profile } from "@/types/database";
+import type { HabitWithConfigs, Profile } from "@/types/database";
 
 vi.mock("@/hooks/useBreakHabits");
 vi.mock("@/hooks/useBuildHabits");
+
+const { mockFrom } = vi.hoisted(() => ({ mockFrom: vi.fn() }));
+
 vi.mock("@/lib/supabase", () => ({
   supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          gte: () => ({
-            lte: () => Promise.resolve({ data: [], error: null }),
-          }),
-        }),
-      }),
-    }),
+    from: (table: string) => {
+      mockFrom(table);
+      const builder: Record<string, unknown> = {};
+      builder.select = () => builder;
+      builder.eq = () => builder;
+      builder.gte = () => Promise.resolve({ data: [], error: null });
+      return builder;
+    },
   },
 }));
 
@@ -45,6 +47,23 @@ function makeProfile(overrides: Partial<Profile> = {}): Profile {
     last_protocol_check: null,
     created_at: "",
     updated_at: "",
+    ...overrides,
+  };
+}
+
+function makeBreakHabit(
+  overrides: Partial<HabitWithConfigs> = {},
+): HabitWithConfigs {
+  return {
+    id: "break-1",
+    user_id: "user-1",
+    category: "break",
+    name: "Smoking",
+    status: "active",
+    paused_at: null,
+    sort_order: 0,
+    created_at: "",
+    configs: [],
     ...overrides,
   };
 }
@@ -108,5 +127,18 @@ describe("useProtocolDetection", () => {
 
     expect(result.current.detected).toEqual([]);
     expect(result.current.isChecking).toBe(false);
+  });
+
+  it("queries slip_drift_log (not break_observations) for the break drift signal", () => {
+    const profile = makeProfile({ last_protocol_check: null });
+    vi.mocked(useBreakHabits).mockReturnValue({
+      data: [makeBreakHabit()],
+      isSuccess: true,
+    } as unknown as ReturnType<typeof useBreakHabits>);
+
+    renderHook(() => useProtocolDetection("user-1", profile), { wrapper });
+
+    expect(mockFrom).toHaveBeenCalledWith("slip_drift_log");
+    expect(mockFrom).not.toHaveBeenCalledWith("break_observations");
   });
 });

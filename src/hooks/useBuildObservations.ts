@@ -1,13 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { differenceInDays, format } from "date-fns";
+import { addDays, differenceInDays, format, parseISO } from "date-fns";
 
 import { supabase } from "@/lib/supabase";
-import type {
-  BuildObservation,
-  MarkType,
-  ProtocolType,
-  TrackType,
-} from "@/types/database";
+import type { BuildObservation, MarkType } from "@/types/database";
 
 export function useBuildObservation(
   userId: string,
@@ -102,32 +97,36 @@ export function useUpsertBuildObservation(userId: string) {
       });
 
       try {
-        // Write deferred standing_up_log for build habit slips/drifts
-        const { data: recentSlip } = await supabase
-          .from("slip_drift_log")
-          .select("triggered_at, track_type, type")
+        // Standing up is derived from real logged gaps, never from the
+        // decorative "I am returning" drift acknowledgment.
+        const { data: previous } = await supabase
+          .from("build_observations")
+          .select("date")
           .eq("user_id", userId)
           .eq("habit_id", data.habit_id)
-          .in("type", ["slip", "drift"])
-          .order("triggered_at", { ascending: false })
+          .lt("date", data.date)
+          .order("date", { ascending: false })
           .limit(1)
           .maybeSingle();
 
-        if (!recentSlip) return;
+        if (!previous) return;
 
-        const fallDate = recentSlip.triggered_at.slice(0, 10);
+        const fallDate = format(
+          addDays(parseISO(previous.date), 1),
+          "yyyy-MM-dd",
+        );
         if (fallDate >= data.date) return;
 
         const { data: existing } = await supabase
           .from("standing_up_log")
-          .select("id")
+          .select("id, return_date")
           .eq("user_id", userId)
           .eq("habit_id", data.habit_id)
-          .gte("return_date", fallDate)
-          .limit(1)
+          .eq("fall_date", fallDate)
           .maybeSingle();
 
-        if (existing) return;
+        // A row already fully covering this episode — nothing to do.
+        if (existing && existing.return_date >= data.date) return;
 
         const { data: habit } = await supabase
           .from("habits")
@@ -137,16 +136,38 @@ export function useUpsertBuildObservation(userId: string) {
 
         if (!habit) return;
 
-        await supabase.from("standing_up_log").insert({
-          user_id: userId,
-          habit_id: data.habit_id,
-          track_type: recentSlip.track_type as TrackType,
-          track_name: habit.name,
-          protocol: recentSlip.type as ProtocolType,
-          fall_date: fallDate,
-          return_date: data.date,
-          gap_days: differenceInDays(new Date(data.date), new Date(fallDate)),
-        });
+        const gapDays = differenceInDays(
+          parseISO(data.date),
+          parseISO(fallDate),
+        );
+        const protocol: "slip" | "drift" = gapDays === 1 ? "slip" : "drift";
+
+        if (existing) {
+          // A stale row for this fall date, written before this fix shipped —
+          // correct it in place rather than leaving it silently wrong.
+          await supabase
+            .from("standing_up_log")
+            .update({
+              track_type: "build",
+              track_name: habit.name,
+              protocol,
+              fall_date: fallDate,
+              return_date: data.date,
+              gap_days: gapDays,
+            })
+            .eq("id", existing.id);
+        } else {
+          await supabase.from("standing_up_log").insert({
+            user_id: userId,
+            habit_id: data.habit_id,
+            track_type: "build",
+            track_name: habit.name,
+            protocol,
+            fall_date: fallDate,
+            return_date: data.date,
+            gap_days: gapDays,
+          });
+        }
 
         queryClient.invalidateQueries({
           queryKey: ["standing_up_log", userId],

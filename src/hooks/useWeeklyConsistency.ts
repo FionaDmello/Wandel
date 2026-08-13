@@ -32,12 +32,14 @@ export function useWeeklyConsistency(userId: string, weekEnding: string) {
         [
           fetchEngineActivityDates(userId, { from: start, to: weekEnding }),
           supabase
-            .from("break_observations")
-            .select("habit_id, logged_at")
+            .from("slip_drift_log")
+            .select("habit_id, triggered_at")
             .eq("user_id", userId)
-            .gte("logged_at", `${start}T00:00:00`)
-            .lte("logged_at", `${weekEnding}T23:59:59`)
-            .order("logged_at"),
+            .eq("track_type", "break")
+            .eq("type", "slip")
+            .gte("triggered_at", `${start}T00:00:00`)
+            .lte("triggered_at", `${weekEnding}T23:59:59`)
+            .order("triggered_at"),
           supabase
             .from("build_observations")
             .select("habit_id, date")
@@ -51,9 +53,18 @@ export function useWeeklyConsistency(userId: string, weekEnding: string) {
       if (breakResult.error) throw breakResult.error;
       if (buildResult.error) throw buildResult.error;
 
+      const breakSlipRows = (
+        breakResult.data as { habit_id: string | null; triggered_at: string }[]
+      )
+        .filter((r) => r.habit_id !== null)
+        .map((r) => ({
+          habit_id: r.habit_id as string,
+          logged_at: r.triggered_at,
+        }));
+
       return {
         engineMarked: engineActivityDates.length,
-        breakObsDaysByHabit: countDistinctDaysByHabit(breakResult.data),
+        breakObsDaysByHabit: countDistinctDaysByHabit(breakSlipRows),
         buildObsDaysByHabit: countDistinctDaysByHabit(buildResult.data),
       };
     },
