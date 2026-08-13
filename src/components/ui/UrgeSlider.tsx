@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { stopPropagation } from "@/lib/stopPropagation";
+
 interface UrgeSliderProps {
   value: number;
   onChange: (value: number) => void;
@@ -29,6 +31,9 @@ export function UrgeSlider({ value, onChange }: UrgeSliderProps) {
         max={10}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
+        onTouchStart={stopPropagation}
+        onTouchMove={stopPropagation}
+        onTouchEnd={stopPropagation}
         className="urge-slider w-full"
         aria-label="Urge intensity"
       />

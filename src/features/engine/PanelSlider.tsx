@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 
 import type { AccentColor } from "@/constants/accentClasses";
 import { ACCENT_SLIDER, ACCENT_TEXT } from "@/constants/accentClasses";
+import { stopPropagation } from "@/lib/stopPropagation";
 
 interface PanelSliderProps {
   value: number;
@@ -9,10 +10,6 @@ interface PanelSliderProps {
   anchorLow: string;
   anchorHigh: string;
   accent: AccentColor;
-}
-
-function stopPropagation(e: React.TouchEvent<HTMLInputElement>) {
-  e.stopPropagation();
 }
 
 export function PanelSlider({
