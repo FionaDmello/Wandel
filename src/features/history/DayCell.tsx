@@ -40,7 +40,7 @@ export function DayCell({
       </span>
       <div className="flex flex-wrap justify-center gap-[3px]">
         {hasEngineActivity && (
-          <span className="w-[5px] h-[5px] rounded-full bg-amber" />
+          <span className="w-[5px] h-[5px] rounded-full bg-blue" />
         )}
         {Array.from({ length: breakCount }).map((_, i) => (
           <span key={i} className="w-[5px] h-[5px] rounded-full bg-teal" />
