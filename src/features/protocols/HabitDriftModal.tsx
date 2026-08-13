@@ -1,4 +1,3 @@
-import { format, subDays } from "date-fns";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
@@ -6,7 +5,6 @@ import { Chip } from "@/components/ui/Chip";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
 import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
-import { useLogStandingUp } from "@/hooks/useStandingUpLog";
 import type { PendingProtocol } from "@/types/protocols";
 
 type Phase = 1 | 2 | 3;
@@ -46,7 +44,6 @@ export function HabitDriftModal({
     ) ?? buildConfigs.find((c) => c.key === "non_negotiable");
 
   const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
-  const { mutateAsync: logStandingUp } = useLogStandingUp(userId);
 
   const causeAdjustment =
     selectedCause === "distress_tolerance"
@@ -63,37 +60,15 @@ export function HabitDriftModal({
 
   const handleComplete = async () => {
     setIsSaving(true);
-    const today = format(new Date(), "yyyy-MM-dd");
 
     try {
-      if (isBreak) {
-        await Promise.all([
-          logSlipDrift({
-            track_type: "break",
-            type: "drift",
-            habit_id: protocol.habitId,
-            cause_category: selectedCause,
-            protocol_completed: true,
-          }),
-          logStandingUp({
-            track_type: "break",
-            track_name: protocol.trackName,
-            protocol: "drift",
-            habit_id: protocol.habitId,
-            gap_days: driftDays,
-            fall_date: format(subDays(new Date(), driftDays), "yyyy-MM-dd"),
-            return_date: today,
-          }),
-        ]);
-      } else {
-        await logSlipDrift({
-          track_type: "build",
-          type: "drift",
-          habit_id: protocol.habitId,
-          cause_category: selectedCause,
-          protocol_completed: true,
-        });
-      }
+      await logSlipDrift({
+        track_type: isBreak ? "break" : "build",
+        type: "drift",
+        habit_id: protocol.habitId,
+        cause_category: selectedCause,
+        protocol_completed: true,
+      });
       onComplete();
     } finally {
       setIsSaving(false);

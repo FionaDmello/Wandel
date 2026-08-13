@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
@@ -9,7 +8,6 @@ import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
 import { useLogBreakObservation } from "@/hooks/useBreakObservations";
 import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
-import { useLogStandingUp } from "@/hooks/useStandingUpLog";
 import type { TrackType } from "@/types/database";
 
 type Phase = 1 | 2 | 3 | 4;
@@ -55,7 +53,6 @@ export function HabitSlipModal({
 
   const { mutateAsync: logBreakObservation } = useLogBreakObservation(userId);
   const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
-  const { mutateAsync: logStandingUp } = useLogStandingUp(userId);
 
   const toggleEmotion = (e: string) =>
     setSelectedEmotions((prev) =>
@@ -89,7 +86,6 @@ export function HabitSlipModal({
 
   const handleComplete = async () => {
     setIsSaving(true);
-    const today = format(new Date(), "yyyy-MM-dd");
     const emotionText = selectedEmotions.join(", ") || null;
 
     try {
@@ -109,15 +105,6 @@ export function HabitSlipModal({
             emotional_state_before: emotionText,
             all_or_nothing_stage: selectedStage,
             protocol_completed: true,
-          }),
-          logStandingUp({
-            track_type: "break",
-            track_name: habit.trackName,
-            protocol: "slip",
-            habit_id: habit.habitId,
-            gap_days: 0,
-            fall_date: today,
-            return_date: today,
           }),
         ]);
       } else {
