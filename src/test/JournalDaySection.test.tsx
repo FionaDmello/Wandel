@@ -6,7 +6,7 @@ import { JournalDaySection } from "@/features/journal/JournalDaySection";
 describe("JournalDaySection", () => {
   it("hides the detail until expanded", () => {
     render(
-      <JournalDaySection summary="Full · Reading">
+      <JournalDaySection summary="Full · Reading" dotClassName="bg-amber">
         <p>The detail</p>
       </JournalDaySection>,
     );
@@ -21,7 +21,7 @@ describe("JournalDaySection", () => {
 
   it("collapses again on a second click", () => {
     render(
-      <JournalDaySection summary="Full · Reading">
+      <JournalDaySection summary="Full · Reading" dotClassName="bg-amber">
         <p>The detail</p>
       </JournalDaySection>,
     );

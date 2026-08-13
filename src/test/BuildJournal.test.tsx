@@ -132,7 +132,7 @@ describe("BuildJournal", () => {
           triggered_at: "2026-05-12T00:00:00Z",
           cause_category: "logistics",
           emotional_state_before: "Tired",
-          all_or_nothing_stage: null,
+          all_or_nothing_stage: "at_the_slip",
         },
         {
           id: "slip-2",
@@ -151,7 +151,12 @@ describe("BuildJournal", () => {
     expect(screen.getAllByText("Slipped")).toHaveLength(1);
     fireEvent.click(screen.getByText("Slipped"));
 
+    expect(screen.getByText("What was unavailable:")).toBeInTheDocument();
+    expect(screen.getByText("Logistics")).toBeInTheDocument();
+    expect(screen.getByText("Feeling before:")).toBeInTheDocument();
     expect(screen.getByText("Tired")).toBeInTheDocument();
+    expect(screen.getByText("Where you were:")).toBeInTheDocument();
+    expect(screen.getByText("Just this slip")).toBeInTheDocument();
   });
 
   it("shows a standing-up-only day with no observation or slip", () => {
@@ -183,6 +188,11 @@ describe("BuildJournal", () => {
 
     render(<BuildJournal userId="user-1" habitId="habit-1" />, { wrapper });
 
-    expect(screen.getByText("Stood up — 3 days")).toBeInTheDocument();
+    expect(screen.getByText("Stood up · 3 days")).toBeInTheDocument();
+    expect(screen.queryByText("10 May → 13 May")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Stood up · 3 days"));
+
+    expect(screen.getByText("10 May → 13 May")).toBeInTheDocument();
   });
 });

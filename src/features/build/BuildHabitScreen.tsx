@@ -3,7 +3,7 @@ import { ArrowLeft, Settings } from "lucide-react";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
-import { Button } from "@/components/ui/Button";
+import { Divider } from "@/components/ui/Divider";
 import { PausedBanner } from "@/features/break/PausedBanner";
 import { BuildJournal } from "@/features/build/BuildJournal";
 import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
@@ -76,24 +76,36 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
 
         {habit.status === "active" && (
           <>
-            <div className="flex flex-col gap-3">
-              <Button variant="primary" onClick={() => setShowSlipModal(true)}>
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowSlipModal(true)}
+                className="bg-amber text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
+              >
                 I slipped
-              </Button>
-              <Button
-                variant="primary"
+              </button>
+              <button
+                type="button"
                 onClick={() =>
                   navigate({
                     to: "/build/$habitId/log",
                     params: { habitId: habit.id },
                   })
                 }
+                className="bg-amber text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
               >
                 Log today's effort
-              </Button>
+              </button>
             </div>
 
-            <BuildJournal userId={userId} habitId={habit.id} />
+            <Divider className="my-0" />
+
+            <div className="flex flex-col gap-3">
+              <p className="font-serif italic text-[16px] text-plum leading-snug">
+                Your log
+              </p>
+              <BuildJournal userId={userId} habitId={habit.id} />
+            </div>
           </>
         )}
 

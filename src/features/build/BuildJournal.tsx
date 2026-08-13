@@ -1,6 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 
+import {
+  ALL_OR_NOTHING_STAGE_LABELS,
+  CAUSE_CATEGORY_LABELS,
+} from "@/constants/slipLabels";
 import { formatGapLabel } from "@/features/history/formatGapLabel";
 import { JournalDaySection } from "@/features/journal/JournalDaySection";
 import { mergeJournalEntries } from "@/features/journal/mergeJournalEntries";
@@ -55,7 +59,7 @@ export function BuildJournal({ userId, habitId }: BuildJournalProps) {
 
   if (days.length === 0) {
     return (
-      <p className="font-sans text-[13px] text-muted text-center py-8">
+      <p className="font-serif italic text-[15px] text-muted text-center py-10">
         Nothing logged yet.
       </p>
     );
@@ -64,14 +68,30 @@ export function BuildJournal({ userId, habitId }: BuildJournalProps) {
   return (
     <div className="flex flex-col gap-4">
       {days.map((day) => (
-        <div key={day.date} className="flex flex-col gap-2">
-          <p className="font-sans text-[11px] font-medium text-muted uppercase tracking-[0.08em]">
+        <div
+          key={day.date}
+          className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-amber px-5 py-4"
+        >
+          <p className="font-serif text-[16px] font-semibold leading-snug text-plum">
             {format(parseISO(day.date), "EEEE, d MMMM")}
           </p>
+
+          {day.standingUp && (
+            <JournalDaySection
+              dotClassName="bg-teal"
+              summary={`Stood up · ${formatGapLabel(day.standingUp.gap_days)}`}
+            >
+              <p className="font-sans text-[12px] text-muted">
+                {format(parseISO(day.standingUp.fall_date), "d MMM")} →{" "}
+                {format(parseISO(day.standingUp.return_date), "d MMM")}
+              </p>
+            </JournalDaySection>
+          )}
 
           {day.observations.map((o) => (
             <JournalDaySection
               key={o.id}
+              dotClassName="bg-amber"
               summary={`${o.sub_type ? `${o.sub_type} · ` : ""}${o.mark_label}`}
             >
               {o.note && (
@@ -97,32 +117,40 @@ export function BuildJournal({ userId, habitId }: BuildJournalProps) {
           ))}
 
           {day.slips.map((s) => (
-            <JournalDaySection key={s.id} summary="Slipped">
+            <JournalDaySection
+              key={s.id}
+              dotClassName="bg-muted"
+              summary="Slipped"
+            >
               {s.cause_category && (
                 <p className="font-sans text-[12px] text-muted">
-                  {s.cause_category.replace(/_/g, " ")}
+                  <span className="text-plum font-medium">
+                    What was unavailable:{" "}
+                  </span>
+                  <span>{CAUSE_CATEGORY_LABELS[s.cause_category]}</span>
                 </p>
               )}
               {s.emotional_state_before && (
                 <p className="font-sans text-[12px] text-muted">
-                  {s.emotional_state_before}
+                  <span className="text-plum font-medium">
+                    Feeling before:{" "}
+                  </span>
+                  <span>{s.emotional_state_before}</span>
                 </p>
               )}
               {s.all_or_nothing_stage && (
                 <p className="font-sans text-[12px] text-muted">
-                  {s.all_or_nothing_stage.replace(/_/g, " ")}
+                  <span className="text-plum font-medium">
+                    Where you were:{" "}
+                  </span>
+                  <span>
+                    {ALL_OR_NOTHING_STAGE_LABELS[s.all_or_nothing_stage] ??
+                      s.all_or_nothing_stage}
+                  </span>
                 </p>
               )}
             </JournalDaySection>
           ))}
-
-          {day.standingUp && (
-            <div className="bg-card rounded-2xl px-4 py-3">
-              <p className="font-sans text-[13px] text-plum">
-                Stood up — {formatGapLabel(day.standingUp.gap_days)}
-              </p>
-            </div>
-          )}
         </div>
       ))}
     </div>
