@@ -38,19 +38,25 @@ export function useProtocolDetection(
   const hasActiveBreak = breakHabits.some((h) => h.status === "active");
   const hasActiveBuild = buildHabits.some((h) => h.status === "active");
 
-  const { data: breakObsRecent = [], isLoading: breakObsLoading } = useQuery({
-    queryKey: ["break_obs_recent", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("break_observations")
-        .select("habit_id, logged_at")
-        .eq("user_id", userId)
-        .gte("logged_at", `${since}T00:00:00.000Z`);
-      if (error) throw error;
-      return (data ?? []) as { habit_id: string; logged_at: string }[];
-    },
-    enabled: shouldDetect && hasActiveBreak,
-  });
+  const { data: breakSlipsRecent = [], isLoading: breakSlipsLoading } =
+    useQuery({
+      queryKey: ["break_slips_recent", userId],
+      queryFn: async () => {
+        const { data, error } = await supabase
+          .from("slip_drift_log")
+          .select("habit_id, triggered_at")
+          .eq("user_id", userId)
+          .eq("track_type", "break")
+          .eq("type", "slip")
+          .gte("triggered_at", `${since}T00:00:00.000Z`);
+        if (error) throw error;
+        return (data ?? []) as {
+          habit_id: string | null;
+          triggered_at: string;
+        }[];
+      },
+      enabled: shouldDetect && hasActiveBreak,
+    });
 
   const { data: buildObsRecent = [], isLoading: buildObsLoading } = useQuery({
     queryKey: ["build_obs_recent", userId],
@@ -71,7 +77,7 @@ export function useProtocolDetection(
     (breakHabitsLoading ||
       buildHabitsLoading ||
       engineLoading ||
-      breakObsLoading ||
+      breakSlipsLoading ||
       buildObsLoading);
 
   const detected = useMemo(() => {
@@ -80,15 +86,16 @@ export function useProtocolDetection(
       breakHabitsLoading ||
       buildHabitsLoading ||
       engineLoading ||
-      breakObsLoading ||
+      breakSlipsLoading ||
       buildObsLoading
     ) {
       return [];
     }
 
     const breakObsByDate = new Map<string, Set<string>>();
-    breakObsRecent.forEach((o) => {
-      const date = o.logged_at.slice(0, 10);
+    breakSlipsRecent.forEach((o) => {
+      if (!o.habit_id) return;
+      const date = o.triggered_at.slice(0, 10);
       if (!breakObsByDate.has(date)) breakObsByDate.set(date, new Set());
       breakObsByDate.get(date)!.add(o.habit_id);
     });
@@ -121,11 +128,11 @@ export function useProtocolDetection(
     breakHabitsLoading,
     buildHabitsLoading,
     engineLoading,
-    breakObsLoading,
+    breakSlipsLoading,
     buildObsLoading,
     breakHabits,
     buildHabits,
-    breakObsRecent,
+    breakSlipsRecent,
     buildObsRecent,
     engineActivityDates,
     today,
