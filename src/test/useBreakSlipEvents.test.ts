@@ -31,11 +31,18 @@ function wrapper({ children }: { children: React.ReactNode }) {
 beforeEach(() => vi.clearAllMocks());
 
 describe("useBreakSlipEvents", () => {
-  it("returns break-track slip events", async () => {
+  it("returns break-track slip events with full detail", async () => {
     mockEq.mockResolvedValue({
       data: [
-        { habit_id: "h1", triggered_at: "2026-05-10T00:00:00Z" },
-        { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
+        {
+          id: "slip-1",
+          habit_id: "habit-1",
+          triggered_at: "2026-05-10T00:00:00Z",
+          job_id: "job-1",
+          cause_category: "logistics",
+          emotional_state_before: "Tired",
+          all_or_nothing_stage: "at_the_slip",
+        },
       ],
       error: null,
     });
@@ -46,16 +53,30 @@ describe("useBreakSlipEvents", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([
-      { habit_id: "h1", triggered_at: "2026-05-10T00:00:00Z" },
-      { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
+      {
+        id: "slip-1",
+        habit_id: "habit-1",
+        triggered_at: "2026-05-10T00:00:00Z",
+        job_id: "job-1",
+        cause_category: "logistics",
+        emotional_state_before: "Tired",
+        all_or_nothing_stage: "at_the_slip",
+      },
     ]);
   });
 
   it("filters out rows with a null habit_id", async () => {
     mockEq.mockResolvedValue({
       data: [
-        { habit_id: null, triggered_at: "2026-05-10T00:00:00Z" },
-        { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
+        {
+          id: "slip-1",
+          habit_id: null,
+          triggered_at: "2026-05-10T00:00:00Z",
+          job_id: null,
+          cause_category: null,
+          emotional_state_before: null,
+          all_or_nothing_stage: null,
+        },
       ],
       error: null,
     });
@@ -65,9 +86,7 @@ describe("useBreakSlipEvents", () => {
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual([
-      { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
-    ]);
+    expect(result.current.data).toEqual([]);
   });
 
   it("throws when query errors", async () => {
@@ -81,9 +100,7 @@ describe("useBreakSlipEvents", () => {
   });
 
   it("does not run when userId is empty", () => {
-    const { result } = renderHook(() => useBreakSlipEvents(""), {
-      wrapper,
-    });
+    const { result } = renderHook(() => useBreakSlipEvents(""), { wrapper });
 
     expect(result.current.fetchStatus).toBe("idle");
     expect(mockEq).not.toHaveBeenCalled();
