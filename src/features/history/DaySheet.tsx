@@ -206,7 +206,7 @@ export function DaySheet({
                           type="button"
                           onClick={() =>
                             goTo(
-                              `/build/${habit.id}?date=${date}` as "/build/$habitId",
+                              `/build/${habit.id}/log?date=${date}` as "/build/$habitId/log",
                             )
                           }
                           className="font-sans text-[11px] font-medium text-amber bg-transparent border-none cursor-pointer"
