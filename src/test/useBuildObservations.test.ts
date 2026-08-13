@@ -11,12 +11,14 @@ const {
   mockHabitSingle,
   mockStandingUpExisting,
   mockStandingUpInsert,
+  mockStandingUpUpdate,
 } = vi.hoisted(() => ({
   mockObservationInsert: vi.fn(),
   mockPreviousObservation: vi.fn(),
   mockHabitSingle: vi.fn(),
   mockStandingUpExisting: vi.fn(),
   mockStandingUpInsert: vi.fn(),
+  mockStandingUpUpdate: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase", () => {
@@ -49,6 +51,12 @@ vi.mock("@/lib/supabase", () => {
       mockStandingUpInsert(rows);
       return Promise.resolve({ error: null });
     },
+    update: (fields: unknown) => ({
+      eq: (_column: string, id: string) => {
+        mockStandingUpUpdate(fields, id);
+        return Promise.resolve({ error: null });
+      },
+    }),
   };
 
   return {
@@ -120,6 +128,7 @@ describe("useUpsertBuildObservation — standing up on real gaps", () => {
         gap_days: 3,
       }),
     );
+    expect(mockStandingUpUpdate).not.toHaveBeenCalled();
   });
 
   it("sets protocol to slip for a single missed day", async () => {
@@ -163,6 +172,7 @@ describe("useUpsertBuildObservation — standing up on real gaps", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockStandingUpInsert).not.toHaveBeenCalled();
+    expect(mockStandingUpUpdate).not.toHaveBeenCalled();
   });
 
   it("does not write when there is no prior log at all", async () => {
@@ -178,15 +188,16 @@ describe("useUpsertBuildObservation — standing up on real gaps", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockStandingUpInsert).not.toHaveBeenCalled();
+    expect(mockStandingUpUpdate).not.toHaveBeenCalled();
   });
 
-  it("does not write a duplicate when this fall episode is already recorded", async () => {
+  it("does not write a duplicate when this fall episode is already fully resolved", async () => {
     mockPreviousObservation.mockResolvedValue({
       data: { date: "2026-05-10" },
       error: null,
     });
     mockStandingUpExisting.mockResolvedValue({
-      data: { id: "existing-entry" },
+      data: { id: "existing-entry", return_date: "2026-05-14" },
       error: null,
     });
 
@@ -199,6 +210,45 @@ describe("useUpsertBuildObservation — standing up on real gaps", () => {
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockStandingUpInsert).not.toHaveBeenCalled();
+    expect(mockStandingUpUpdate).not.toHaveBeenCalled();
+  });
+
+  it("corrects a stale row in place instead of silently skipping it", async () => {
+    mockPreviousObservation.mockResolvedValue({
+      data: { date: "2026-05-10" },
+      error: null,
+    });
+    mockHabitSingle.mockResolvedValue({
+      data: { name: "Meditation" },
+      error: null,
+    });
+    mockStandingUpExisting.mockResolvedValue({
+      data: { id: "stale-entry", return_date: "2026-05-11" },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useUpsertBuildObservation("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD);
+    });
+
+    await waitFor(() =>
+      expect(mockStandingUpUpdate).toHaveBeenCalledWith(
+        {
+          track_type: "build",
+          track_name: "Meditation",
+          protocol: "drift",
+          fall_date: "2026-05-11",
+          return_date: "2026-05-14",
+          gap_days: 3,
+        },
+        "stale-entry",
+      ),
+    );
     expect(mockStandingUpInsert).not.toHaveBeenCalled();
   });
 });

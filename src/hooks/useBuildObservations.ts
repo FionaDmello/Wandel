@@ -119,13 +119,14 @@ export function useUpsertBuildObservation(userId: string) {
 
         const { data: existing } = await supabase
           .from("standing_up_log")
-          .select("id")
+          .select("id, return_date")
           .eq("user_id", userId)
           .eq("habit_id", data.habit_id)
           .eq("fall_date", fallDate)
           .maybeSingle();
 
-        if (existing) return;
+        // A row already fully covering this episode — nothing to do.
+        if (existing && existing.return_date >= data.date) return;
 
         const { data: habit } = await supabase
           .from("habits")
@@ -139,17 +140,34 @@ export function useUpsertBuildObservation(userId: string) {
           parseISO(data.date),
           parseISO(fallDate),
         );
+        const protocol: "slip" | "drift" = gapDays === 1 ? "slip" : "drift";
 
-        await supabase.from("standing_up_log").insert({
-          user_id: userId,
-          habit_id: data.habit_id,
-          track_type: "build",
-          track_name: habit.name,
-          protocol: gapDays === 1 ? "slip" : "drift",
-          fall_date: fallDate,
-          return_date: data.date,
-          gap_days: gapDays,
-        });
+        if (existing) {
+          // A stale row for this fall date, written before this fix shipped —
+          // correct it in place rather than leaving it silently wrong.
+          await supabase
+            .from("standing_up_log")
+            .update({
+              track_type: "build",
+              track_name: habit.name,
+              protocol,
+              fall_date: fallDate,
+              return_date: data.date,
+              gap_days: gapDays,
+            })
+            .eq("id", existing.id);
+        } else {
+          await supabase.from("standing_up_log").insert({
+            user_id: userId,
+            habit_id: data.habit_id,
+            track_type: "build",
+            track_name: habit.name,
+            protocol,
+            fall_date: fallDate,
+            return_date: data.date,
+            gap_days: gapDays,
+          });
+        }
 
         queryClient.invalidateQueries({
           queryKey: ["standing_up_log", userId],
