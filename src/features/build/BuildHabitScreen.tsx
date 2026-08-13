@@ -1,11 +1,11 @@
-import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Settings } from "lucide-react";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
-import { DateSelector } from "@/components/ui/DateSelector";
+import { Divider } from "@/components/ui/Divider";
 import { PausedBanner } from "@/features/break/PausedBanner";
+import { BuildJournal } from "@/features/build/BuildJournal";
 import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
 import {
@@ -16,24 +16,15 @@ import { useSession } from "@/hooks/useSession";
 import type { HabitWithConfigs } from "@/types/database";
 
 import { BuildConfigPanel } from "./BuildConfigPanel";
-import { BuildLogForm } from "./BuildLogForm";
 import { DeactivatedState } from "./DeactivatedState";
 import { ScheduledState } from "./ScheduledState";
 
 interface BuildHabitContentProps {
   userId: string;
   habit: HabitWithConfigs;
-  logDate?: string;
 }
 
-function BuildHabitContent({
-  userId,
-  habit,
-  logDate: initialLogDate,
-}: BuildHabitContentProps) {
-  const [logDate, setLogDate] = useState(
-    initialLogDate ?? format(new Date(), "yyyy-MM-dd"),
-  );
+function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
   const [showConfig, setShowConfig] = useState(false);
   const [showSlipModal, setShowSlipModal] = useState(false);
   const navigate = useNavigate();
@@ -85,21 +76,36 @@ function BuildHabitContent({
 
         {habit.status === "active" && (
           <>
-            <DateSelector value={logDate} onChange={setLogDate} />
-            <BuildLogForm
-              userId={userId}
-              habitId={habit.id}
-              habitName={habit.name}
-              configs={habit.configs ?? []}
-              date={logDate}
-            />
-            <button
-              type="button"
-              onClick={() => setShowSlipModal(true)}
-              className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer pb-2"
-            >
-              I slipped
-            </button>
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowSlipModal(true)}
+                className="bg-amber text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
+              >
+                I slipped
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  navigate({
+                    to: "/build/$habitId/log",
+                    params: { habitId: habit.id },
+                  })
+                }
+                className="bg-amber text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
+              >
+                Log today's effort
+              </button>
+            </div>
+
+            <Divider className="my-0" />
+
+            <div className="flex flex-col gap-3">
+              <p className="font-serif italic text-[16px] text-plum leading-snug">
+                Your log
+              </p>
+              <BuildJournal userId={userId} habitId={habit.id} />
+            </div>
           </>
         )}
 
@@ -152,7 +158,6 @@ function BuildHabitContent({
 
 export function BuildHabitScreen() {
   const { habitId } = useParams({ strict: false });
-  const search = useSearch({ strict: false }) as { date?: string };
   const { session, loading } = useSession();
   const userId = session?.user.id ?? "";
   const habitQuery = useBuildHabit(userId, habitId ?? "");
@@ -177,11 +182,5 @@ export function BuildHabitScreen() {
     );
   }
 
-  return (
-    <BuildHabitContent
-      userId={userId}
-      habit={habitQuery.data}
-      logDate={search.date}
-    />
-  );
+  return <BuildHabitContent userId={userId} habit={habitQuery.data} />;
 }

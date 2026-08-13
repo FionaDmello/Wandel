@@ -9,10 +9,12 @@ import { Label } from "@/components/ui/Label";
 import { UrgeSlider } from "@/components/ui/UrgeSlider";
 import { EMOTIONS } from "@/constants/emotions";
 import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
+import { useBreakObservationById } from "@/hooks/useBreakObservationById";
 import {
   useLogBreakObservation,
   useUpdateBreakObservationAftermath,
 } from "@/hooks/useBreakObservations";
+import { useUpdateBreakObservation } from "@/hooks/useUpdateBreakObservation";
 import type { HabitConfig } from "@/types/database";
 
 type LogPhase = "form" | "confirming" | "aftermath";
@@ -75,25 +77,45 @@ function AftermathPhase({
   );
 }
 
-interface LogFormProps {
+interface LogFormFieldsProps {
   userId: string;
   habitId: string;
   jobConfigs: HabitConfig[];
   date?: string;
+  entryId?: string;
+  initialJob: string | null;
+  initialContext: string;
+  initialUrge: number;
+  initialEmotions: string[];
 }
 
-export function LogForm({ userId, habitId, jobConfigs, date }: LogFormProps) {
+function LogFormFields({
+  userId,
+  habitId,
+  jobConfigs,
+  date,
+  entryId,
+  initialJob,
+  initialContext,
+  initialUrge,
+  initialEmotions,
+}: LogFormFieldsProps) {
   const logDate = date ?? format(new Date(), "yyyy-MM-dd");
   const [phase, setPhase] = useState<LogPhase>("form");
-  const [context, setContext] = useState("");
-  const [selectedJob, setSelectedJob] = useState<string | null>(null);
-  const [urge, setUrge] = useState(5);
-  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
-  const [observationId, setObservationId] = useState<string | null>(null);
+  const [context, setContext] = useState(initialContext);
+  const [selectedJob, setSelectedJob] = useState<string | null>(initialJob);
+  const [urge, setUrge] = useState(initialUrge);
+  const [selectedEmotions, setSelectedEmotions] =
+    useState<string[]>(initialEmotions);
+  const [observationId, setObservationId] = useState<string | null>(
+    entryId ?? null,
+  );
   const [submitted, setSubmitted] = useState(false);
 
   const { mutate: logObservation, isPending: isLogging } =
     useLogBreakObservation(userId);
+  const { mutate: updateObservation, isPending: isUpdating } =
+    useUpdateBreakObservation(userId);
   const { mutate: updateAftermath, isPending: isSavingAftermath } =
     useUpdateBreakObservationAftermath();
 
@@ -117,6 +139,25 @@ export function LogForm({ userId, habitId, jobConfigs, date }: LogFormProps) {
   const handleSubmit = () => {
     setSubmitted(true);
     if (!selectedJob || selectedEmotions.length === 0) return;
+
+    if (entryId) {
+      updateObservation(
+        {
+          id: entryId,
+          job: selectedJob,
+          context: context.trim() || undefined,
+          urge_intensity: urge,
+          emotions: selectedEmotions,
+        },
+        {
+          onSuccess: () => {
+            setObservationId(entryId);
+            setPhase("confirming");
+          },
+        },
+      );
+      return;
+    }
 
     const today = format(new Date(), "yyyy-MM-dd");
     const isRetroactive = logDate !== today;
@@ -149,6 +190,7 @@ export function LogForm({ userId, habitId, jobConfigs, date }: LogFormProps) {
 
   const jobMissing = submitted && !selectedJob;
   const emotionsMissing = submitted && selectedEmotions.length === 0;
+  const isSaving = isLogging || isUpdating;
 
   if (phase === "confirming") {
     return (
@@ -265,9 +307,45 @@ export function LogForm({ userId, habitId, jobConfigs, date }: LogFormProps) {
         )}
       </div>
 
-      <Button variant="accent" onClick={handleSubmit} disabled={isLogging}>
-        {isLogging ? "Logging…" : "Log it"}
+      <Button variant="accent" onClick={handleSubmit} disabled={isSaving}>
+        {isSaving ? (entryId ? "Saving…" : "Logging…") : "Log it"}
       </Button>
     </div>
+  );
+}
+
+interface LogFormProps {
+  userId: string;
+  habitId: string;
+  jobConfigs: HabitConfig[];
+  date?: string;
+  entryId?: string;
+}
+
+export function LogForm({
+  userId,
+  habitId,
+  jobConfigs,
+  date,
+  entryId,
+}: LogFormProps) {
+  const existingQuery = useBreakObservationById(userId, entryId ?? "");
+
+  if (entryId && existingQuery.isLoading) return null;
+
+  const existing = entryId ? existingQuery.data : undefined;
+
+  return (
+    <LogFormFields
+      userId={userId}
+      habitId={habitId}
+      jobConfigs={jobConfigs}
+      date={date}
+      entryId={entryId}
+      initialJob={existing?.job ?? null}
+      initialContext={existing?.context ?? ""}
+      initialUrge={existing?.urge_intensity ?? 5}
+      initialEmotions={existing?.emotions.map((e) => e.value) ?? []}
+    />
   );
 }

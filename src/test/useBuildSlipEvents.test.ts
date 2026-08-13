@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useBreakSlipEvents } from "@/hooks/useBreakSlipEvents";
+import { useBuildSlipEvents } from "@/hooks/useBuildSlipEvents";
 
 const { mockEq } = vi.hoisted(() => ({ mockEq: vi.fn() }));
 
@@ -30,24 +30,23 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 beforeEach(() => vi.clearAllMocks());
 
-describe("useBreakSlipEvents", () => {
-  it("returns break-track slip events with full detail", async () => {
+describe("useBuildSlipEvents", () => {
+  it("returns build-track slip events", async () => {
     mockEq.mockResolvedValue({
       data: [
         {
           id: "slip-1",
           habit_id: "habit-1",
           triggered_at: "2026-05-10T00:00:00Z",
-          job_id: "job-1",
           cause_category: "logistics",
           emotional_state_before: "Tired",
-          all_or_nothing_stage: "at_the_slip",
+          all_or_nothing_stage: null,
         },
       ],
       error: null,
     });
 
-    const { result } = renderHook(() => useBreakSlipEvents("user-1"), {
+    const { result } = renderHook(() => useBuildSlipEvents("user-1"), {
       wrapper,
     });
 
@@ -57,10 +56,9 @@ describe("useBreakSlipEvents", () => {
         id: "slip-1",
         habit_id: "habit-1",
         triggered_at: "2026-05-10T00:00:00Z",
-        job_id: "job-1",
         cause_category: "logistics",
         emotional_state_before: "Tired",
-        all_or_nothing_stage: "at_the_slip",
+        all_or_nothing_stage: null,
       },
     ]);
   });
@@ -72,7 +70,6 @@ describe("useBreakSlipEvents", () => {
           id: "slip-1",
           habit_id: null,
           triggered_at: "2026-05-10T00:00:00Z",
-          job_id: null,
           cause_category: null,
           emotional_state_before: null,
           all_or_nothing_stage: null,
@@ -81,7 +78,7 @@ describe("useBreakSlipEvents", () => {
       error: null,
     });
 
-    const { result } = renderHook(() => useBreakSlipEvents("user-1"), {
+    const { result } = renderHook(() => useBuildSlipEvents("user-1"), {
       wrapper,
     });
 
@@ -92,7 +89,7 @@ describe("useBreakSlipEvents", () => {
   it("throws when query errors", async () => {
     mockEq.mockResolvedValue({ data: null, error: { message: "DB error" } });
 
-    const { result } = renderHook(() => useBreakSlipEvents("user-1"), {
+    const { result } = renderHook(() => useBuildSlipEvents("user-1"), {
       wrapper,
     });
 
@@ -100,7 +97,7 @@ describe("useBreakSlipEvents", () => {
   });
 
   it("does not run when userId is empty", () => {
-    const { result } = renderHook(() => useBreakSlipEvents(""), { wrapper });
+    const { result } = renderHook(() => useBuildSlipEvents(""), { wrapper });
 
     expect(result.current.fetchStatus).toBe("idle");
     expect(mockEq).not.toHaveBeenCalled();

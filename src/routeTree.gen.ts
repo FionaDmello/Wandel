@@ -22,6 +22,10 @@ import { Route as BuildIndexRouteImport } from './routes/build.index'
 import { Route as BreakIndexRouteImport } from './routes/break.index'
 import { Route as BuildHabitIdRouteImport } from './routes/build.$habitId'
 import { Route as BreakHabitIdRouteImport } from './routes/break.$habitId'
+import { Route as BuildHabitIdIndexRouteImport } from './routes/build.$habitId.index'
+import { Route as BreakHabitIdIndexRouteImport } from './routes/break.$habitId.index'
+import { Route as BuildHabitIdLogRouteImport } from './routes/build.$habitId.log'
+import { Route as BreakHabitIdLogRouteImport } from './routes/break.$habitId.log'
 
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
@@ -88,6 +92,26 @@ const BreakHabitIdRoute = BreakHabitIdRouteImport.update({
   path: '/$habitId',
   getParentRoute: () => BreakRoute,
 } as any)
+const BuildHabitIdIndexRoute = BuildHabitIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BuildHabitIdRoute,
+} as any)
+const BreakHabitIdIndexRoute = BreakHabitIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BreakHabitIdRoute,
+} as any)
+const BuildHabitIdLogRoute = BuildHabitIdLogRouteImport.update({
+  id: '/log',
+  path: '/log',
+  getParentRoute: () => BuildHabitIdRoute,
+} as any)
+const BreakHabitIdLogRoute = BreakHabitIdLogRouteImport.update({
+  id: '/log',
+  path: '/log',
+  getParentRoute: () => BreakHabitIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -99,10 +123,14 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
-  '/break/$habitId': typeof BreakHabitIdRoute
-  '/build/$habitId': typeof BuildHabitIdRoute
+  '/break/$habitId': typeof BreakHabitIdRouteWithChildren
+  '/build/$habitId': typeof BuildHabitIdRouteWithChildren
   '/break/': typeof BreakIndexRoute
   '/build/': typeof BuildIndexRoute
+  '/break/$habitId/log': typeof BreakHabitIdLogRoute
+  '/build/$habitId/log': typeof BuildHabitIdLogRoute
+  '/break/$habitId/': typeof BreakHabitIdIndexRoute
+  '/build/$habitId/': typeof BuildHabitIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -112,10 +140,12 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
-  '/break/$habitId': typeof BreakHabitIdRoute
-  '/build/$habitId': typeof BuildHabitIdRoute
   '/break': typeof BreakIndexRoute
   '/build': typeof BuildIndexRoute
+  '/break/$habitId/log': typeof BreakHabitIdLogRoute
+  '/build/$habitId/log': typeof BuildHabitIdLogRoute
+  '/break/$habitId': typeof BreakHabitIdIndexRoute
+  '/build/$habitId': typeof BuildHabitIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -128,10 +158,14 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
-  '/break/$habitId': typeof BreakHabitIdRoute
-  '/build/$habitId': typeof BuildHabitIdRoute
+  '/break/$habitId': typeof BreakHabitIdRouteWithChildren
+  '/build/$habitId': typeof BuildHabitIdRouteWithChildren
   '/break/': typeof BreakIndexRoute
   '/build/': typeof BuildIndexRoute
+  '/break/$habitId/log': typeof BreakHabitIdLogRoute
+  '/build/$habitId/log': typeof BuildHabitIdLogRoute
+  '/break/$habitId/': typeof BreakHabitIdIndexRoute
+  '/build/$habitId/': typeof BuildHabitIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,6 +183,10 @@ export interface FileRouteTypes {
     | '/build/$habitId'
     | '/break/'
     | '/build/'
+    | '/break/$habitId/log'
+    | '/build/$habitId/log'
+    | '/break/$habitId/'
+    | '/build/$habitId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -158,10 +196,12 @@ export interface FileRouteTypes {
     | '/review'
     | '/settings'
     | '/setup'
-    | '/break/$habitId'
-    | '/build/$habitId'
     | '/break'
     | '/build'
+    | '/break/$habitId/log'
+    | '/build/$habitId/log'
+    | '/break/$habitId'
+    | '/build/$habitId'
   id:
     | '__root__'
     | '/'
@@ -177,6 +217,10 @@ export interface FileRouteTypes {
     | '/build/$habitId'
     | '/break/'
     | '/build/'
+    | '/break/$habitId/log'
+    | '/build/$habitId/log'
+    | '/break/$habitId/'
+    | '/build/$habitId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -284,28 +328,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BreakHabitIdRouteImport
       parentRoute: typeof BreakRoute
     }
+    '/build/$habitId/': {
+      id: '/build/$habitId/'
+      path: '/'
+      fullPath: '/build/$habitId/'
+      preLoaderRoute: typeof BuildHabitIdIndexRouteImport
+      parentRoute: typeof BuildHabitIdRoute
+    }
+    '/break/$habitId/': {
+      id: '/break/$habitId/'
+      path: '/'
+      fullPath: '/break/$habitId/'
+      preLoaderRoute: typeof BreakHabitIdIndexRouteImport
+      parentRoute: typeof BreakHabitIdRoute
+    }
+    '/build/$habitId/log': {
+      id: '/build/$habitId/log'
+      path: '/log'
+      fullPath: '/build/$habitId/log'
+      preLoaderRoute: typeof BuildHabitIdLogRouteImport
+      parentRoute: typeof BuildHabitIdRoute
+    }
+    '/break/$habitId/log': {
+      id: '/break/$habitId/log'
+      path: '/log'
+      fullPath: '/break/$habitId/log'
+      preLoaderRoute: typeof BreakHabitIdLogRouteImport
+      parentRoute: typeof BreakHabitIdRoute
+    }
   }
 }
 
+interface BreakHabitIdRouteChildren {
+  BreakHabitIdLogRoute: typeof BreakHabitIdLogRoute
+  BreakHabitIdIndexRoute: typeof BreakHabitIdIndexRoute
+}
+
+const BreakHabitIdRouteChildren: BreakHabitIdRouteChildren = {
+  BreakHabitIdLogRoute: BreakHabitIdLogRoute,
+  BreakHabitIdIndexRoute: BreakHabitIdIndexRoute,
+}
+
+const BreakHabitIdRouteWithChildren = BreakHabitIdRoute._addFileChildren(
+  BreakHabitIdRouteChildren,
+)
+
 interface BreakRouteChildren {
-  BreakHabitIdRoute: typeof BreakHabitIdRoute
+  BreakHabitIdRoute: typeof BreakHabitIdRouteWithChildren
   BreakIndexRoute: typeof BreakIndexRoute
 }
 
 const BreakRouteChildren: BreakRouteChildren = {
-  BreakHabitIdRoute: BreakHabitIdRoute,
+  BreakHabitIdRoute: BreakHabitIdRouteWithChildren,
   BreakIndexRoute: BreakIndexRoute,
 }
 
 const BreakRouteWithChildren = BreakRoute._addFileChildren(BreakRouteChildren)
 
+interface BuildHabitIdRouteChildren {
+  BuildHabitIdLogRoute: typeof BuildHabitIdLogRoute
+  BuildHabitIdIndexRoute: typeof BuildHabitIdIndexRoute
+}
+
+const BuildHabitIdRouteChildren: BuildHabitIdRouteChildren = {
+  BuildHabitIdLogRoute: BuildHabitIdLogRoute,
+  BuildHabitIdIndexRoute: BuildHabitIdIndexRoute,
+}
+
+const BuildHabitIdRouteWithChildren = BuildHabitIdRoute._addFileChildren(
+  BuildHabitIdRouteChildren,
+)
+
 interface BuildRouteChildren {
-  BuildHabitIdRoute: typeof BuildHabitIdRoute
+  BuildHabitIdRoute: typeof BuildHabitIdRouteWithChildren
   BuildIndexRoute: typeof BuildIndexRoute
 }
 
 const BuildRouteChildren: BuildRouteChildren = {
-  BuildHabitIdRoute: BuildHabitIdRoute,
+  BuildHabitIdRoute: BuildHabitIdRouteWithChildren,
   BuildIndexRoute: BuildIndexRoute,
 }
 
