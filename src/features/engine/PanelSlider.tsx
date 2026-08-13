@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 
 import type { AccentColor } from "@/constants/accentClasses";
 import { ACCENT_SLIDER, ACCENT_TEXT } from "@/constants/accentClasses";
+import { stopPropagation } from "@/lib/stopPropagation";
 
 interface PanelSliderProps {
   value: number;
@@ -35,6 +36,9 @@ export function PanelSlider({
           max={10}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
+          onTouchStart={stopPropagation}
+          onTouchMove={stopPropagation}
+          onTouchEnd={stopPropagation}
           className={`panel-slider ${ACCENT_SLIDER[accent]} flex-1`}
           aria-label="Panel rating"
         />
