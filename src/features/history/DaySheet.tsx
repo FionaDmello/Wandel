@@ -150,7 +150,7 @@ export function DaySheet({
                           type="button"
                           onClick={() =>
                             goTo(
-                              `/break/${habit.id}?date=${date}` as "/break/$habitId",
+                              `/break/${habit.id}/log?date=${date}` as "/break/$habitId/log",
                             )
                           }
                           className="font-sans text-[11px] font-medium text-teal bg-transparent border-none cursor-pointer"
