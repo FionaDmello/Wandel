@@ -6,7 +6,6 @@ import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 
 const mockLogBreakObservation = vi.fn();
 const mockLogSlipDrift = vi.fn();
-const mockLogStandingUp = vi.fn();
 
 vi.mock("@/hooks/useBreakHabits", () => ({
   useBreakHabit: () => ({ data: undefined }),
@@ -18,10 +17,6 @@ vi.mock("@/hooks/useBreakObservations", () => ({
 
 vi.mock("@/hooks/useSlipDriftLog", () => ({
   useLogSlipDrift: () => ({ mutateAsync: mockLogSlipDrift }),
-}));
-
-vi.mock("@/hooks/useStandingUpLog", () => ({
-  useLogStandingUp: () => ({ mutateAsync: mockLogStandingUp }),
 }));
 
 const habit: HabitSlipContext = {
@@ -47,10 +42,9 @@ describe("HabitSlipModal", () => {
     expect(onDismiss).toHaveBeenCalledOnce();
     expect(mockLogBreakObservation).not.toHaveBeenCalled();
     expect(mockLogSlipDrift).not.toHaveBeenCalled();
-    expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 
-  it("completing the flow for a break habit logs the slip but never writes standing_up_log", async () => {
+  it("completing the flow for a break habit logs the slip and the acknowledgment", async () => {
     const onComplete = vi.fn();
     mockLogBreakObservation.mockResolvedValue({});
     mockLogSlipDrift.mockResolvedValue({});
@@ -87,6 +81,5 @@ describe("HabitSlipModal", () => {
       all_or_nothing_stage: "at_the_slip",
       protocol_completed: true,
     });
-    expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 });

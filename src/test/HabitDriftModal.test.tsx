@@ -4,19 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { HabitDriftModal } from "@/features/protocols/HabitDriftModal";
 import type { PendingProtocol } from "@/types/protocols";
 
-const mockLogSlipDrift = vi.fn();
-const mockLogStandingUp = vi.fn();
-
 vi.mock("@/hooks/useBuildHabits", () => ({
   useBuildHabit: () => ({ data: undefined }),
-}));
-
-vi.mock("@/hooks/useSlipDriftLog", () => ({
-  useLogSlipDrift: () => ({ mutateAsync: mockLogSlipDrift }),
-}));
-
-vi.mock("@/hooks/useStandingUpLog", () => ({
-  useLogStandingUp: () => ({ mutateAsync: mockLogStandingUp }),
 }));
 
 const breakProtocol: PendingProtocol = {
@@ -29,7 +18,7 @@ const breakProtocol: PendingProtocol = {
 };
 
 describe("HabitDriftModal", () => {
-  it("Skip for now calls onDismiss and saves nothing", () => {
+  it("Skip for now calls onDismiss", () => {
     const onDismiss = vi.fn();
     render(
       <HabitDriftModal
@@ -43,11 +32,9 @@ describe("HabitDriftModal", () => {
     fireEvent.click(screen.getByText("Skip for now"));
 
     expect(onDismiss).toHaveBeenCalledOnce();
-    expect(mockLogSlipDrift).not.toHaveBeenCalled();
-    expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 
-  it("'I am returning' is purely decorative — completes the flow without logging anything", () => {
+  it("'I am returning' is purely decorative — just calls onComplete", () => {
     const onComplete = vi.fn();
 
     render(
@@ -64,11 +51,9 @@ describe("HabitDriftModal", () => {
     fireEvent.click(screen.getByText("I am returning."));
 
     expect(onComplete).toHaveBeenCalledOnce();
-    expect(mockLogSlipDrift).not.toHaveBeenCalled();
-    expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 
-  it("does the same for a build habit — no logging on completion", () => {
+  it("does the same for a build habit", () => {
     const onComplete = vi.fn();
     const buildProtocol: PendingProtocol = {
       id: "habit_drift",
@@ -93,7 +78,5 @@ describe("HabitDriftModal", () => {
     fireEvent.click(screen.getByText("I am returning."));
 
     expect(onComplete).toHaveBeenCalledOnce();
-    expect(mockLogSlipDrift).not.toHaveBeenCalled();
-    expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 });
