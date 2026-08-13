@@ -4,16 +4,16 @@ import { useEffect, useRef } from "react";
 
 import { computeStandingUpResolutions } from "@/features/protocols/computeStandingUp";
 import { useBreakHabits } from "@/hooks/useBreakHabits";
-import { useBreakSlipDriftEvents } from "@/hooks/useBreakSlipDriftEvents";
+import { useBreakSlipEvents } from "@/hooks/useBreakSlipEvents";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
 import { supabase } from "@/lib/supabase";
-import type { ProtocolType, StandingUpEntry } from "@/types/database";
+import type { StandingUpEntry } from "@/types/database";
 
 interface StandingUpInsertPayload {
   habit_id: string;
   track_type: "break";
   track_name: string;
-  protocol: ProtocolType;
+  protocol: "slip";
   gap_days: number;
   fall_date: string;
   return_date: string;
@@ -41,7 +41,7 @@ function useLogStandingUpEntries(userId: string) {
 
 export function useSyncBreakStandingUp(userId: string): void {
   const breakHabitsQuery = useBreakHabits(userId);
-  const eventsQuery = useBreakSlipDriftEvents(userId);
+  const eventsQuery = useBreakSlipEvents(userId);
   const standingUpQuery = useAllStandingUpEntries(userId);
   const { mutate: logEntries } = useLogStandingUpEntries(userId);
 
@@ -84,14 +84,11 @@ export function useSyncBreakStandingUp(userId: string): void {
       const resolutions = computeStandingUpResolutions(fallDates, today);
 
       for (const resolution of resolutions) {
-        const eventAtFall = habitEvents.find(
-          (e) => e.triggered_at.slice(0, 10) === resolution.fallDate,
-        );
         payloads.push({
           habit_id: habit.id,
           track_type: "break",
           track_name: habit.name,
-          protocol: eventAtFall?.type ?? "slip",
+          protocol: "slip",
           gap_days: resolution.gapDays,
           fall_date: resolution.fallDate,
           return_date: resolution.returnDate,

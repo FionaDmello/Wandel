@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
-import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
 import type { PendingProtocol } from "@/types/protocols";
 
 type Phase = 1 | 2 | 3;
@@ -30,7 +29,6 @@ export function HabitDriftModal({
   const [selectedCause, setSelectedCause] = useState<CauseCategory | null>(
     null,
   );
-  const [isSaving, setIsSaving] = useState(false);
 
   const { data: buildHabit } = useBuildHabit(
     userId,
@@ -42,8 +40,6 @@ export function HabitDriftModal({
     buildConfigs.find(
       (c) => c.key === "non_negotiable" && c.sub_type === null,
     ) ?? buildConfigs.find((c) => c.key === "non_negotiable");
-
-  const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
 
   const causeAdjustment =
     selectedCause === "distress_tolerance"
@@ -58,25 +54,8 @@ export function HabitDriftModal({
     setSelectedCause((prev) => (prev === cause ? null : cause));
   };
 
-  const handleComplete = async () => {
-    setIsSaving(true);
-
-    try {
-      await logSlipDrift({
-        track_type: isBreak ? "break" : "build",
-        type: "drift",
-        habit_id: protocol.habitId,
-        cause_category: selectedCause,
-        protocol_completed: true,
-      });
-      onComplete();
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
-    <ProtocolModal onClose={onDismiss} dismissible={!isSaving}>
+    <ProtocolModal onClose={onDismiss}>
       <div className="px-6 pt-5 pb-1">
         <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
           {protocol.trackName}
@@ -170,14 +149,8 @@ export function HabitDriftModal({
             </>
           )}
 
-          <Button
-            variant="accent"
-            onClick={() => {
-              void handleComplete();
-            }}
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving…" : "I am returning."}
+          <Button variant="accent" onClick={onComplete}>
+            I am returning.
           </Button>
 
           <button

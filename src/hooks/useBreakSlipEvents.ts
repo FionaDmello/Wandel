@@ -1,26 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabase";
-import type { ProtocolType } from "@/types/database";
 
-export interface BreakSlipDriftEvent {
+export interface BreakSlipEvent {
   habit_id: string;
   triggered_at: string;
-  type: ProtocolType;
 }
 
-export function useBreakSlipDriftEvents(userId: string) {
+export function useBreakSlipEvents(userId: string) {
   return useQuery({
-    queryKey: ["break_slip_drift_events", userId],
+    queryKey: ["break_slip_events", userId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("slip_drift_log")
-        .select("habit_id, triggered_at, type")
+        .select("habit_id, triggered_at")
         .eq("user_id", userId)
-        .eq("track_type", "break");
+        .eq("track_type", "break")
+        .eq("type", "slip");
       if (error) throw error;
       return (data ?? []).filter(
-        (row): row is BreakSlipDriftEvent => row.habit_id !== null,
+        (row): row is BreakSlipEvent => row.habit_id !== null,
       );
     },
     enabled: !!userId,

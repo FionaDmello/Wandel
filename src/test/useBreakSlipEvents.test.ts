@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useBreakSlipDriftEvents } from "@/hooks/useBreakSlipDriftEvents";
+import { useBreakSlipEvents } from "@/hooks/useBreakSlipEvents";
 
 const { mockEq } = vi.hoisted(() => ({ mockEq: vi.fn() }));
 
@@ -12,7 +12,9 @@ vi.mock("@/lib/supabase", () => ({
     from: () => ({
       select: () => ({
         eq: () => ({
-          eq: mockEq,
+          eq: () => ({
+            eq: mockEq,
+          }),
         }),
       }),
     }),
@@ -28,50 +30,50 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 beforeEach(() => vi.clearAllMocks());
 
-describe("useBreakSlipDriftEvents", () => {
-  it("returns break-track slip and drift events", async () => {
+describe("useBreakSlipEvents", () => {
+  it("returns break-track slip events", async () => {
     mockEq.mockResolvedValue({
       data: [
-        { habit_id: "h1", triggered_at: "2026-05-10T00:00:00Z", type: "slip" },
-        { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z", type: "drift" },
+        { habit_id: "h1", triggered_at: "2026-05-10T00:00:00Z" },
+        { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
       ],
       error: null,
     });
 
-    const { result } = renderHook(() => useBreakSlipDriftEvents("user-1"), {
+    const { result } = renderHook(() => useBreakSlipEvents("user-1"), {
       wrapper,
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([
-      { habit_id: "h1", triggered_at: "2026-05-10T00:00:00Z", type: "slip" },
-      { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z", type: "drift" },
+      { habit_id: "h1", triggered_at: "2026-05-10T00:00:00Z" },
+      { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
     ]);
   });
 
   it("filters out rows with a null habit_id", async () => {
     mockEq.mockResolvedValue({
       data: [
-        { habit_id: null, triggered_at: "2026-05-10T00:00:00Z", type: "slip" },
-        { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z", type: "slip" },
+        { habit_id: null, triggered_at: "2026-05-10T00:00:00Z" },
+        { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
       ],
       error: null,
     });
 
-    const { result } = renderHook(() => useBreakSlipDriftEvents("user-1"), {
+    const { result } = renderHook(() => useBreakSlipEvents("user-1"), {
       wrapper,
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([
-      { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z", type: "slip" },
+      { habit_id: "h1", triggered_at: "2026-05-12T00:00:00Z" },
     ]);
   });
 
   it("throws when query errors", async () => {
     mockEq.mockResolvedValue({ data: null, error: { message: "DB error" } });
 
-    const { result } = renderHook(() => useBreakSlipDriftEvents("user-1"), {
+    const { result } = renderHook(() => useBreakSlipEvents("user-1"), {
       wrapper,
     });
 
@@ -79,7 +81,7 @@ describe("useBreakSlipDriftEvents", () => {
   });
 
   it("does not run when userId is empty", () => {
-    const { result } = renderHook(() => useBreakSlipDriftEvents(""), {
+    const { result } = renderHook(() => useBreakSlipEvents(""), {
       wrapper,
     });
 

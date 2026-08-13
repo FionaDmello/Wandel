@@ -15,7 +15,7 @@ import { useSyncBreakStandingUp } from "@/hooks/useSyncBreakStandingUp";
 import type { HabitWithConfigs, StandingUpEntry } from "@/types/database";
 
 vi.mock("@/hooks/useBreakHabits");
-vi.mock("@/hooks/useBreakSlipDriftEvents");
+vi.mock("@/hooks/useBreakSlipEvents");
 vi.mock("@/hooks/useStandingUpLog");
 
 const { mockInsert, mockSelect } = vi.hoisted(() => ({
@@ -35,7 +35,7 @@ vi.mock("@/lib/supabase", () => ({
 }));
 
 import { useBreakHabits } from "@/hooks/useBreakHabits";
-import { useBreakSlipDriftEvents } from "@/hooks/useBreakSlipDriftEvents";
+import { useBreakSlipEvents } from "@/hooks/useBreakSlipEvents";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
 
 const TODAY = "2026-05-14";
@@ -85,16 +85,15 @@ describe("useSyncBreakStandingUp", () => {
       data: [makeHabit()],
       isSuccess: true,
     } as unknown as ReturnType<typeof useBreakHabits>);
-    vi.mocked(useBreakSlipDriftEvents).mockReturnValue({
+    vi.mocked(useBreakSlipEvents).mockReturnValue({
       data: [
         {
           habit_id: "habit-1",
           triggered_at: "2026-05-10T00:00:00Z",
-          type: "slip",
         },
       ],
       isSuccess: true,
-    } as unknown as ReturnType<typeof useBreakSlipDriftEvents>);
+    } as unknown as ReturnType<typeof useBreakSlipEvents>);
     vi.mocked(useAllStandingUpEntries).mockReturnValue({
       data: [],
       isSuccess: true,
@@ -123,16 +122,15 @@ describe("useSyncBreakStandingUp", () => {
       data: [makeHabit()],
       isSuccess: true,
     } as unknown as ReturnType<typeof useBreakHabits>);
-    vi.mocked(useBreakSlipDriftEvents).mockReturnValue({
+    vi.mocked(useBreakSlipEvents).mockReturnValue({
       data: [
         {
           habit_id: "habit-1",
           triggered_at: "2026-05-13T00:00:00Z",
-          type: "slip",
         },
       ],
       isSuccess: true,
-    } as unknown as ReturnType<typeof useBreakSlipDriftEvents>);
+    } as unknown as ReturnType<typeof useBreakSlipEvents>);
     vi.mocked(useAllStandingUpEntries).mockReturnValue({
       data: [],
       isSuccess: true,
@@ -148,16 +146,15 @@ describe("useSyncBreakStandingUp", () => {
       data: [makeHabit()],
       isSuccess: true,
     } as unknown as ReturnType<typeof useBreakHabits>);
-    vi.mocked(useBreakSlipDriftEvents).mockReturnValue({
+    vi.mocked(useBreakSlipEvents).mockReturnValue({
       data: [
         {
           habit_id: "habit-1",
           triggered_at: "2026-05-10T00:00:00Z",
-          type: "slip",
         },
       ],
       isSuccess: true,
-    } as unknown as ReturnType<typeof useBreakSlipDriftEvents>);
+    } as unknown as ReturnType<typeof useBreakSlipEvents>);
     const existing: StandingUpEntry = {
       id: "entry-1",
       user_id: "user-1",
@@ -185,16 +182,15 @@ describe("useSyncBreakStandingUp", () => {
       data: [makeHabit({ status: "deactivated" })],
       isSuccess: true,
     } as unknown as ReturnType<typeof useBreakHabits>);
-    vi.mocked(useBreakSlipDriftEvents).mockReturnValue({
+    vi.mocked(useBreakSlipEvents).mockReturnValue({
       data: [
         {
           habit_id: "habit-1",
           triggered_at: "2026-05-10T00:00:00Z",
-          type: "slip",
         },
       ],
       isSuccess: true,
-    } as unknown as ReturnType<typeof useBreakSlipDriftEvents>);
+    } as unknown as ReturnType<typeof useBreakSlipEvents>);
     vi.mocked(useAllStandingUpEntries).mockReturnValue({
       data: [],
       isSuccess: true,
@@ -210,10 +206,10 @@ describe("useSyncBreakStandingUp", () => {
       data: undefined,
       isSuccess: false,
     } as unknown as ReturnType<typeof useBreakHabits>);
-    vi.mocked(useBreakSlipDriftEvents).mockReturnValue({
+    vi.mocked(useBreakSlipEvents).mockReturnValue({
       data: undefined,
       isSuccess: false,
-    } as unknown as ReturnType<typeof useBreakSlipDriftEvents>);
+    } as unknown as ReturnType<typeof useBreakSlipEvents>);
     vi.mocked(useAllStandingUpEntries).mockReturnValue({
       data: undefined,
       isSuccess: false,

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { HabitDriftModal } from "@/features/protocols/HabitDriftModal";
@@ -47,9 +47,8 @@ describe("HabitDriftModal", () => {
     expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 
-  it("completing the flow for a break habit logs drift but never writes standing_up_log", async () => {
+  it("'I am returning' is purely decorative — completes the flow without logging anything", () => {
     const onComplete = vi.fn();
-    mockLogSlipDrift.mockResolvedValue({});
 
     render(
       <HabitDriftModal
@@ -64,21 +63,13 @@ describe("HabitDriftModal", () => {
     fireEvent.click(screen.getByText("Continue"));
     fireEvent.click(screen.getByText("I am returning."));
 
-    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce());
-
-    expect(mockLogSlipDrift).toHaveBeenCalledWith({
-      track_type: "break",
-      type: "drift",
-      habit_id: "habit-1",
-      cause_category: null,
-      protocol_completed: true,
-    });
+    expect(onComplete).toHaveBeenCalledOnce();
+    expect(mockLogSlipDrift).not.toHaveBeenCalled();
     expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 
-  it("completing the flow for a build habit logs drift with track_type build", async () => {
+  it("does the same for a build habit — no logging on completion", () => {
     const onComplete = vi.fn();
-    mockLogSlipDrift.mockResolvedValue({});
     const buildProtocol: PendingProtocol = {
       id: "habit_drift",
       habitId: "habit-2",
@@ -101,14 +92,8 @@ describe("HabitDriftModal", () => {
     fireEvent.click(screen.getByText("Continue"));
     fireEvent.click(screen.getByText("I am returning."));
 
-    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce());
-
-    expect(mockLogSlipDrift).toHaveBeenCalledWith({
-      track_type: "build",
-      type: "drift",
-      habit_id: "habit-2",
-      cause_category: null,
-      protocol_completed: true,
-    });
+    expect(onComplete).toHaveBeenCalledOnce();
+    expect(mockLogSlipDrift).not.toHaveBeenCalled();
+    expect(mockLogStandingUp).not.toHaveBeenCalled();
   });
 });
