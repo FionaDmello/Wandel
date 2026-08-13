@@ -22,6 +22,7 @@ import { Route as BuildIndexRouteImport } from './routes/build.index'
 import { Route as BreakIndexRouteImport } from './routes/break.index'
 import { Route as BuildHabitIdRouteImport } from './routes/build.$habitId'
 import { Route as BreakHabitIdRouteImport } from './routes/break.$habitId'
+import { Route as BuildHabitIdLogRouteImport } from './routes/build.$habitId.log'
 
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
@@ -88,6 +89,11 @@ const BreakHabitIdRoute = BreakHabitIdRouteImport.update({
   path: '/$habitId',
   getParentRoute: () => BreakRoute,
 } as any)
+const BuildHabitIdLogRoute = BuildHabitIdLogRouteImport.update({
+  id: '/log',
+  path: '/log',
+  getParentRoute: () => BuildHabitIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,9 +106,10 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
   '/break/$habitId': typeof BreakHabitIdRoute
-  '/build/$habitId': typeof BuildHabitIdRoute
+  '/build/$habitId': typeof BuildHabitIdRouteWithChildren
   '/break/': typeof BreakIndexRoute
   '/build/': typeof BuildIndexRoute
+  '/build/$habitId/log': typeof BuildHabitIdLogRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,9 +120,10 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
   '/break/$habitId': typeof BreakHabitIdRoute
-  '/build/$habitId': typeof BuildHabitIdRoute
+  '/build/$habitId': typeof BuildHabitIdRouteWithChildren
   '/break': typeof BreakIndexRoute
   '/build': typeof BuildIndexRoute
+  '/build/$habitId/log': typeof BuildHabitIdLogRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,9 +137,10 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
   '/break/$habitId': typeof BreakHabitIdRoute
-  '/build/$habitId': typeof BuildHabitIdRoute
+  '/build/$habitId': typeof BuildHabitIdRouteWithChildren
   '/break/': typeof BreakIndexRoute
   '/build/': typeof BuildIndexRoute
+  '/build/$habitId/log': typeof BuildHabitIdLogRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/build/$habitId'
     | '/break/'
     | '/build/'
+    | '/build/$habitId/log'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/build/$habitId'
     | '/break'
     | '/build'
+    | '/build/$habitId/log'
   id:
     | '__root__'
     | '/'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/build/$habitId'
     | '/break/'
     | '/build/'
+    | '/build/$habitId/log'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -284,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BreakHabitIdRouteImport
       parentRoute: typeof BreakRoute
     }
+    '/build/$habitId/log': {
+      id: '/build/$habitId/log'
+      path: '/log'
+      fullPath: '/build/$habitId/log'
+      preLoaderRoute: typeof BuildHabitIdLogRouteImport
+      parentRoute: typeof BuildHabitIdRoute
+    }
   }
 }
 
@@ -299,13 +318,25 @@ const BreakRouteChildren: BreakRouteChildren = {
 
 const BreakRouteWithChildren = BreakRoute._addFileChildren(BreakRouteChildren)
 
+interface BuildHabitIdRouteChildren {
+  BuildHabitIdLogRoute: typeof BuildHabitIdLogRoute
+}
+
+const BuildHabitIdRouteChildren: BuildHabitIdRouteChildren = {
+  BuildHabitIdLogRoute: BuildHabitIdLogRoute,
+}
+
+const BuildHabitIdRouteWithChildren = BuildHabitIdRoute._addFileChildren(
+  BuildHabitIdRouteChildren,
+)
+
 interface BuildRouteChildren {
-  BuildHabitIdRoute: typeof BuildHabitIdRoute
+  BuildHabitIdRoute: typeof BuildHabitIdRouteWithChildren
   BuildIndexRoute: typeof BuildIndexRoute
 }
 
 const BuildRouteChildren: BuildRouteChildren = {
-  BuildHabitIdRoute: BuildHabitIdRoute,
+  BuildHabitIdRoute: BuildHabitIdRouteWithChildren,
   BuildIndexRoute: BuildIndexRoute,
 }
 
