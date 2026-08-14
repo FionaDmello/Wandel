@@ -198,8 +198,12 @@ function SettingsForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Kindness reminders</Label>
-          <div className="flex flex-col gap-3">
+          <Label id="settings-reminders-label">Kindness reminders</Label>
+          <div
+            role="group"
+            aria-labelledby="settings-reminders-label"
+            className="flex flex-col gap-3"
+          >
             {reminders.map((reminder, index) => (
               <div
                 key={index}
@@ -209,6 +213,7 @@ function SettingsForm({
                   value={reminder}
                   onChange={(e) => updateReminder(index, e.target.value)}
                   rows={1}
+                  aria-label={`Reminder ${index + 1}`}
                   className={`flex-1 bg-transparent border-none outline-none resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
                   placeholder="Write a reminder..."
                 />
