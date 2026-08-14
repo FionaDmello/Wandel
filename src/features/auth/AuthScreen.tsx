@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Divider } from "@/components/ui/Divider";
+import type { AuthMode } from "@/types/auth";
 
 import { EmailPasswordForm } from "./EmailPasswordForm";
 import { ConfirmationScreen } from "./MagicLinkConfirmation";
@@ -14,6 +15,7 @@ type PendingConfirmation =
 
 export function AuthScreen() {
   const [pending, setPending] = useState<PendingConfirmation>(null);
+  const [mode, setMode] = useState<AuthMode>("signIn");
 
   if (pending?.type === "signup") {
     return (
@@ -42,20 +44,30 @@ export function AuthScreen() {
 
         <div className="flex flex-col gap-6">
           <EmailPasswordForm
+            mode={mode}
+            onToggleMode={() =>
+              setMode(mode === "signIn" ? "signUp" : "signIn")
+            }
             onConfirmationRequired={(email) =>
               setPending({ type: "signup", email })
             }
           />
 
-          <div className="flex items-center gap-3">
-            <Divider className="flex-1 my-0" />
-            <span className="font-sans text-xs text-muted shrink-0">or</span>
-            <Divider className="flex-1 my-0" />
-          </div>
+          {mode === "signIn" && (
+            <>
+              <div className="flex items-center gap-3">
+                <Divider className="flex-1 my-0" />
+                <span className="font-sans text-xs text-muted shrink-0">
+                  or
+                </span>
+                <Divider className="flex-1 my-0" />
+              </div>
 
-          <MagicLinkForm
-            onSent={(email) => setPending({ type: "magic-link", email })}
-          />
+              <MagicLinkForm
+                onSent={(email) => setPending({ type: "magic-link", email })}
+              />
+            </>
+          )}
         </div>
       </div>
     </ScreenWrap>
