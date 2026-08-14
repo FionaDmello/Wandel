@@ -71,33 +71,36 @@ export function CalendarGrid({
 
       {weeks.map((week, wi) => (
         <div key={wi} className="grid grid-cols-7 gap-1">
-          {week.map((cell, di) =>
-            cell ? (
+          {week.map((cell, di) => {
+            if (!cell) return <div key={di} />;
+
+            const isFuture =
+              year > currentYear ||
+              (year === currentYear &&
+                month === currentMonth &&
+                cell.date > today);
+
+            return (
               <DayCell
                 key={cell.date}
                 date={cell.date}
                 day={cell.day}
                 hasEngineActivity={activitySet.has(cell.date)}
                 breakCount={
-                  eligibleBreakHabits.filter(
-                    (h) =>
-                      h.created_at.slice(0, 10) <= cell.date &&
-                      !breakSlippedByDate.get(cell.date)?.has(h.id),
-                  ).length
+                  isFuture
+                    ? 0
+                    : eligibleBreakHabits.filter(
+                        (h) =>
+                          h.created_at.slice(0, 10) <= cell.date &&
+                          !breakSlippedByDate.get(cell.date)?.has(h.id),
+                      ).length
                 }
                 buildCount={buildHabitsByDate.get(cell.date)?.size ?? 0}
-                isFuture={
-                  year > currentYear ||
-                  (year === currentYear &&
-                    month === currentMonth &&
-                    cell.date > today)
-                }
+                isFuture={isFuture}
                 onTap={() => onDayTap(cell.date)}
               />
-            ) : (
-              <div key={di} />
-            ),
-          )}
+            );
+          })}
         </div>
       ))}
     </div>
