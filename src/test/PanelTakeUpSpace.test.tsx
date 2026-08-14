@@ -228,19 +228,46 @@ describe("PanelTakeUpSpace", () => {
     expect(screen.getByText("tus-logger")).toBeInTheDocument();
   });
 
-  it("clicking Discard abandons the draft, then creates a fresh entry and opens the logger", () => {
+  it("clicking Discard abandons the draft and does not recreate one", () => {
     draftData = { ...makeEntry(5), status: "draft" };
     render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
     fireEvent.click(screen.getByText("Discard"));
-    expect(mockAbandonMutate).toHaveBeenCalledWith(
-      "tus-5",
-      expect.objectContaining({ onSuccess: expect.any(Function) }),
+    expect(mockAbandonMutate).toHaveBeenCalledWith("tus-5");
+    expect(mockCreateMutate).not.toHaveBeenCalled();
+    expect(screen.queryByText("tus-logger")).toBeNull();
+  });
+
+  it("reverts to the normal state once the draft is discarded", () => {
+    draftData = { ...makeEntry(5), status: "draft" };
+    const { rerender } = render(
+      <PanelTakeUpSpace userId="user-1" date="2026-07-24" />,
     );
-    expect(mockCreateMutate).toHaveBeenCalledWith(
-      { date: "2026-07-24" },
-      expect.objectContaining({ onSuccess: expect.any(Function) }),
-    );
+    fireEvent.click(screen.getByText("Discard"));
+
+    draftData = null;
+    rerender(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+
+    expect(screen.queryByText("You have an entry in progress.")).toBeNull();
+    expect(screen.getByText("Notice")).toBeInTheDocument();
+  });
+
+  it("clicking the in-progress card in the entries log continues the draft", () => {
+    const draftEntry: TakeUpSpaceEntry = { ...makeEntry(5), status: "draft" };
+    draftData = draftEntry;
+    entriesData = [draftEntry];
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByText("In progress — tap to continue."));
     expect(screen.getByText("tus-logger")).toBeInTheDocument();
+  });
+
+  it("the in-progress card in the entries log does not continue the draft while discarding", () => {
+    const draftEntry: TakeUpSpaceEntry = { ...makeEntry(5), status: "draft" };
+    draftData = draftEntry;
+    entriesData = [draftEntry];
+    mockAbandonIsPending = true;
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByText("In progress — tap to continue."));
+    expect(screen.queryByText("tus-logger")).toBeNull();
   });
 
   it("shows Discarding… on the Discard button while a mutation is pending", () => {

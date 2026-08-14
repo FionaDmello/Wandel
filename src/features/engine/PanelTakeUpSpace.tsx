@@ -57,7 +57,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
     }
   }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
-  const discardPending = abandonDraft.isPending || createEntry.isPending;
+  const discardPending = abandonDraft.isPending;
   const filteredEntries = filterTakeUpSpaceEntries(entries, filters);
   const hasActiveFilters =
     filters.outcomes.length > 0 ||
@@ -66,13 +66,13 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
     filters.tagNames.length > 0 ||
     filters.noTags;
 
+  function handleContinueDraft() {
+    if (draft && !discardPending) setActiveEntry(draft);
+  }
+
   function handleDiscard() {
     if (!draft) return;
-    abandonDraft.mutate(draft.id, {
-      onSuccess: () => {
-        createEntry.mutate({ date }, { onSuccess: setActiveEntry });
-      },
-    });
+    abandonDraft.mutate(draft.id);
   }
 
   function handleLogComplete() {
@@ -129,7 +129,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
             <button
               type="button"
               disabled={discardPending}
-              onClick={() => setActiveEntry(draft)}
+              onClick={handleContinueDraft}
               className="font-sans text-[12px] text-plum font-medium disabled:opacity-50"
             >
               Continue
@@ -171,7 +171,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
 
       <TakeUpSpaceLog
         entries={filteredEntries}
-        onContinueDraft={() => {}}
+        onContinueDraft={handleContinueDraft}
         onAddToCost={setCostEditorEntry}
       />
 

@@ -72,8 +72,19 @@ export function useCreateTakeUpSpaceEntry(userId: string) {
         })
         .select()
         .single();
-      if (error) throw error;
-      return data as TakeUpSpaceEntry;
+
+      if (!error) return data as TakeUpSpaceEntry;
+      if (error.code !== "23505") throw error;
+
+      const { data: existing, error: fetchError } = await supabase
+        .from("take_up_space_log")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("status", "draft")
+        .maybeSingle();
+      if (fetchError) throw fetchError;
+      if (!existing) throw error;
+      return existing as TakeUpSpaceEntry;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
