@@ -136,8 +136,12 @@ function SettingsForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Qualities</Label>
-          <div className="flex flex-wrap gap-2">
+          <Label id="settings-qualities-label">Qualities</Label>
+          <div
+            role="group"
+            aria-labelledby="settings-qualities-label"
+            className="flex flex-wrap gap-2"
+          >
             {DEFAULT_QUALITIES.map((quality) => (
               <Chip
                 key={quality}
@@ -173,6 +177,7 @@ function SettingsForm({
                   }}
                   onBlur={confirmCustomQuality}
                   placeholder="Type a quality"
+                  aria-label="New quality"
                   className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} text-canvas placeholder:text-canvas/60 w-24`}
                 />
               </div>

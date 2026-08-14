@@ -114,8 +114,12 @@ function MarkForm({
       )}
 
       <div className="flex flex-col gap-2">
-        <Label>How did you show up?</Label>
-        <div className="flex flex-col gap-2">
+        <Label id="build-log-marks-label">How did you show up?</Label>
+        <div
+          role="group"
+          aria-labelledby="build-log-marks-label"
+          className="flex flex-col gap-2"
+        >
           {MARKS.map(({ type, label, configKey }) => {
             const description = getConfigValue(configs, configKey, subType);
             const isSelected = selectedMark === type;
@@ -217,8 +221,12 @@ export function BuildLogForm({
     return (
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <Label>Which variation?</Label>
-          <div className="flex flex-wrap gap-2">
+          <Label id="build-log-variation-label">Which variation?</Label>
+          <div
+            role="group"
+            aria-labelledby="build-log-variation-label"
+            className="flex flex-wrap gap-2"
+          >
             {subTypes.map((st) => (
               <div key={st} className="relative">
                 <Chip

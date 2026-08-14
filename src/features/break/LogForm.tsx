@@ -221,8 +221,12 @@ function LogFormFields({
     <div className="flex flex-col gap-6">
       {jobs.length > 0 && (
         <div className="flex flex-col gap-2">
-          <Label>What job is it doing?</Label>
-          <div className="flex flex-col gap-2">
+          <Label id="break-log-jobs-label">What job is it doing?</Label>
+          <div
+            role="group"
+            aria-labelledby="break-log-jobs-label"
+            className="flex flex-col gap-2"
+          >
             {jobs.map((job) => (
               <button
                 key={job.id}
@@ -287,8 +291,12 @@ function LogFormFields({
       <Divider className="my-0" />
 
       <div className="flex flex-col gap-2">
-        <Label>How are you feeling?</Label>
-        <div className="flex flex-wrap gap-2">
+        <Label id="break-log-emotions-label">How are you feeling?</Label>
+        <div
+          role="group"
+          aria-labelledby="break-log-emotions-label"
+          className="flex flex-wrap gap-2"
+        >
           {EMOTIONS.map((e) => (
             <Chip
               key={e}
