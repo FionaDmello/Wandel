@@ -125,8 +125,12 @@ export function useUpsertBuildObservation(userId: string) {
           .eq("fall_date", fallDate)
           .maybeSingle();
 
-        // A row already fully covering this episode — nothing to do.
-        if (existing && existing.return_date >= data.date) return;
+        // A row already exactly matching this episode — nothing to do.
+        // Otherwise the existing row is either stale-wide (an earlier date
+        // was just backfilled into its middle — needs shrinking) or
+        // stale-narrow (the original #29 self-heal case — needs
+        // extending); both are corrected by writing the same values below.
+        if (existing && existing.return_date === data.date) return;
 
         const { data: habit } = await supabase
           .from("habits")

@@ -251,4 +251,46 @@ describe("useUpsertBuildObservation — standing up on real gaps", () => {
     );
     expect(mockStandingUpInsert).not.toHaveBeenCalled();
   });
+
+  it("shrinks a stale wide row when an earlier date is backfilled into its middle", async () => {
+    // The stored row currently spans 2026-05-11 -> 2026-05-20 (written when
+    // May 20 was the nearest later log). We're now saving 2026-05-14, which
+    // falls inside that span and should shrink the row's return_date down
+    // to 2026-05-14.
+    mockPreviousObservation.mockResolvedValue({
+      data: { date: "2026-05-10" },
+      error: null,
+    });
+    mockHabitSingle.mockResolvedValue({
+      data: { name: "Running" },
+      error: null,
+    });
+    mockStandingUpExisting.mockResolvedValue({
+      data: { id: "wide-stale-row", return_date: "2026-05-20" },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useUpsertBuildObservation("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD); // PAYLOAD.date is "2026-05-14"
+    });
+
+    await waitFor(() =>
+      expect(mockStandingUpUpdate).toHaveBeenCalledWith(
+        {
+          track_type: "build",
+          track_name: "Running",
+          protocol: "drift",
+          fall_date: "2026-05-11",
+          return_date: "2026-05-14",
+          gap_days: 3,
+        },
+        "wide-stale-row",
+      ),
+    );
+    expect(mockStandingUpInsert).not.toHaveBeenCalled();
+  });
 });
