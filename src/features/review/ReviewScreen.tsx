@@ -54,7 +54,7 @@ function ReviewContent({ userId }: { userId: string }) {
     <ScreenWrap>
       <div className="flex flex-col px-6 pt-6 pb-12 gap-8">
         <div className="flex items-center justify-between">
-          <Link to="/engine" className="font-sans text-sm text-muted">
+          <Link to="/engine" className="font-sans text-sm text-plum">
             ← Engine
           </Link>
           <p className="font-serif italic text-lg text-plum">Weekly review</p>

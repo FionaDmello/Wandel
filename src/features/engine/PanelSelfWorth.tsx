@@ -50,7 +50,7 @@ export function PanelSelfWorth({ userId, date }: PanelSelfWorthProps) {
         <button
           type="button"
           onClick={() => setShowAll(true)}
-          className="font-sans text-[12px] text-teal"
+          className="font-sans text-[12px] text-teal-dark"
         >
           Show all {entries.length} entries
         </button>

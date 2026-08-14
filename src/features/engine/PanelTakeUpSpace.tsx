@@ -106,7 +106,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
           <button
             type="button"
             onClick={() => setEditorOpen(true)}
-            className="font-sans text-[11px] text-rose font-medium"
+            className="font-sans text-[11px] text-rose-dark font-medium"
           >
             Edit
           </button>

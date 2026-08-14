@@ -56,7 +56,7 @@ function ChipGroup<T extends string>({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+      <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
         {label}
       </span>
       <div className="flex flex-wrap gap-2">
@@ -134,7 +134,7 @@ export function TakeUpSpaceFilterSheet({
         />
 
         <div className="flex flex-col gap-2">
-          <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+          <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
             Tags
           </span>
           <div className="flex flex-wrap gap-2">

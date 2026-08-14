@@ -22,7 +22,7 @@ export function TabBar() {
             />
             <Icon active={active} />
             <span
-              className={`font-sans text-[10px] mt-0.5 ${active ? "font-medium text-plum" : "font-normal text-muted"}`}
+              className={`font-sans text-[10px] mt-0.5 ${active ? "font-medium text-plum" : "font-normal text-plum"}`}
             >
               {label}
             </span>

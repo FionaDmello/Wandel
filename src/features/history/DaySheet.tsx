@@ -104,8 +104,8 @@ export function DaySheet({
           {/* Engine */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue shrink-0" />
-              <p className="font-sans text-[11px] font-medium text-blue uppercase tracking-[0.08em]">
+              <span className="w-2 h-2 rounded-full bg-blue-dark shrink-0" />
+              <p className="font-sans text-[11px] font-medium text-blue-dark uppercase tracking-[0.08em]">
                 Engine
               </p>
             </div>
@@ -122,7 +122,7 @@ export function DaySheet({
                   <button
                     type="button"
                     onClick={goToEngine}
-                    className="font-sans text-[11px] font-medium text-blue bg-transparent border-none cursor-pointer"
+                    className="font-sans text-[11px] font-medium text-blue-dark bg-transparent border-none cursor-pointer"
                   >
                     Go to Engine →
                   </button>
@@ -139,8 +139,8 @@ export function DaySheet({
               return (
                 <div key={habit.id} className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-teal shrink-0" />
-                    <p className="font-sans text-[11px] font-medium text-teal uppercase tracking-[0.08em]">
+                    <span className="w-2 h-2 rounded-full bg-teal-dark shrink-0" />
+                    <p className="font-sans text-[11px] font-medium text-teal-dark uppercase tracking-[0.08em]">
                       {habit.name}
                     </p>
                   </div>
@@ -187,7 +187,7 @@ export function DaySheet({
                               `/break/${habit.id}/log?date=${date}` as "/break/$habitId/log",
                             )
                           }
-                          className="font-sans text-[11px] font-medium text-teal bg-transparent border-none cursor-pointer"
+                          className="font-sans text-[11px] font-medium text-teal-dark bg-transparent border-none cursor-pointer"
                         >
                           Add it
                         </button>
