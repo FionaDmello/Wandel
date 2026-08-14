@@ -99,6 +99,8 @@ export function useUpsertBuildObservation(userId: string) {
       try {
         // Standing up is derived from real logged gaps, never from the
         // decorative "I am returning" drift acknowledgment.
+        let wroteStandingUp = false;
+
         const { data: previous } = await supabase
           .from("build_observations")
           .select("date")
@@ -171,6 +173,7 @@ export function useUpsertBuildObservation(userId: string) {
                     gap_days: gapDays,
                   });
                 }
+                wroteStandingUp = true;
               }
             }
           }
@@ -230,14 +233,17 @@ export function useUpsertBuildObservation(userId: string) {
                   return_date: next.date,
                   gap_days: nextGapDays,
                 });
+                wroteStandingUp = true;
               }
             }
           }
         }
 
-        queryClient.invalidateQueries({
-          queryKey: ["standing_up_log", userId],
-        });
+        if (wroteStandingUp) {
+          queryClient.invalidateQueries({
+            queryKey: ["standing_up_log", userId],
+          });
+        }
       } catch {
         // Standing up write is best-effort; don't fail the mutation
       }
