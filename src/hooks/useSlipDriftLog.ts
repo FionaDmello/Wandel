@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, subDays } from "date-fns";
 
 import { supabase } from "@/lib/supabase";
@@ -16,6 +16,8 @@ interface SlipDriftPayload {
 }
 
 export function useLogSlipDrift(userId: string) {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: SlipDriftPayload) => {
       const { data, error } = await supabase
@@ -25,6 +27,11 @@ export function useLogSlipDrift(userId: string) {
         .single();
       if (error) throw error;
       return data as SlipDriftEntry;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [`${variables.track_type}_slip_events`, userId],
+      });
     },
   });
 }

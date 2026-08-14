@@ -86,6 +86,34 @@ describe("useLogSlipDrift", () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
+
+  it("invalidates the track-type-scoped slip-events query on success", async () => {
+    mockSingle.mockResolvedValue({ data: ENTRY, error: null });
+
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const invalidateSpy = vi.spyOn(client, "invalidateQueries");
+    function localWrapper({ children }: { children: React.ReactNode }) {
+      return React.createElement(QueryClientProvider, { client }, children);
+    }
+
+    const { result } = renderHook(() => useLogSlipDrift("user-1"), {
+      wrapper: localWrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD);
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: ["engine_slip_events", "user-1"],
+    });
+  });
 });
 
 describe("useRecentEngineDriftCount", () => {
