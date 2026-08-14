@@ -130,7 +130,7 @@ function SettingsForm({
               setWhyStatement(e.target.value);
             }}
             rows={3}
-            className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas resize-none placeholder:text-muted`}
+            className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas resize-none placeholder:text-muted`}
             placeholder="Why are you doing this?"
           />
         </div>
@@ -178,7 +178,7 @@ function SettingsForm({
                   onBlur={confirmCustomQuality}
                   placeholder="Type a quality"
                   aria-label="New quality"
-                  className={`bg-transparent border-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas font-sans ${INPUT_TEXT_SIZE} text-canvas placeholder:text-canvas/60 w-24`}
+                  className={`bg-transparent border-none focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas font-sans ${INPUT_TEXT_SIZE} text-canvas placeholder:text-canvas/60 w-24`}
                 />
               </div>
             ) : (
@@ -214,7 +214,7 @@ function SettingsForm({
                   onChange={(e) => updateReminder(index, e.target.value)}
                   rows={1}
                   aria-label={`Reminder ${index + 1}`}
-                  className={`flex-1 bg-transparent border-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
+                  className={`flex-1 bg-transparent border-none focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
                   placeholder="Write a reminder..."
                 />
                 {reminders.length > 1 && (

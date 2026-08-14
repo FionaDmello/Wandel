@@ -62,7 +62,7 @@ export function HardThingLogger({
           placeholder="What did you show up for?"
           aria-label="What you showed up for"
           rows={2}
-          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
         />
 
         <div className="flex flex-col gap-2">
@@ -110,7 +110,7 @@ export function HardThingLogger({
           placeholder="What made this hard — and what stays with you?"
           aria-label="Note"
           rows={3}
-          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
         />
 
         <button

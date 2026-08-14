@@ -126,7 +126,7 @@ export function TakeUpSpaceTagEditor({
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Tag name"
-            className={`w-full bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
+            className={`w-full bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
           />
           {isDuplicate && newName.trim() && (
             <span className="font-sans text-[11px] text-muted">
