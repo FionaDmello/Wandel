@@ -49,7 +49,7 @@ export function SelfLoveLogger({
   }
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title="A moment of care" onClose={onClose}>
       <div className="px-6 pt-2 pb-1">
         <p className="font-serif italic text-[18px] text-plum">
           A moment of care

@@ -83,7 +83,7 @@ export function TakeUpSpaceLogger({
   }
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title="Take Up Space" onClose={onClose}>
       <div className="flex justify-center gap-2 px-6 pt-2 pb-1">
         <button
           type="button"

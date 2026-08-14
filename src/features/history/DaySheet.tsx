@@ -1,7 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { format, parse } from "date-fns";
 import { X } from "lucide-react";
+import { useEffect, useRef } from "react";
 
+import { trapFocus } from "@/lib/trapFocus";
 import type {
   BreakObservationWithEmotions,
   BuildObservation,
@@ -43,6 +45,31 @@ export function DaySheet({
     navigate({ to: "/engine", search: { date } });
   };
 
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    previouslyFocused.current = document.activeElement as HTMLElement | null;
+    panelRef.current?.focus();
+    return () => {
+      previouslyFocused.current?.focus();
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && !e.isComposing) {
+        onClose();
+        return;
+      }
+      if (e.key === "Tab") {
+        trapFocus(e, panelRef.current);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <>
       <div
@@ -51,7 +78,14 @@ export function DaySheet({
         aria-hidden="true"
       />
 
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] max-h-[80dvh] overflow-y-auto pb-[env(safe-area-inset-bottom,0px)]">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={displayDate}
+        tabIndex={-1}
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] max-h-[80dvh] overflow-y-auto pb-[env(safe-area-inset-bottom,0px)]"
+      >
         <div className="flex items-center justify-between px-6 pt-5 pb-2">
           <p className="font-serif italic text-[18px] text-plum">
             {displayDate}

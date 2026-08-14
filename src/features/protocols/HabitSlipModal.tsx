@@ -126,7 +126,11 @@ export function HabitSlipModal({
   };
 
   return (
-    <ProtocolModal onClose={onDismiss} dismissible={!isSaving}>
+    <ProtocolModal
+      title={habit.trackName}
+      onClose={onDismiss}
+      dismissible={!isSaving}
+    >
       <div className="px-6 pt-5 pb-1">
         <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
           {habit.trackName}

@@ -37,7 +37,7 @@ export function TakeUpSpaceCostEditor({
   }
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title={questionText ?? "Add to this"} onClose={onClose}>
       <div className="flex flex-col gap-4 px-6 pt-3 pb-8">
         {questionText && (
           <p className="font-sans text-[14px] font-medium text-plum">
