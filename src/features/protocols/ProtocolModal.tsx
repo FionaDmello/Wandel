@@ -18,10 +18,19 @@ export function ProtocolModal({
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const dragDelta = useRef(0);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    previouslyFocused.current = document.activeElement as HTMLElement | null;
+    sheetRef.current?.focus();
+    return () => {
+      previouslyFocused.current?.focus();
+    };
   }, []);
 
   const finishDismiss = useCallback(() => {
@@ -94,6 +103,9 @@ export function ProtocolModal({
 
       <div
         ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

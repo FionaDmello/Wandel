@@ -285,4 +285,38 @@ describe("ProtocolModal", () => {
     expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
     removeSpy.mockRestore();
   });
+
+  it("sets dialog role and aria-modal on the sheet", () => {
+    render(
+      <ProtocolModal onClose={vi.fn()}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+  });
+
+  it("focuses the sheet on mount", () => {
+    render(
+      <ProtocolModal onClose={vi.fn()}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+    expect(screen.getByRole("dialog")).toHaveFocus();
+  });
+
+  it("returns focus to the previously focused element on unmount", () => {
+    const trigger = document.createElement("button");
+    document.body.appendChild(trigger);
+    trigger.focus();
+
+    const { unmount } = render(
+      <ProtocolModal onClose={vi.fn()}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+    unmount();
+
+    expect(trigger).toHaveFocus();
+    trigger.remove();
+  });
 });
