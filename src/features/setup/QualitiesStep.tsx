@@ -108,6 +108,7 @@ export function QualitiesStep({ values, onNext }: QualitiesStepProps) {
               }}
               onBlur={confirmCustom}
               placeholder="Type a quality"
+              aria-label="New quality"
               className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} text-canvas placeholder:text-canvas/60 w-24`}
             />
           </div>
