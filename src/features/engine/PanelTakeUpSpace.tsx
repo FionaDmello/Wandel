@@ -57,7 +57,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
     }
   }, [tagsLoading, tags, seedPending, seedSuccess, seedMutate]);
 
-  const discardPending = abandonDraft.isPending || createEntry.isPending;
+  const discardPending = abandonDraft.isPending;
   const filteredEntries = filterTakeUpSpaceEntries(entries, filters);
   const hasActiveFilters =
     filters.outcomes.length > 0 ||
@@ -68,11 +68,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
 
   function handleDiscard() {
     if (!draft) return;
-    abandonDraft.mutate(draft.id, {
-      onSuccess: () => {
-        createEntry.mutate({ date }, { onSuccess: setActiveEntry });
-      },
-    });
+    abandonDraft.mutate(draft.id);
   }
 
   function handleLogComplete() {
