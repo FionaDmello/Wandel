@@ -121,6 +121,14 @@ export function HardThingLogger({
         >
           I did this
         </button>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="font-sans text-[13px] text-violet text-center mt-1"
+        >
+          Cancel
+        </button>
       </div>
     </ProtocolModal>
   );

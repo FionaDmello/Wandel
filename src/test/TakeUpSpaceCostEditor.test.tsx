@@ -156,4 +156,18 @@ describe("TakeUpSpaceCostEditor", () => {
     expect(mockMutate).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalledOnce();
   });
+
+  it("clicking Cancel calls onClose without saving", () => {
+    const onClose = vi.fn();
+    render(
+      <TakeUpSpaceCostEditor
+        userId="user-1"
+        entry={makeEntry()}
+        onClose={onClose}
+      />,
+    );
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(mockMutate).not.toHaveBeenCalled();
+  });
 });
