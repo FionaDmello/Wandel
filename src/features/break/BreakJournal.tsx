@@ -128,7 +128,7 @@ export function BreakJournal({ userId, habitId, configs }: BreakJournalProps) {
                     search: { date: day.date, entryId: o.id },
                   })
                 }
-                className="font-sans text-[11px] font-medium text-teal text-left bg-transparent border-none cursor-pointer pt-1"
+                className="font-sans text-[11px] font-medium text-teal-dark text-left bg-transparent border-none cursor-pointer pt-1"
               >
                 Edit
               </button>

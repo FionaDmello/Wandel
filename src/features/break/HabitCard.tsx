@@ -12,7 +12,7 @@ const STATUS_STYLES: Record<
   HabitStatus,
   { dot: string; label: string; text: string }
 > = {
-  active: { dot: "bg-teal", label: "Active", text: "text-teal" },
+  active: { dot: "bg-teal-dark", label: "Active", text: "text-teal-dark" },
   scheduled: { dot: "bg-violet", label: "Scheduled", text: "text-violet" },
   paused: { dot: "bg-amber", label: "Paused", text: "text-amber" },
   deactivated: { dot: "bg-muted", label: "Deactivated", text: "text-muted" },

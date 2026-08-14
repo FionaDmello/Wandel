@@ -231,7 +231,7 @@ function SettingsForm({
 
         {error && <p className="font-sans text-xs text-amber">{error}</p>}
         {!error && saved && (
-          <p className="font-sans text-xs text-teal">Saved.</p>
+          <p className="font-sans text-xs text-teal-dark">Saved.</p>
         )}
 
         <Button variant="primary" onClick={handleSave} disabled={isPending}>
