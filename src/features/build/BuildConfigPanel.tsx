@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
 import { Divider } from "@/components/ui/Divider";
+import { IconButton } from "@/components/ui/IconButton";
 import {
   useAddBuildSubType,
   useDeleteBuildSubType,
@@ -92,14 +93,13 @@ export function BuildConfigPanel({
     return (
       <ScreenWrap>
         <div className="flex items-center gap-3 px-5 pt-[14px]">
-          <button
-            type="button"
+          <IconButton
             onClick={() => setView({ mode: "list" })}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer shrink-0"
-            aria-label="Back"
+            ariaLabel="Back"
+            className="text-muted shrink-0"
           >
             <ArrowLeft size={18} />
-          </button>
+          </IconButton>
           <p className="font-sans text-sm font-medium text-plum">
             {st ?? habitName}
           </p>
@@ -148,14 +148,13 @@ export function BuildConfigPanel({
     return (
       <ScreenWrap>
         <div className="flex items-center gap-3 px-5 pt-[14px]">
-          <button
-            type="button"
+          <IconButton
             onClick={() => setView({ mode: "list" })}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer shrink-0"
-            aria-label="Back"
+            ariaLabel="Back"
+            className="text-muted shrink-0"
           >
             <ArrowLeft size={18} />
-          </button>
+          </IconButton>
           <p className="font-sans text-sm font-medium text-plum">
             New variation
           </p>
@@ -180,14 +179,13 @@ export function BuildConfigPanel({
   return (
     <ScreenWrap>
       <div className="flex items-center gap-3 px-5 pt-[14px]">
-        <button
-          type="button"
+        <IconButton
           onClick={onClose}
-          className="p-1 text-muted bg-transparent border-none cursor-pointer shrink-0"
-          aria-label="Close"
+          ariaLabel="Close"
+          className="text-muted shrink-0"
         >
           <ArrowLeft size={18} />
-        </button>
+        </IconButton>
         <p className="font-sans text-sm font-medium text-plum">
           {habitName} — config
         </p>

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { DateSelector } from "@/components/ui/DateSelector";
+import { IconButton } from "@/components/ui/IconButton";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
 import { useSession } from "@/hooks/useSession";
 import type { HabitWithConfigs } from "@/types/database";
@@ -33,23 +34,22 @@ function BuildLogContent({
     <ScreenWrap>
       <div className="flex flex-col px-6 pt-6 gap-6">
         <div className="flex items-center justify-between">
-          <button
-            type="button"
+          <IconButton
             onClick={() =>
               navigate({
                 to: "/build/$habitId",
                 params: { habitId: habit.id },
               })
             }
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Back"
+            ariaLabel="Back"
+            className="text-muted"
           >
             <ArrowLeft size={18} />
-          </button>
+          </IconButton>
           <h1 className="font-sans text-sm font-medium text-plum">
             {habit.name}
           </h1>
-          <div className="w-[26px]" />
+          <div className="w-[34px]" />
         </div>
 
         {habit.status === "active" ? (
