@@ -211,4 +211,17 @@ describe("EvidenceEditor", () => {
     await userEvent.click(screen.getByText("This is who you are."));
     expect(localOnSuccess).toHaveBeenCalledOnce();
   });
+
+  it("clicking Cancel calls onClose without submitting", async () => {
+    render(
+      <EvidenceEditor
+        {...DEFAULT_PROPS}
+        onClose={onClose}
+        onSuccess={onSuccess}
+      />,
+    );
+    await userEvent.click(screen.getByText("Cancel"));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(mockMutate).not.toHaveBeenCalled();
+  });
 });

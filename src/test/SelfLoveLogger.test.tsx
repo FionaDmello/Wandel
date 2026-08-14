@@ -95,4 +95,12 @@ describe("SelfLoveLogger", () => {
     await userEvent.click(screen.getByText("That was for me"));
     expect(onSuccess).toHaveBeenCalledOnce();
   });
+
+  it("clicking Cancel calls onClose without submitting", async () => {
+    const onClose = vi.fn();
+    render(<SelfLoveLogger {...DEFAULT_PROPS} onClose={onClose} />);
+    await userEvent.click(screen.getByText("Cancel"));
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(mockMutate).not.toHaveBeenCalled();
+  });
 });
