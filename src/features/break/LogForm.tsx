@@ -268,8 +268,9 @@ function LogFormFields({
       )}
 
       <div className="flex flex-col gap-2">
-        <Label>Context</Label>
+        <Label htmlFor="break-log-context">Context</Label>
         <textarea
+          id="break-log-context"
           value={context}
           onChange={(e) => setContext(e.target.value)}
           rows={2}

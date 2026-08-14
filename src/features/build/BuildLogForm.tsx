@@ -158,8 +158,9 @@ function MarkForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Note (optional)</Label>
+        <Label htmlFor="build-log-note">Note (optional)</Label>
         <textarea
+          id="build-log-note"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={2}

@@ -118,8 +118,9 @@ export function SubTypeStep({ habitName, onNext, onCancel }: SubTypeStepProps) {
         {showForm ? (
           <div className="flex flex-col gap-4 p-4 bg-card rounded-2xl border-l-[3px] border-l-border">
             <div className="flex flex-col gap-2">
-              <Label>Variation name</Label>
+              <Label htmlFor="subtype-name">Variation name</Label>
               <input
+                id="subtype-name"
                 type="text"
                 value={formName}
                 onChange={(e) => {
@@ -132,8 +133,9 @@ export function SubTypeStep({ habitName, onNext, onCancel }: SubTypeStepProps) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label>Anchor</Label>
+              <Label htmlFor="subtype-anchor">Anchor</Label>
               <input
+                id="subtype-anchor"
                 type="text"
                 value={formAnchor}
                 onChange={(e) => {
@@ -145,8 +147,9 @@ export function SubTypeStep({ habitName, onNext, onCancel }: SubTypeStepProps) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label>Non-negotiable</Label>
+              <Label htmlFor="subtype-nonneg">Non-negotiable</Label>
               <input
+                id="subtype-nonneg"
                 type="text"
                 value={formNonNeg}
                 onChange={(e) => {
@@ -158,8 +161,9 @@ export function SubTypeStep({ habitName, onNext, onCancel }: SubTypeStepProps) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label>Minimum version</Label>
+              <Label htmlFor="subtype-minimum">Minimum version</Label>
               <input
+                id="subtype-minimum"
                 type="text"
                 value={formMin}
                 onChange={(e) => {
@@ -171,8 +175,9 @@ export function SubTypeStep({ habitName, onNext, onCancel }: SubTypeStepProps) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label>Full session</Label>
+              <Label htmlFor="subtype-full">Full session</Label>
               <input
+                id="subtype-full"
                 type="text"
                 value={formFull}
                 onChange={(e) => {

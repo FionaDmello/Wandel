@@ -102,8 +102,9 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
       <div className="flex flex-col gap-5">
         {props.existingNames !== undefined && (
           <div className="flex flex-col gap-2">
-            <Label>Variation name</Label>
+            <Label htmlFor="variation-name">Variation name</Label>
             <input
+              id="variation-name"
               type="text"
               value={name}
               onChange={(e) => {
@@ -118,8 +119,11 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
         )}
 
         <div className="flex flex-col gap-2">
-          <Label>Anchor — when will you do this?</Label>
+          <Label htmlFor="variation-anchor">
+            Anchor — when will you do this?
+          </Label>
           <input
+            id="variation-anchor"
             type="text"
             value={anchor}
             onChange={(e) => {
@@ -132,8 +136,11 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Non-negotiable — the bare minimum</Label>
+          <Label htmlFor="variation-nonneg">
+            Non-negotiable — the bare minimum
+          </Label>
           <input
+            id="variation-nonneg"
             type="text"
             value={nonNegotiable}
             onChange={(e) => {
@@ -146,8 +153,9 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Minimum version</Label>
+          <Label htmlFor="variation-minimum">Minimum version</Label>
           <input
+            id="variation-minimum"
             type="text"
             value={minimumVersion}
             onChange={(e) => {
@@ -160,8 +168,9 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Full session</Label>
+          <Label htmlFor="variation-full">Full session</Label>
           <input
+            id="variation-full"
             type="text"
             value={fullVersion}
             onChange={(e) => {

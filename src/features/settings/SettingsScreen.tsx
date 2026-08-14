@@ -121,8 +121,9 @@ function SettingsForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Your why</Label>
+          <Label htmlFor="settings-why">Your why</Label>
           <textarea
+            id="settings-why"
             value={whyStatement}
             onChange={(e) => {
               setError(null);
