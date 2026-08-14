@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
+import { IconButton } from "@/components/ui/IconButton";
 import { INITIAL_DRAFT } from "@/constants/setupDraft";
 import { TOTAL_CONTENT_STEPS } from "@/constants/setupSteps";
 import type { SetupDraft } from "@/types/setup";
@@ -27,14 +28,9 @@ export function SetupScreen() {
     <ScreenWrap padBottom={false}>
       {step > 0 && (
         <div className="flex items-center px-5 pt-[14px]">
-          <button
-            type="button"
-            onClick={back}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Go back"
-          >
+          <IconButton onClick={back} ariaLabel="Go back" className="text-muted">
             <ArrowLeft size={18} />
-          </button>
+          </IconButton>
 
           <div className="flex flex-1 justify-center gap-[6px]">
             {Array.from({ length: TOTAL_CONTENT_STEPS }, (_, i) => (
@@ -47,7 +43,7 @@ export function SetupScreen() {
             ))}
           </div>
 
-          <div className="w-[26px]" />
+          <div className="w-[34px]" />
         </div>
       )}
 

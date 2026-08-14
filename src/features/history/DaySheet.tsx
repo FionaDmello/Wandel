@@ -3,6 +3,7 @@ import { format, parse } from "date-fns";
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+import { IconButton } from "@/components/ui/IconButton";
 import { trapFocus } from "@/lib/trapFocus";
 import type {
   BreakObservationWithEmotions,
@@ -90,14 +91,13 @@ export function DaySheet({
           <p className="font-serif italic text-[18px] text-plum">
             {displayDate}
           </p>
-          <button
-            type="button"
+          <IconButton
             onClick={onClose}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Close"
+            ariaLabel="Close"
+            className="text-muted"
           >
             <X size={18} />
-          </button>
+          </IconButton>
         </div>
 
         <div className="flex flex-col gap-5 px-6 pb-8">

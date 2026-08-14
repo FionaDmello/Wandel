@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
+import { IconButton } from "@/components/ui/IconButton";
 import { Label } from "@/components/ui/Label";
 import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import type { SubTypeConfig } from "@/hooks/useBuildHabits";
@@ -18,14 +19,13 @@ function SubTypeCard({ name, onRemove }: SubTypeCardProps) {
       <span className="font-sans text-[13px] font-medium text-plum">
         {name}
       </span>
-      <button
-        type="button"
+      <IconButton
         onClick={onRemove}
-        className="p-1 text-muted bg-transparent border-none cursor-pointer"
-        aria-label={`Remove ${name}`}
+        ariaLabel={`Remove ${name}`}
+        className="text-muted"
       >
         <X size={14} strokeWidth={2} />
-      </button>
+      </IconButton>
     </div>
   );
 }

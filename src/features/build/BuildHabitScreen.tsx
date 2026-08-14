@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Divider } from "@/components/ui/Divider";
+import { IconButton } from "@/components/ui/IconButton";
 import { PausedBanner } from "@/features/break/PausedBanner";
 import { BuildJournal } from "@/features/build/BuildJournal";
 import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
@@ -53,25 +54,23 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
     <ScreenWrap>
       <div className="flex flex-col px-6 pt-6 gap-6">
         <div className="flex items-center justify-between">
-          <button
-            type="button"
+          <IconButton
             onClick={() => navigate({ to: "/build" })}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Back"
+            ariaLabel="Back"
+            className="text-muted"
           >
             <ArrowLeft size={18} />
-          </button>
+          </IconButton>
           <h1 className="font-sans text-sm font-medium text-plum">
             {habit.name}
           </h1>
-          <button
-            type="button"
+          <IconButton
             onClick={() => setShowConfig(true)}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Configure habit"
+            ariaLabel="Configure habit"
+            className="text-muted"
           >
             <Settings size={18} />
-          </button>
+          </IconButton>
         </div>
 
         {habit.status === "active" && (

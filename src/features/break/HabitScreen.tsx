@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
 import { Divider } from "@/components/ui/Divider";
+import { IconButton } from "@/components/ui/IconButton";
 import { BreakJournal } from "@/features/break/BreakJournal";
 import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
@@ -53,25 +54,23 @@ function HabitContent({ userId, habit }: HabitContentProps) {
     <ScreenWrap>
       <div className="flex flex-col px-6 pt-6 gap-6">
         <div className="flex items-center justify-between">
-          <button
-            type="button"
+          <IconButton
             onClick={() => navigate({ to: "/break" })}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Back"
+            ariaLabel="Back"
+            className="text-muted"
           >
             <ArrowLeft size={18} />
-          </button>
+          </IconButton>
           <h1 className="font-sans text-sm font-medium text-plum">
             {habit.name}
           </h1>
-          <button
-            type="button"
+          <IconButton
             onClick={() => setShowJobConfig(true)}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Configure jobs"
+            ariaLabel="Configure jobs"
+            className="text-muted"
           >
             <Settings size={18} />
-          </button>
+          </IconButton>
         </div>
 
         {habit.status === "active" && (
