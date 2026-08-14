@@ -96,6 +96,7 @@ export function SelfLoveLogger({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="What did this bring up?"
+          aria-label="Note"
           rows={3}
           className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />

@@ -121,8 +121,9 @@ function SettingsForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Your why</Label>
+          <Label htmlFor="settings-why">Your why</Label>
           <textarea
+            id="settings-why"
             value={whyStatement}
             onChange={(e) => {
               setError(null);
@@ -135,8 +136,12 @@ function SettingsForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Qualities</Label>
-          <div className="flex flex-wrap gap-2">
+          <Label id="settings-qualities-label">Qualities</Label>
+          <div
+            role="group"
+            aria-labelledby="settings-qualities-label"
+            className="flex flex-wrap gap-2"
+          >
             {DEFAULT_QUALITIES.map((quality) => (
               <Chip
                 key={quality}
@@ -172,6 +177,7 @@ function SettingsForm({
                   }}
                   onBlur={confirmCustomQuality}
                   placeholder="Type a quality"
+                  aria-label="New quality"
                   className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} text-canvas placeholder:text-canvas/60 w-24`}
                 />
               </div>
@@ -192,8 +198,12 @@ function SettingsForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Kindness reminders</Label>
-          <div className="flex flex-col gap-3">
+          <Label id="settings-reminders-label">Kindness reminders</Label>
+          <div
+            role="group"
+            aria-labelledby="settings-reminders-label"
+            className="flex flex-col gap-3"
+          >
             {reminders.map((reminder, index) => (
               <div
                 key={index}
@@ -203,6 +213,7 @@ function SettingsForm({
                   value={reminder}
                   onChange={(e) => updateReminder(index, e.target.value)}
                   rows={1}
+                  aria-label={`Reminder ${index + 1}`}
                   className={`flex-1 bg-transparent border-none outline-none resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
                   placeholder="Write a reminder..."
                 />

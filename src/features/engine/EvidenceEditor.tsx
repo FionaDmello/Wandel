@@ -51,6 +51,7 @@ export function EvidenceEditor({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="What would you title this moment?"
+          aria-label="Title"
           rows={1}
           className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
@@ -59,6 +60,7 @@ export function EvidenceEditor({
           value={situation}
           onChange={(e) => setSituation(e.target.value)}
           placeholder="What was happening?"
+          aria-label="Situation"
           rows={3}
           className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
@@ -67,6 +69,7 @@ export function EvidenceEditor({
           value={didWell}
           onChange={(e) => setDidWell(e.target.value)}
           placeholder="What did you actually do well here?"
+          aria-label="What you did well"
           rows={3}
           className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
