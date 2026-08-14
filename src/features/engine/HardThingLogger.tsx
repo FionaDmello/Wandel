@@ -60,6 +60,7 @@ export function HardThingLogger({
           value={what}
           onChange={(e) => setWhat(e.target.value)}
           placeholder="What did you show up for?"
+          aria-label="What you showed up for"
           rows={2}
           className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
@@ -107,6 +108,7 @@ export function HardThingLogger({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="What made this hard — and what stays with you?"
+          aria-label="Note"
           rows={3}
           className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
         />
