@@ -1,11 +1,8 @@
 import { format } from "date-fns";
 
 import { buildCalendarGrid } from "@/constants/calendarGrid";
-import type {
-  BreakObservationWithEmotions,
-  BuildObservation,
-  Habit,
-} from "@/types/database";
+import type { BreakSlipEvent } from "@/hooks/useBreakSlipEvents";
+import type { BuildObservation, Habit } from "@/types/database";
 
 import { DayCell } from "./DayCell";
 
@@ -16,7 +13,7 @@ interface CalendarGridProps {
   month: number;
   engineActivityDates: string[];
   breakHabits: Habit[];
-  breakObs: BreakObservationWithEmotions[];
+  breakSlipEvents: BreakSlipEvent[];
   buildObs: BuildObservation[];
   onDayTap: (date: string) => void;
 }
@@ -26,7 +23,7 @@ export function CalendarGrid({
   month,
   engineActivityDates,
   breakHabits,
-  breakObs,
+  breakSlipEvents,
   buildObs,
   onDayTap,
 }: CalendarGridProps) {
@@ -37,12 +34,13 @@ export function CalendarGrid({
 
   const activitySet = new Set(engineActivityDates);
 
-  // Dates where the break habit was used (an observation was logged)
-  const breakUsedByDate = new Map<string, Set<string>>();
-  breakObs.forEach((o) => {
-    const date = o.logged_at.slice(0, 10);
-    if (!breakUsedByDate.has(date)) breakUsedByDate.set(date, new Set());
-    breakUsedByDate.get(date)!.add(o.habit_id);
+  // Dates where a real slip was logged for the habit — urge logs are
+  // purely informational and must never count as evidence here.
+  const breakSlippedByDate = new Map<string, Set<string>>();
+  breakSlipEvents.forEach((e) => {
+    const date = e.triggered_at.slice(0, 10);
+    if (!breakSlippedByDate.has(date)) breakSlippedByDate.set(date, new Set());
+    breakSlippedByDate.get(date)!.add(e.habit_id);
   });
 
   // Habits eligible to show clean-day dots (active or paused, not deactivated or scheduled)
@@ -73,33 +71,36 @@ export function CalendarGrid({
 
       {weeks.map((week, wi) => (
         <div key={wi} className="grid grid-cols-7 gap-1">
-          {week.map((cell, di) =>
-            cell ? (
+          {week.map((cell, di) => {
+            if (!cell) return <div key={di} />;
+
+            const isFuture =
+              year > currentYear ||
+              (year === currentYear &&
+                month === currentMonth &&
+                cell.date > today);
+
+            return (
               <DayCell
                 key={cell.date}
                 date={cell.date}
                 day={cell.day}
                 hasEngineActivity={activitySet.has(cell.date)}
                 breakCount={
-                  eligibleBreakHabits.filter(
-                    (h) =>
-                      h.created_at.slice(0, 10) <= cell.date &&
-                      !breakUsedByDate.get(cell.date)?.has(h.id),
-                  ).length
+                  isFuture
+                    ? 0
+                    : eligibleBreakHabits.filter(
+                        (h) =>
+                          h.created_at.slice(0, 10) <= cell.date &&
+                          !breakSlippedByDate.get(cell.date)?.has(h.id),
+                      ).length
                 }
                 buildCount={buildHabitsByDate.get(cell.date)?.size ?? 0}
-                isFuture={
-                  year > currentYear ||
-                  (year === currentYear &&
-                    month === currentMonth &&
-                    cell.date > today)
-                }
+                isFuture={isFuture}
                 onTap={() => onDayTap(cell.date)}
               />
-            ) : (
-              <div key={di} />
-            ),
-          )}
+            );
+          })}
         </div>
       ))}
     </div>
