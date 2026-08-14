@@ -89,6 +89,7 @@ export function JobsConfig({
             key={job.name}
             type="button"
             onClick={() => toggle(job)}
+            aria-pressed={isSelected(job.name)}
             className={`flex items-center justify-between gap-3 w-full text-left px-4 py-3 rounded-2xl bg-card transition-all duration-100 border-l-[3px] ${
               isSelected(job.name) ? "border-amber" : "border-transparent"
             }`}
@@ -116,6 +117,7 @@ export function JobsConfig({
             key={job.name}
             type="button"
             onClick={() => toggle(job)}
+            aria-pressed={isSelected(job.name)}
             className="flex items-center justify-between gap-3 w-full text-left px-4 py-3 rounded-2xl bg-card border-l-[3px] border-amber"
           >
             <div className="flex flex-col gap-[2px]">

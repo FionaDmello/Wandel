@@ -235,6 +235,7 @@ function LogFormFields({
                   setSelectedJob(job.value);
                   setSubmitted(false);
                 }}
+                aria-pressed={selectedJob === job.value}
                 className={`flex items-center justify-between gap-3 w-full text-left px-4 py-3 rounded-2xl bg-card border-l-[3px] transition-colors duration-100 border-none cursor-pointer ${
                   selectedJob === job.value
                     ? "border-l-amber"

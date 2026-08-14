@@ -131,6 +131,7 @@ function MarkForm({
                   setSelectedMark(type);
                   setSubmitted(false);
                 }}
+                aria-pressed={isSelected}
                 className={`flex items-center gap-4 w-full text-left px-4 py-3 rounded-2xl bg-card border-l-[3px] transition-colors duration-100 border-none cursor-pointer ${
                   isSelected
                     ? "border-l-amber"
