@@ -1,5 +1,6 @@
+import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
@@ -43,7 +44,6 @@ interface MarkFormProps {
   habitName: string;
   userId: string;
   date?: string;
-  onLogged?: () => void;
 }
 
 function MarkForm({
@@ -56,27 +56,17 @@ function MarkForm({
   habitName,
   userId,
   date,
-  onLogged,
 }: MarkFormProps) {
+  const navigate = useNavigate();
   const [selectedMark, setSelectedMark] = useState<MarkType | null>(
     existingMark,
   );
   const [note, setNote] = useState(existingNote);
   const [submitted, setSubmitted] = useState(false);
-  const [confirming, setConfirming] = useState(false);
   const { mutate: upsert, isPending } = useUpsertBuildObservation(userId);
 
   const anchor = getConfigValue(configs, "anchor", subType);
   const logDate = date ?? format(new Date(), "yyyy-MM-dd");
-
-  useEffect(() => {
-    if (!confirming) return;
-    const timer = setTimeout(() => {
-      setConfirming(false);
-      onLogged?.();
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [confirming, onLogged]);
 
   const handleLog = () => {
     setSubmitted(true);
@@ -93,17 +83,12 @@ function MarkForm({
         mark_label: markDef.label,
         note: note.trim() || undefined,
       },
-      { onSuccess: () => setConfirming(true) },
+      {
+        onSuccess: () =>
+          navigate({ to: "/build/$habitId", params: { habitId } }),
+      },
     );
   };
-
-  if (confirming) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <p className="font-serif italic text-[28px] text-plum">Logged.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -257,7 +242,6 @@ export function BuildLogForm({
             habitName={habitName}
             userId={userId}
             date={date}
-            onLogged={() => setSelectedSubType(null)}
           />
         )}
       </div>

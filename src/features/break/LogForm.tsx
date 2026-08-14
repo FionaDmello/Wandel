@@ -1,6 +1,7 @@
+import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
@@ -17,7 +18,7 @@ import {
 import { useUpdateBreakObservation } from "@/hooks/useUpdateBreakObservation";
 import type { HabitConfig } from "@/types/database";
 
-type LogPhase = "form" | "confirming" | "aftermath";
+type LogPhase = "form" | "aftermath";
 
 interface AftermathPhaseProps {
   initialEmotions: string[];
@@ -100,6 +101,7 @@ function LogFormFields({
   initialUrge,
   initialEmotions,
 }: LogFormFieldsProps) {
+  const navigate = useNavigate();
   const logDate = date ?? format(new Date(), "yyyy-MM-dd");
   const [phase, setPhase] = useState<LogPhase>("form");
   const [context, setContext] = useState(initialContext);
@@ -126,16 +128,6 @@ function LogFormFields({
       prev.includes(e) ? prev.filter((x) => x !== e) : [...prev, e],
     );
 
-  const resetForm = () => {
-    setPhase("form");
-    setContext("");
-    setSelectedJob(null);
-    setUrge(5);
-    setSelectedEmotions([]);
-    setObservationId(null);
-    setSubmitted(false);
-  };
-
   const handleSubmit = () => {
     setSubmitted(true);
     if (!selectedJob || selectedEmotions.length === 0) return;
@@ -152,7 +144,7 @@ function LogFormFields({
         {
           onSuccess: () => {
             setObservationId(entryId);
-            setPhase("confirming");
+            setPhase("aftermath");
           },
         },
       );
@@ -176,29 +168,15 @@ function LogFormFields({
       {
         onSuccess: (obs) => {
           setObservationId(obs.id);
-          setPhase("confirming");
+          setPhase("aftermath");
         },
       },
     );
   };
 
-  useEffect(() => {
-    if (phase !== "confirming") return;
-    const timer = setTimeout(() => setPhase("aftermath"), 800);
-    return () => clearTimeout(timer);
-  }, [phase]);
-
   const jobMissing = submitted && !selectedJob;
   const emotionsMissing = submitted && selectedEmotions.length === 0;
   const isSaving = isLogging || isUpdating;
-
-  if (phase === "confirming") {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <p className="font-serif italic text-[28px] text-plum">Logged.</p>
-      </div>
-    );
-  }
 
   if (phase === "aftermath") {
     return (
@@ -209,10 +187,13 @@ function LogFormFields({
           if (!observationId) return;
           updateAftermath(
             { id: observationId, aftermath: "", emotions, userId },
-            { onSuccess: resetForm },
+            {
+              onSuccess: () =>
+                navigate({ to: "/break/$habitId", params: { habitId } }),
+            },
           );
         }}
-        onSkip={resetForm}
+        onSkip={() => navigate({ to: "/break/$habitId", params: { habitId } })}
       />
     );
   }

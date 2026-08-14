@@ -6,7 +6,6 @@ import { EMOTIONS } from "@/constants/emotions";
 import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
-import { useLogBreakObservation } from "@/hooks/useBreakObservations";
 import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
 import type { TrackType } from "@/types/database";
 
@@ -36,7 +35,6 @@ export function HabitSlipModal({
 
   const [phase, setPhase] = useState<Phase>(1);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-  const [selectedJobValue, setSelectedJobValue] = useState<string | null>(null);
   const [selectedCause, setSelectedCause] = useState<CauseCategory | null>(
     null,
   );
@@ -51,7 +49,6 @@ export function HabitSlipModal({
   );
   const jobConfigs = (breakHabit?.configs ?? []).filter((c) => c.key === "job");
 
-  const { mutateAsync: logBreakObservation } = useLogBreakObservation(userId);
   const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
 
   const toggleEmotion = (e: string) =>
@@ -59,14 +56,8 @@ export function HabitSlipModal({
       prev.includes(e) ? prev.filter((x) => x !== e) : [...prev, e],
     );
 
-  const selectJob = (id: string, value: string) => {
-    if (selectedJobId === id) {
-      setSelectedJobId(null);
-      setSelectedJobValue(null);
-    } else {
-      setSelectedJobId(id);
-      setSelectedJobValue(value);
-    }
+  const selectJob = (id: string) => {
+    setSelectedJobId((prev) => (prev === id ? null : id));
   };
 
   const selectCause = (cause: CauseCategory) => {
@@ -90,23 +81,16 @@ export function HabitSlipModal({
 
     try {
       if (isBreak) {
-        await Promise.all([
-          logBreakObservation({
-            habit_id: habit.habitId,
-            job: selectedJobValue ?? undefined,
-            emotions: [],
-          }),
-          logSlipDrift({
-            track_type: "break",
-            type: "slip",
-            habit_id: habit.habitId,
-            job_id: selectedJobId,
-            cause_category: selectedCause,
-            emotional_state_before: emotionText,
-            all_or_nothing_stage: selectedStage,
-            protocol_completed: true,
-          }),
-        ]);
+        await logSlipDrift({
+          track_type: "break",
+          type: "slip",
+          habit_id: habit.habitId,
+          job_id: selectedJobId,
+          cause_category: selectedCause,
+          emotional_state_before: emotionText,
+          all_or_nothing_stage: selectedStage,
+          protocol_completed: true,
+        });
       } else {
         await logSlipDrift({
           track_type: "build",
@@ -171,7 +155,7 @@ export function HabitSlipModal({
                     key={job.id}
                     label={job.value}
                     selected={selectedJobId === job.id}
-                    onToggle={() => selectJob(job.id, job.value)}
+                    onToggle={() => selectJob(job.id)}
                   />
                 ))}
               </div>
