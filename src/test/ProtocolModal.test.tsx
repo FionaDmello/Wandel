@@ -14,7 +14,7 @@ afterEach(() => {
 describe("ProtocolModal", () => {
   it("closes and unmounts on backdrop click even when no onClose prop is passed", () => {
     const { container } = render(
-      <ProtocolModal>
+      <ProtocolModal title="Test">
         <p>content</p>
       </ProtocolModal>,
     );
@@ -33,7 +33,7 @@ describe("ProtocolModal", () => {
   it("does nothing on backdrop click when dismissible is false", () => {
     const onClose = vi.fn();
     const { container } = render(
-      <ProtocolModal onClose={onClose} dismissible={false}>
+      <ProtocolModal title="Test" onClose={onClose} dismissible={false}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -52,7 +52,7 @@ describe("ProtocolModal", () => {
   it("closes on a swipe past the 80px threshold", () => {
     const onClose = vi.fn();
     const { container } = render(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -75,7 +75,7 @@ describe("ProtocolModal", () => {
   it("snaps back without closing on a swipe below the 80px threshold", () => {
     const onClose = vi.fn();
     const { container } = render(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -98,7 +98,7 @@ describe("ProtocolModal", () => {
   it("snaps back on a swipe past threshold when dismissible is false", () => {
     const onClose = vi.fn();
     const { container } = render(
-      <ProtocolModal onClose={onClose} dismissible={false}>
+      <ProtocolModal title="Test" onClose={onClose} dismissible={false}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -121,7 +121,7 @@ describe("ProtocolModal", () => {
   it("calls onClose exactly once when two dismiss triggers overlap", () => {
     const onClose = vi.fn();
     const { container } = render(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -139,7 +139,7 @@ describe("ProtocolModal", () => {
 
   it("disables pointer events on the sheet during the closing animation after backdrop click", () => {
     const { container } = render(
-      <ProtocolModal onClose={vi.fn()}>
+      <ProtocolModal title="Test" onClose={vi.fn()}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -162,7 +162,7 @@ describe("ProtocolModal", () => {
 
   it("disables pointer events on the sheet during the closing animation after a swipe past threshold", () => {
     const { container } = render(
-      <ProtocolModal onClose={vi.fn()}>
+      <ProtocolModal title="Test" onClose={vi.fn()}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -182,7 +182,7 @@ describe("ProtocolModal", () => {
   it("stays closed after rerender once dismissed", () => {
     const onClose = vi.fn();
     const { container, rerender } = render(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -193,7 +193,7 @@ describe("ProtocolModal", () => {
     });
 
     rerender(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>different content</p>
       </ProtocolModal>,
     );
@@ -204,7 +204,7 @@ describe("ProtocolModal", () => {
   it("closes on Escape key", () => {
     const onClose = vi.fn();
     render(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -222,7 +222,7 @@ describe("ProtocolModal", () => {
   it("does nothing on Escape when dismissible is false", () => {
     const onClose = vi.fn();
     render(
-      <ProtocolModal onClose={onClose} dismissible={false}>
+      <ProtocolModal title="Test" onClose={onClose} dismissible={false}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -240,7 +240,7 @@ describe("ProtocolModal", () => {
   it("ignores Escape while an IME composition is in progress", () => {
     const onClose = vi.fn();
     render(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -257,7 +257,7 @@ describe("ProtocolModal", () => {
   it("calls onClose exactly once when Escape is pressed twice in quick succession", () => {
     const onClose = vi.fn();
     render(
-      <ProtocolModal onClose={onClose}>
+      <ProtocolModal title="Test" onClose={onClose}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -275,7 +275,7 @@ describe("ProtocolModal", () => {
   it("removes the Escape key listener on unmount", () => {
     const removeSpy = vi.spyOn(document, "removeEventListener");
     const { unmount } = render(
-      <ProtocolModal onClose={vi.fn()}>
+      <ProtocolModal title="Test" onClose={vi.fn()}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -288,7 +288,7 @@ describe("ProtocolModal", () => {
 
   it("sets dialog role and aria-modal on the sheet", () => {
     render(
-      <ProtocolModal onClose={vi.fn()}>
+      <ProtocolModal title="Test" onClose={vi.fn()}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -297,7 +297,7 @@ describe("ProtocolModal", () => {
 
   it("focuses the sheet on mount", () => {
     render(
-      <ProtocolModal onClose={vi.fn()}>
+      <ProtocolModal title="Test" onClose={vi.fn()}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -310,7 +310,7 @@ describe("ProtocolModal", () => {
     trigger.focus();
 
     const { unmount } = render(
-      <ProtocolModal onClose={vi.fn()}>
+      <ProtocolModal title="Test" onClose={vi.fn()}>
         <p>content</p>
       </ProtocolModal>,
     );
@@ -318,5 +318,41 @@ describe("ProtocolModal", () => {
 
     expect(trigger).toHaveFocus();
     trigger.remove();
+  });
+
+  it("sets aria-label from the title prop", () => {
+    render(
+      <ProtocolModal title="Log a hard thing" onClose={vi.fn()}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute(
+      "aria-label",
+      "Log a hard thing",
+    );
+  });
+
+  it("wraps Tab from the last focusable element back to the first", () => {
+    render(
+      <ProtocolModal title="Test" onClose={vi.fn()}>
+        <button type="button">First</button>
+        <button type="button">Last</button>
+      </ProtocolModal>,
+    );
+    screen.getByText("Last").focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(screen.getByText("First")).toHaveFocus();
+  });
+
+  it("wraps Shift+Tab from the first focusable element back to the last", () => {
+    render(
+      <ProtocolModal title="Test" onClose={vi.fn()}>
+        <button type="button">First</button>
+        <button type="button">Last</button>
+      </ProtocolModal>,
+    );
+    screen.getByText("First").focus();
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(screen.getByText("Last")).toHaveFocus();
   });
 });

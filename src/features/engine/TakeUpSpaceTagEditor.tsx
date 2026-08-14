@@ -57,7 +57,7 @@ export function TakeUpSpaceTagEditor({
   const addDisabled = !newName.trim() || isDuplicate || save.isPending;
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title="Your tags" onClose={onClose}>
       <div className="px-6 pt-2 pb-1">
         <p className="font-serif italic text-[18px] text-plum">Your tags</p>
       </div>

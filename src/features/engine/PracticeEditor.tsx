@@ -59,7 +59,7 @@ export function PracticeEditor({ userId, onClose }: PracticeEditorProps) {
   const addDisabled = !newName.trim() || save.isPending;
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title="Your practices" onClose={onClose}>
       <div className="px-6 pt-2 pb-1">
         <p className="font-serif italic text-[18px] text-plum">
           Your practices

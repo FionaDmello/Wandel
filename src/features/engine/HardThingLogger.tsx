@@ -48,7 +48,7 @@ export function HardThingLogger({
   }
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title="Log a hard thing" onClose={onClose}>
       <div className="px-6 pt-2 pb-1">
         <p className="font-serif italic text-[18px] text-plum">
           Log a hard thing

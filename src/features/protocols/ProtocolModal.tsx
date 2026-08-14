@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { trapFocus } from "@/lib/trapFocus";
+
 interface ProtocolModalProps {
   children: React.ReactNode;
+  title: string;
   onClose?: () => void;
   dismissible?: boolean;
 }
 
 export function ProtocolModal({
   children,
+  title,
   onClose,
   dismissible = true,
 }: ProtocolModalProps) {
@@ -54,8 +58,13 @@ export function ProtocolModal({
   // ever becomes a real consumer.
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Escape" || e.isComposing) return;
-      dismiss();
+      if (e.key === "Escape" && !e.isComposing) {
+        dismiss();
+        return;
+      }
+      if (e.key === "Tab") {
+        trapFocus(e, sheetRef.current);
+      }
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
@@ -105,6 +114,7 @@ export function ProtocolModal({
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
+        aria-label={title}
         tabIndex={-1}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}

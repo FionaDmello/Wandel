@@ -112,7 +112,7 @@ export function TakeUpSpaceFilterSheet({
   }
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title="Filter entries" onClose={onClose}>
       <div className="flex flex-col gap-5 px-6 pt-3 pb-8">
         <ChipGroup
           label="Outcome"

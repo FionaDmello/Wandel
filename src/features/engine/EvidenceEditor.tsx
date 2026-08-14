@@ -41,7 +41,7 @@ export function EvidenceEditor({
   }
 
   return (
-    <ProtocolModal onClose={onClose}>
+    <ProtocolModal title="Evidence" onClose={onClose}>
       <div className="px-6 pt-2 pb-1">
         <p className="font-serif italic text-[18px] text-plum">Evidence</p>
       </div>
