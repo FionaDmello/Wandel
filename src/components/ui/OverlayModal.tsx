@@ -1,11 +1,14 @@
 import { useEffect, useRef } from "react";
 
+import { trapFocus } from "@/lib/trapFocus";
+
 interface OverlayModalProps {
+  title: string;
   onClose: () => void;
   children: React.ReactNode;
 }
 
-export function OverlayModal({ onClose, children }: OverlayModalProps) {
+export function OverlayModal({ title, onClose, children }: OverlayModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
@@ -19,8 +22,13 @@ export function OverlayModal({ onClose, children }: OverlayModalProps) {
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Escape" || e.isComposing) return;
-      onClose();
+      if (e.key === "Escape" && !e.isComposing) {
+        onClose();
+        return;
+      }
+      if (e.key === "Tab") {
+        trapFocus(e, panelRef.current);
+      }
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
@@ -38,6 +46,7 @@ export function OverlayModal({ onClose, children }: OverlayModalProps) {
           ref={panelRef}
           role="dialog"
           aria-modal="true"
+          aria-label={title}
           tabIndex={-1}
           className="relative bg-canvas rounded-3xl w-full max-h-[80dvh] overflow-y-auto pointer-events-auto"
         >

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { buildCalendarGrid } from "@/constants/calendarGrid";
+import { trapFocus } from "@/lib/trapFocus";
 
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -35,8 +36,13 @@ export function DatePicker({ value, onSelect, onClose }: DatePickerProps) {
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Escape" || e.isComposing) return;
-      onClose();
+      if (e.key === "Escape" && !e.isComposing) {
+        onClose();
+        return;
+      }
+      if (e.key === "Tab") {
+        trapFocus(e, panelRef.current);
+      }
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
@@ -73,6 +79,7 @@ export function DatePicker({ value, onSelect, onClose }: DatePickerProps) {
         ref={panelRef}
         role="dialog"
         aria-modal="true"
+        aria-label="Choose a date"
         tabIndex={-1}
         className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] pb-[env(safe-area-inset-bottom,0px)]"
       >

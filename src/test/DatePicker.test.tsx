@@ -58,4 +58,24 @@ describe("DatePicker", () => {
     fireEvent.click(screen.getByLabelText("Close"));
     expect(onClose).toHaveBeenCalledOnce();
   });
+
+  it("sets aria-label", () => {
+    render(
+      <DatePicker value="2026-05-27" onSelect={vi.fn()} onClose={vi.fn()} />,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute(
+      "aria-label",
+      "Choose a date",
+    );
+  });
+
+  it("wraps Tab from the last focusable element back to the first", () => {
+    render(
+      <DatePicker value="2026-05-27" onSelect={vi.fn()} onClose={vi.fn()} />,
+    );
+    const cells = screen.getAllByRole("button");
+    cells[cells.length - 1].focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(cells[0]).toHaveFocus();
+  });
 });

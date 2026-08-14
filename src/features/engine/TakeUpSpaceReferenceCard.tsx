@@ -8,7 +8,7 @@ export function TakeUpSpaceReferenceCard({
   onClose,
 }: TakeUpSpaceReferenceCardProps) {
   return (
-    <OverlayModal onClose={onClose}>
+    <OverlayModal title="Take Up Space" onClose={onClose}>
       <div className="px-6 pt-8 pb-8 flex flex-col">
         <p className="font-serif italic text-[22px] text-plum">Take Up Space</p>
         <p className="font-sans text-[11px] text-muted mb-5">

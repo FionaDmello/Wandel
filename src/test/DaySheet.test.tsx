@@ -61,4 +61,20 @@ describe("DaySheet", () => {
     fireEvent.click(screen.getByLabelText("Close"));
     expect(onClose).toHaveBeenCalledOnce();
   });
+
+  it("sets aria-label from the display date", () => {
+    render(<DaySheet {...DEFAULT_PROPS} date="2026-05-27" />);
+    expect(screen.getByRole("dialog")).toHaveAttribute(
+      "aria-label",
+      "Wednesday, 27 May",
+    );
+  });
+
+  it("wraps Shift+Tab from the first focusable element back to the last", () => {
+    render(<DaySheet {...DEFAULT_PROPS} />);
+    const buttons = screen.getAllByRole("button");
+    buttons[0].focus();
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(buttons[buttons.length - 1]).toHaveFocus();
+  });
 });
