@@ -4,15 +4,10 @@ import { describe, expect, it, vi } from "vitest";
 import type { HabitSlipContext } from "@/features/protocols/HabitSlipModal";
 import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 
-const mockLogBreakObservation = vi.fn();
 const mockLogSlipDrift = vi.fn();
 
 vi.mock("@/hooks/useBreakHabits", () => ({
   useBreakHabit: () => ({ data: undefined }),
-}));
-
-vi.mock("@/hooks/useBreakObservations", () => ({
-  useLogBreakObservation: () => ({ mutateAsync: mockLogBreakObservation }),
 }));
 
 vi.mock("@/hooks/useSlipDriftLog", () => ({
@@ -40,13 +35,11 @@ describe("HabitSlipModal", () => {
     fireEvent.click(screen.getByText("Skip for now"));
 
     expect(onDismiss).toHaveBeenCalledOnce();
-    expect(mockLogBreakObservation).not.toHaveBeenCalled();
     expect(mockLogSlipDrift).not.toHaveBeenCalled();
   });
 
-  it("completing the flow for a break habit logs the slip and the acknowledgment", async () => {
+  it("completing the flow for a break habit logs only the slip, no observation", async () => {
     const onComplete = vi.fn();
-    mockLogBreakObservation.mockResolvedValue({});
     mockLogSlipDrift.mockResolvedValue({});
 
     render(
@@ -66,11 +59,6 @@ describe("HabitSlipModal", () => {
 
     await waitFor(() => expect(onComplete).toHaveBeenCalledOnce());
 
-    expect(mockLogBreakObservation).toHaveBeenCalledWith({
-      habit_id: "habit-1",
-      job: undefined,
-      emotions: [],
-    });
     expect(mockLogSlipDrift).toHaveBeenCalledWith({
       track_type: "break",
       type: "slip",
