@@ -189,7 +189,7 @@ export function JobsConfig({
           <button
             type="button"
             onClick={handleAddClick}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-card border-l-[3px] border-transparent text-muted"
+            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-card border-l-[3px] border-transparent text-plum"
           >
             <Plus size={13} strokeWidth={2} />
             <span className="font-sans text-[13px]">Add your own</span>

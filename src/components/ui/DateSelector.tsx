@@ -24,10 +24,10 @@ export function DateSelector({ value, onChange }: DateSelectorProps) {
         onClick={() => setIsOpen(true)}
         className="inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
       >
-        <span className="font-serif italic text-[15px] text-muted">
+        <span className="font-serif italic text-[15px] text-plum">
           {displayDate}
         </span>
-        <Calendar size={12} className="text-muted shrink-0" />
+        <Calendar size={12} className="text-plum shrink-0" />
       </button>
 
       {isOpen && (
