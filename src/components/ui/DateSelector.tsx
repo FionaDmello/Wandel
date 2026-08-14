@@ -22,7 +22,7 @@ export function DateSelector({ value, onChange }: DateSelectorProps) {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
+        className="inline-flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-1"
       >
         <span className="font-serif italic text-[15px] text-plum">
           {displayDate}

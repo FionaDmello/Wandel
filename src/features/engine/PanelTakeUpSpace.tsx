@@ -1,6 +1,7 @@
 import { Filter, Info, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { IconButton } from "@/components/ui/IconButton";
 import { EMPTY_TAKE_UP_SPACE_FILTERS } from "@/constants/takeUpSpaceFilters";
 import { filterTakeUpSpaceEntries } from "@/features/engine/filterTakeUpSpaceEntries";
 import { PanelHeader } from "@/features/engine/PanelHeader";
@@ -87,14 +88,13 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
         subtitle="Learning to stay with yourself"
         accent="rose"
         action={
-          <button
-            type="button"
-            aria-label="About Take Up Space"
+          <IconButton
             onClick={() => setReferenceOpen(true)}
+            ariaLabel="About Take Up Space"
             className="text-rose"
           >
             <Info size={14} />
-          </button>
+          </IconButton>
         }
       />
 
@@ -147,14 +147,13 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
       )}
 
       <div className="flex justify-between items-center">
-        <button
-          type="button"
-          aria-label="Filter entries"
+        <IconButton
           onClick={() => setFilterOpen(true)}
+          ariaLabel="Filter entries"
           className={hasActiveFilters ? "text-rose" : "text-muted"}
         >
           <Filter size={14} />
-        </button>
+        </IconButton>
         {!draft && (
           <button
             type="button"
