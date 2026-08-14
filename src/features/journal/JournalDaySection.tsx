@@ -19,6 +19,7 @@ export function JournalDaySection({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
         className="flex items-center justify-between w-full bg-transparent border-none cursor-pointer text-left"
       >
         <span className="flex items-center gap-2.5">

@@ -29,6 +29,7 @@ export function ReviewHistoryRecord({
       <button
         type="button"
         onClick={onToggle}
+        aria-expanded={isExpanded}
         className="flex items-start justify-between py-4 w-full gap-4"
       >
         <div className="flex flex-col items-start gap-2">

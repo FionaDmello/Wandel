@@ -20,6 +20,7 @@ export function AmbientLayer({ userId }: AmbientLayerProps) {
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
         className="flex items-center justify-between w-full"
       >
         <span className="font-sans text-[11px] text-muted uppercase tracking-widest">

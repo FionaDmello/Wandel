@@ -29,6 +29,7 @@ export function StandingUpSection({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
         className="flex items-center justify-between w-full bg-transparent border-none cursor-pointer"
       >
         <span className="font-serif italic text-[16px] text-plum">
