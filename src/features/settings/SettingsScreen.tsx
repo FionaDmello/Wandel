@@ -6,6 +6,7 @@ import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { Divider } from "@/components/ui/Divider";
+import { IconButton } from "@/components/ui/IconButton";
 import { Label } from "@/components/ui/Label";
 import { DEFAULT_QUALITIES } from "@/constants/defaultQualities";
 import { INPUT_TEXT_SIZE } from "@/constants/inputClasses";
@@ -109,14 +110,13 @@ function SettingsForm({
     <ScreenWrap>
       <div className="flex flex-col px-8 py-8 gap-8">
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <IconButton
             onClick={() => navigate({ to: "/engine" })}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer shrink-0"
-            aria-label="Go back"
+            ariaLabel="Go back"
+            className="text-muted shrink-0"
           >
             <ArrowLeft size={18} />
-          </button>
+          </IconButton>
           <h1 className="font-sans text-sm font-medium text-plum">Settings</h1>
         </div>
 

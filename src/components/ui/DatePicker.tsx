@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { buildCalendarGrid } from "@/constants/calendarGrid";
 import { trapFocus } from "@/lib/trapFocus";
 
+import { IconButton } from "./IconButton";
+
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 interface DatePickerProps {
@@ -84,37 +86,34 @@ export function DatePicker({ value, onSelect, onClose }: DatePickerProps) {
         className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] pb-[env(safe-area-inset-bottom,0px)]"
       >
         <div className="flex items-center justify-between px-6 pt-5 pb-4">
-          <button
-            type="button"
+          <IconButton
             onClick={goToPrev}
-            className="p-1 text-muted bg-transparent border-none cursor-pointer"
-            aria-label="Previous month"
+            ariaLabel="Previous month"
+            className="text-muted"
           >
             <ChevronLeft size={18} strokeWidth={1.5} />
-          </button>
+          </IconButton>
 
           <p className="font-sans text-[13px] font-medium text-plum">
             {monthLabel}
           </p>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
+            <IconButton
               onClick={goToNext}
               disabled={isCurrentMonth}
-              className={`p-1 bg-transparent border-none ${isCurrentMonth ? "text-soft cursor-default" : "text-muted cursor-pointer"}`}
-              aria-label="Next month"
+              ariaLabel="Next month"
+              className={isCurrentMonth ? "text-soft" : "text-muted"}
             >
               <ChevronRight size={18} strokeWidth={1.5} />
-            </button>
-            <button
-              type="button"
+            </IconButton>
+            <IconButton
               onClick={onClose}
-              className="p-1 text-muted bg-transparent border-none cursor-pointer"
-              aria-label="Close"
+              ariaLabel="Close"
+              className="text-muted"
             >
               <X size={16} strokeWidth={1.5} />
-            </button>
+            </IconButton>
           </div>
         </div>
 

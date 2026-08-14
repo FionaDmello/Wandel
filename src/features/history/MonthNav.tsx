@@ -1,6 +1,8 @@
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { IconButton } from "@/components/ui/IconButton";
+
 interface MonthNavProps {
   year: number;
   month: number;
@@ -17,26 +19,24 @@ export function MonthNav({ year, month, onPrev, onNext }: MonthNavProps) {
 
   return (
     <div className="flex items-center justify-between px-6 py-4">
-      <button
-        type="button"
+      <IconButton
         onClick={onPrev}
-        className="p-1 text-muted bg-transparent border-none cursor-pointer"
-        aria-label="Previous month"
+        ariaLabel="Previous month"
+        className="text-muted"
       >
         <ChevronLeft size={18} strokeWidth={1.5} />
-      </button>
+      </IconButton>
 
       <p className="font-sans text-[13px] font-medium text-plum">{label}</p>
 
-      <button
-        type="button"
+      <IconButton
         onClick={onNext}
         disabled={isCurrentMonth}
-        className={`p-1 bg-transparent border-none ${isCurrentMonth ? "text-soft cursor-default" : "text-muted cursor-pointer"}`}
-        aria-label="Next month"
+        ariaLabel="Next month"
+        className={isCurrentMonth ? "text-soft" : "text-muted"}
       >
         <ChevronRight size={18} strokeWidth={1.5} />
-      </button>
+      </IconButton>
     </div>
   );
 }
