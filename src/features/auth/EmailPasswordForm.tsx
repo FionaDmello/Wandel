@@ -7,16 +7,20 @@ import { Label } from "@/components/ui/Label";
 import { TextInput } from "@/components/ui/TextInput";
 import { supabase } from "@/lib/supabase";
 import { emailPasswordSchema } from "@/schemas/auth";
+import type { AuthMode } from "@/types/auth";
 
 interface EmailPasswordFormProps {
+  mode: AuthMode;
+  onToggleMode: () => void;
   onConfirmationRequired: (email: string) => void;
 }
 
 export function EmailPasswordForm({
+  mode,
+  onToggleMode,
   onConfirmationRequired,
 }: EmailPasswordFormProps) {
   const router = useRouter();
-  const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm({
@@ -108,7 +112,7 @@ export function EmailPasswordForm({
 
       <button
         type="button"
-        onClick={() => setMode(mode === "signIn" ? "signUp" : "signIn")}
+        onClick={onToggleMode}
         className="font-sans text-xs text-muted text-center mt-1"
       >
         {mode === "signIn"
