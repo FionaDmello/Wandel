@@ -56,7 +56,7 @@ export function TodayIntentionField({
           placeholder="What do you want to show up for today?"
           aria-label="Today's intention"
           rows={2}
-          className={`w-full resize-none bg-canvas rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
+          className={`w-full resize-none bg-canvas rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
         />
         {isDirty && (
           <button
