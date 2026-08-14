@@ -11,10 +11,13 @@
   --color-soft: #ddd8d0;
   --color-muted: #b0a8b8;
   --color-teal: #5dcaa5;
+  --color-teal-dark: #236c54;
   --color-gold: #c4883a;
   --color-slip: #c4786a;
   --color-rose: #c4637a;
+  --color-rose-dark: #813144;
   --color-blue: #3a6ec4;
+  --color-blue-dark: #315ea5;
 
   /* Fonts */
   --font-serif: "Cormorant", Georgia, serif;
