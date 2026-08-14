@@ -4,9 +4,26 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LogForm } from "@/features/break/LogForm";
 import type { HabitConfig } from "@/types/database";
 
-const mockLogObservation = vi.fn();
-const mockUpdateObservation = vi.fn();
-const mockUpdateAftermath = vi.fn();
+const mockNavigate = vi.fn();
+
+vi.mock("@tanstack/react-router", () => ({
+  useNavigate: () => mockNavigate,
+}));
+
+const mockLogObservation = vi.fn(
+  (
+    _payload: { habit_id: string },
+    options?: { onSuccess?: (obs: { id: string }) => void },
+  ) => options?.onSuccess?.({ id: "new-obs-1" }),
+);
+const mockUpdateObservation = vi.fn(
+  (_payload: { id: string }, options?: { onSuccess?: () => void }) =>
+    options?.onSuccess?.(),
+);
+const mockUpdateAftermath = vi.fn(
+  (_payload: unknown, options?: { onSuccess?: () => void }) =>
+    options?.onSuccess?.(),
+);
 
 vi.mock("@/hooks/useBreakObservations", () => ({
   useLogBreakObservation: () => ({
@@ -95,5 +112,90 @@ describe("LogForm", () => {
       expect.anything(),
     );
     expect(mockLogObservation).not.toHaveBeenCalled();
+  });
+
+  it("shows the aftermath step after logging, without navigating yet", () => {
+    render(
+      <LogForm
+        userId="user-1"
+        habitId="habit-1"
+        jobConfigs={[JOB_CONFIG]}
+        date="2026-05-14"
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Boredom"));
+    fireEvent.click(screen.getByText("Tired"));
+    fireEvent.click(screen.getByText("Log it"));
+
+    expect(screen.getByText("How do you feel now?")).toBeInTheDocument();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("navigates to the habit journal after skipping the aftermath step", () => {
+    render(
+      <LogForm
+        userId="user-1"
+        habitId="habit-1"
+        jobConfigs={[JOB_CONFIG]}
+        date="2026-05-14"
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Boredom"));
+    fireEvent.click(screen.getByText("Tired"));
+    fireEvent.click(screen.getByText("Log it"));
+    fireEvent.click(screen.getByText("Skip"));
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: "/break/$habitId",
+      params: { habitId: "habit-1" },
+    });
+  });
+
+  it("navigates to the habit journal after saving the aftermath step", () => {
+    render(
+      <LogForm
+        userId="user-1"
+        habitId="habit-1"
+        jobConfigs={[JOB_CONFIG]}
+        date="2026-05-14"
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Boredom"));
+    fireEvent.click(screen.getByText("Tired"));
+    fireEvent.click(screen.getByText("Log it"));
+    fireEvent.click(screen.getByText("Save aftermath"));
+
+    expect(mockUpdateAftermath).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: "/break/$habitId",
+      params: { habitId: "habit-1" },
+    });
+  });
+
+  it("navigates to the habit journal after editing an entry and skipping aftermath", async () => {
+    render(
+      <LogForm
+        userId="user-1"
+        habitId="habit-1"
+        jobConfigs={[JOB_CONFIG]}
+        date="2026-05-14"
+        entryId="obs-1"
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("At my desk")).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText("Log it"));
+    fireEvent.click(screen.getByText("Skip"));
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: "/break/$habitId",
+      params: { habitId: "habit-1" },
+    });
   });
 });
