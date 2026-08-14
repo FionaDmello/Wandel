@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { useBreakHabits } from "@/hooks/useBreakHabits";
+import { useBreakSlipEvents } from "@/hooks/useBreakSlipEvents";
 import { useBuildHabits } from "@/hooks/useBuildHabits";
 import {
   useMonthBreakObservations,
@@ -35,6 +36,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
   const breakHabitsQuery = useBreakHabits(userId);
   const buildHabitsQuery = useBuildHabits(userId);
   const allStandingUpQuery = useAllStandingUpEntries(userId);
+  const breakSlipEventsQuery = useBreakSlipEvents(userId);
   useSyncBreakStandingUp(userId);
 
   const engineActivitySet = new Set(engineActivityQuery.data ?? []);
@@ -43,6 +45,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
   const breakHabits = breakHabitsQuery.data ?? [];
   const buildHabits = buildHabitsQuery.data ?? [];
   const allStandingUp = allStandingUpQuery.data ?? [];
+  const breakSlipEvents = breakSlipEventsQuery.data ?? [];
 
   const engineStandingUp = allStandingUp.filter(
     (e) => e.track_type === "engine",
@@ -118,7 +121,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
         month={month}
         engineActivityDates={engineActivityQuery.data ?? []}
         breakHabits={breakHabits}
-        breakObs={breakObs}
+        breakSlipEvents={breakSlipEvents}
         buildObs={buildObs}
         onDayTap={setSelectedDate}
       />
