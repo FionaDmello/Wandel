@@ -185,6 +185,67 @@ describe("useCreateTakeUpSpaceEntry", () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
+
+  it("falls back to the existing draft when insert conflicts with the one-draft-per-user constraint", async () => {
+    mockInsertSingle.mockResolvedValue({
+      data: null,
+      error: {
+        code: "23505",
+        message: "duplicate key value violates unique constraint",
+      },
+    });
+    mockMaybeSingle.mockResolvedValue({ data: ENTRY, error: null });
+
+    const { result } = renderHook(() => useCreateTakeUpSpaceEntry("user-1"), {
+      wrapper,
+    });
+
+    let resolved: TakeUpSpaceEntry | undefined;
+    await act(async () => {
+      resolved = await result.current.mutateAsync({ date: "2026-05-29" });
+    });
+
+    expect(resolved).toEqual(ENTRY);
+  });
+
+  it("propagates non-conflict insert errors without a fallback select", async () => {
+    mockInsertSingle.mockResolvedValue({
+      data: null,
+      error: { code: "42501", message: "permission denied" },
+    });
+
+    const { result } = renderHook(() => useCreateTakeUpSpaceEntry("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate({ date: "2026-05-29" });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(mockMaybeSingle).not.toHaveBeenCalled();
+  });
+
+  it("surfaces the original conflict error if the fallback select finds no draft", async () => {
+    mockInsertSingle.mockResolvedValue({
+      data: null,
+      error: {
+        code: "23505",
+        message: "duplicate key value violates unique constraint",
+      },
+    });
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
+
+    const { result } = renderHook(() => useCreateTakeUpSpaceEntry("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate({ date: "2026-05-29" });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
 });
 
 describe("useUpdateTakeUpSpaceEntry", () => {
