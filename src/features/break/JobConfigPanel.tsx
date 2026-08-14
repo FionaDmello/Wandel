@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Divider } from "@/components/ui/Divider";
+import { IconButton } from "@/components/ui/IconButton";
 import { useUpdateHabitStatus } from "@/hooks/useHabitStatus";
 import { useUpdateHabitJobs } from "@/hooks/useUpdateHabitJobs";
 import type { HabitConfig, HabitStatus } from "@/types/database";
@@ -51,14 +52,13 @@ export function JobConfigPanel({
   return (
     <ScreenWrap>
       <div className="flex items-center gap-3 px-5 pt-[14px]">
-        <button
-          type="button"
+        <IconButton
           onClick={onClose}
-          className="p-1 text-muted bg-transparent border-none cursor-pointer shrink-0"
-          aria-label="Close"
+          ariaLabel="Close"
+          className="text-muted shrink-0"
         >
           <ArrowLeft size={18} />
-        </button>
+        </IconButton>
         <p className="font-sans text-sm font-medium text-plum">
           {habitName} — jobs
         </p>
