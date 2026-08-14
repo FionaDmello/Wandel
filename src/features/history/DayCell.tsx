@@ -1,5 +1,7 @@
 import { format } from "date-fns";
 
+import { buildDayCellLabel } from "@/features/history/buildDayCellLabel";
+
 interface DayCellProps {
   date: string;
   day: number;
@@ -27,6 +29,12 @@ export function DayCell({
     <button
       type="button"
       onClick={!isFuture ? onTap : undefined}
+      aria-label={buildDayCellLabel(
+        day,
+        hasEngineActivity,
+        breakCount,
+        buildCount,
+      )}
       className={`flex flex-col items-center justify-center gap-[3px] rounded-xl py-2 min-h-[52px] w-full border-none
         ${isActualToday ? "border border-amber" : "border border-transparent"}
         ${hasData && !isFuture ? "bg-soft cursor-pointer" : "bg-transparent"}

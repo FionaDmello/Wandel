@@ -89,6 +89,7 @@ export function JobsConfig({
             key={job.name}
             type="button"
             onClick={() => toggle(job)}
+            aria-pressed={isSelected(job.name)}
             className={`flex items-center justify-between gap-3 w-full text-left px-4 py-3 rounded-2xl bg-card transition-all duration-100 border-l-[3px] ${
               isSelected(job.name) ? "border-amber" : "border-transparent"
             }`}
@@ -116,6 +117,7 @@ export function JobsConfig({
             key={job.name}
             type="button"
             onClick={() => toggle(job)}
+            aria-pressed={isSelected(job.name)}
             className="flex items-center justify-between gap-3 w-full text-left px-4 py-3 rounded-2xl bg-card border-l-[3px] border-amber"
           >
             <div className="flex flex-col gap-[2px]">
@@ -143,7 +145,7 @@ export function JobsConfig({
               onChange={(e) => setCustomName(e.target.value)}
               onKeyDown={(e) => e.key === "Escape" && setShowInput(false)}
               placeholder="Job name"
-              className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} font-medium text-plum placeholder:text-muted`}
+              className={`bg-transparent border-none focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas font-sans ${INPUT_TEXT_SIZE} font-medium text-plum placeholder:text-muted`}
             />
             <div className="h-[0.5px] bg-soft" />
             <input
@@ -158,7 +160,7 @@ export function JobsConfig({
                 if (e.key === "Escape") setShowInput(false);
               }}
               placeholder="Short description"
-              className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} text-muted placeholder:text-muted`}
+              className={`bg-transparent border-none focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas font-sans ${INPUT_TEXT_SIZE} text-muted placeholder:text-muted`}
             />
             {inputError && (
               <p className="font-sans text-[11px] text-amber">{inputError}</p>

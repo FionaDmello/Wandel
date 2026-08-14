@@ -16,6 +16,7 @@ export function EvidenceCard({ entry, isOpen, onToggle }: EvidenceCardProps) {
     <button
       type="button"
       onClick={onToggle}
+      aria-expanded={isOpen}
       className="w-full text-left bg-canvas rounded-2xl px-4 py-4 flex flex-col gap-3"
     >
       <div className="flex items-start justify-between gap-2">

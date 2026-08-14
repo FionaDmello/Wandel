@@ -153,7 +153,7 @@ export function ReviewStepper({
     );
   };
 
-  const TEXTAREA = `w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none resize-none placeholder:text-muted`;
+  const TEXTAREA = `w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas resize-none placeholder:text-muted`;
   const CANCEL =
     "font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer";
 

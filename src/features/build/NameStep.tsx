@@ -54,7 +54,7 @@ export function NameStep({ onNext, onCancel }: NameStepProps) {
           onKeyDown={(e) => e.key === "Enter" && handleNext()}
           placeholder="e.g. Running"
           aria-label="Habit name"
-          className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none placeholder:text-muted`}
+          className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas placeholder:text-muted`}
           autoFocus
         />
 

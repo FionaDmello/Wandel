@@ -66,7 +66,7 @@ export function RemindersStep({ values, onNext }: RemindersStepProps) {
               onChange={(e) => update(index, e.target.value)}
               rows={2}
               aria-label={`Reminder ${index + 1}`}
-              className={`flex-1 bg-transparent border-none outline-none resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
+              className={`flex-1 bg-transparent border-none focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas resize-none font-serif italic ${INPUT_TEXT_SIZE} text-violet leading-snug placeholder:text-muted`}
               placeholder="Write a reminder..."
             />
             {reminders.length > 1 && (

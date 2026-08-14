@@ -131,6 +131,7 @@ function MarkForm({
                   setSelectedMark(type);
                   setSubmitted(false);
                 }}
+                aria-pressed={isSelected}
                 className={`flex items-center gap-4 w-full text-left px-4 py-3 rounded-2xl bg-card border-l-[3px] transition-colors duration-100 border-none cursor-pointer ${
                   isSelected
                     ? "border-l-amber"
@@ -169,7 +170,7 @@ function MarkForm({
           onChange={(e) => setNote(e.target.value)}
           rows={2}
           placeholder="Anything worth remembering?"
-          className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum outline-none resize-none placeholder:text-muted`}
+          className={`w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas resize-none placeholder:text-muted`}
         />
       </div>
 

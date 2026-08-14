@@ -53,7 +53,7 @@ export function EvidenceEditor({
           placeholder="What would you title this moment?"
           aria-label="Title"
           rows={1}
-          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
         />
 
         <textarea
@@ -62,7 +62,7 @@ export function EvidenceEditor({
           placeholder="What was happening?"
           aria-label="Situation"
           rows={3}
-          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
         />
 
         <textarea
@@ -71,7 +71,7 @@ export function EvidenceEditor({
           placeholder="What did you actually do well here?"
           aria-label="What you did well"
           rows={3}
-          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
+          className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
         />
 
         <button

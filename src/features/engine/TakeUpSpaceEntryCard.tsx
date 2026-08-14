@@ -77,7 +77,16 @@ export function TakeUpSpaceEntryCard({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => setIsOpen((o) => !o)}
+      onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setIsOpen((o) => !o);
+        }
+      }}
       className="bg-canvas rounded-2xl px-4 py-3 cursor-pointer flex flex-col gap-1.5"
     >
       <span className="font-sans text-[12px] font-medium text-plum truncate">

@@ -132,7 +132,7 @@ export function TakeUpSpaceLogger({
             value={answers[question.field]}
             onChange={(e) => handleAnswerChange(question.field, e.target.value)}
             rows={4}
-            className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none`}
+            className={`w-full resize-none bg-card rounded-2xl px-4 py-3 font-sans ${INPUT_TEXT_SIZE} text-plum placeholder:text-muted focus:outline-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas`}
           />
 
           <div className="flex items-center justify-between">
