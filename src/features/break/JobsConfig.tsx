@@ -145,7 +145,7 @@ export function JobsConfig({
               onChange={(e) => setCustomName(e.target.value)}
               onKeyDown={(e) => e.key === "Escape" && setShowInput(false)}
               placeholder="Job name"
-              className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} font-medium text-plum placeholder:text-muted`}
+              className={`bg-transparent border-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas font-sans ${INPUT_TEXT_SIZE} font-medium text-plum placeholder:text-muted`}
             />
             <div className="h-[0.5px] bg-soft" />
             <input
@@ -160,7 +160,7 @@ export function JobsConfig({
                 if (e.key === "Escape") setShowInput(false);
               }}
               placeholder="Short description"
-              className={`bg-transparent border-none outline-none font-sans ${INPUT_TEXT_SIZE} text-muted placeholder:text-muted`}
+              className={`bg-transparent border-none focus:ring-2 ring-violet ring-offset-2 ring-offset-canvas font-sans ${INPUT_TEXT_SIZE} text-muted placeholder:text-muted`}
             />
             {inputError && (
               <p className="font-sans text-[11px] text-amber">{inputError}</p>
