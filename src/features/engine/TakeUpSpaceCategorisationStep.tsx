@@ -77,7 +77,7 @@ export function TakeUpSpaceCategorisationStep({
   return (
     <div className="flex flex-col gap-5 px-6 pt-3 pb-8">
       <div className="flex flex-col gap-2">
-        <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+        <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
           What happened
         </span>
         <div className="flex flex-wrap gap-2">
@@ -100,7 +100,7 @@ export function TakeUpSpaceCategorisationStep({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+        <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
           Where this belongs
         </span>
         <div className="flex flex-wrap gap-2">
@@ -123,7 +123,7 @@ export function TakeUpSpaceCategorisationStep({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+        <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
           Tags
         </span>
         <TakeUpSpaceTagSelector

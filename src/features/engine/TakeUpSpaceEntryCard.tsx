@@ -103,7 +103,7 @@ export function TakeUpSpaceEntryCard({
             const val = entry[key] as string;
             return (
               <div key={key} className="flex flex-col gap-1">
-                <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+                <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
                   {FIELD_LABELS[key]}
                 </span>
                 <p className="font-sans text-[13px] text-plum whitespace-pre-wrap">
@@ -127,7 +127,7 @@ export function TakeUpSpaceEntryCard({
 
           {entry.tag_names.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+              <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
                 TAGS
               </span>
               <p className="font-sans text-[13px] text-plum">
@@ -138,7 +138,7 @@ export function TakeUpSpaceEntryCard({
 
           {entry.panel_tag !== null && entry.panel_tag !== "none" && (
             <div className="flex flex-col gap-1">
-              <span className="font-sans text-[9px] font-medium text-rose uppercase tracking-widest">
+              <span className="font-sans text-[9px] font-medium text-rose-dark uppercase tracking-widest">
                 PANEL
               </span>
               <p className="font-sans text-[13px] text-plum">
