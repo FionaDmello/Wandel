@@ -8,6 +8,7 @@ import { useUpsertBuildObservation } from "@/hooks/useBuildObservations";
 const {
   mockObservationInsert,
   mockPreviousObservation,
+  mockNextObservation,
   mockHabitSingle,
   mockStandingUpExisting,
   mockStandingUpInsert,
@@ -15,6 +16,7 @@ const {
 } = vi.hoisted(() => ({
   mockObservationInsert: vi.fn(),
   mockPreviousObservation: vi.fn(),
+  mockNextObservation: vi.fn(),
   mockHabitSingle: vi.fn(),
   mockStandingUpExisting: vi.fn(),
   mockStandingUpInsert: vi.fn(),
@@ -30,6 +32,11 @@ vi.mock("@/lib/supabase", () => {
           lt: () => ({
             order: () => ({
               limit: () => ({ maybeSingle: mockPreviousObservation }),
+            }),
+          }),
+          gt: () => ({
+            order: () => ({
+              limit: () => ({ maybeSingle: mockNextObservation }),
             }),
           }),
         }),
@@ -95,6 +102,7 @@ beforeEach(() => {
     error: null,
   });
   mockStandingUpExisting.mockResolvedValue({ data: null, error: null });
+  mockNextObservation.mockResolvedValue({ data: null, error: null });
 });
 
 describe("useUpsertBuildObservation — standing up on real gaps", () => {
@@ -292,5 +300,154 @@ describe("useUpsertBuildObservation — standing up on real gaps", () => {
       ),
     );
     expect(mockStandingUpInsert).not.toHaveBeenCalled();
+  });
+
+  it("creates a new row for the gap right after a newly-saved date", async () => {
+    // Saving 2026-05-14 with no gap behind it (previous log was yesterday),
+    // but a later log already exists on 2026-05-20 with a real gap between
+    // them -- this should create a fresh row for that forward gap.
+    mockPreviousObservation.mockResolvedValue({
+      data: { date: "2026-05-13" },
+      error: null,
+    });
+    mockNextObservation.mockResolvedValue({
+      data: { date: "2026-05-20" },
+      error: null,
+    });
+    mockHabitSingle.mockResolvedValue({
+      data: { name: "Running" },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useUpsertBuildObservation("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD); // PAYLOAD.date is "2026-05-14"
+    });
+
+    await waitFor(() =>
+      expect(mockStandingUpInsert).toHaveBeenCalledWith({
+        user_id: "user-1",
+        habit_id: "habit-1",
+        track_type: "build",
+        track_name: "Running",
+        protocol: "drift",
+        fall_date: "2026-05-15",
+        return_date: "2026-05-20",
+        gap_days: 5,
+      }),
+    );
+    expect(mockStandingUpUpdate).not.toHaveBeenCalled();
+  });
+
+  it("does not create a forward row when the next log is the very next day", async () => {
+    mockPreviousObservation.mockResolvedValue({ data: null, error: null });
+    mockNextObservation.mockResolvedValue({
+      data: { date: "2026-05-15" },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useUpsertBuildObservation("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD); // PAYLOAD.date is "2026-05-14"
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockStandingUpInsert).not.toHaveBeenCalled();
+    expect(mockStandingUpUpdate).not.toHaveBeenCalled();
+  });
+
+  it("does not duplicate a forward row that already exists", async () => {
+    mockPreviousObservation.mockResolvedValue({ data: null, error: null });
+    mockNextObservation.mockResolvedValue({
+      data: { date: "2026-05-20" },
+      error: null,
+    });
+    mockStandingUpExisting.mockResolvedValue({
+      data: { id: "already-there", return_date: "2026-05-20" },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useUpsertBuildObservation("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD); // PAYLOAD.date is "2026-05-14"
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockStandingUpInsert).not.toHaveBeenCalled();
+  });
+
+  it("issue #42: splits a gap correctly when the middle date is backfilled after the later date already exists", async () => {
+    // Mirrors the exact reported scenario: 2026-06-20 and 2026-08-12 are
+    // already logged, with one wide (and now-wrong) row spanning
+    // 2026-06-21 -> 2026-08-12. Backfilling 2026-07-29 should, in this one
+    // save, both shrink that row down to 2026-07-29 AND create a new row
+    // for the newly-revealed 2026-07-30 -> 2026-08-12 gap.
+    mockPreviousObservation.mockResolvedValue({
+      data: { date: "2026-06-20" },
+      error: null,
+    });
+    mockNextObservation.mockResolvedValue({
+      data: { date: "2026-08-12" },
+      error: null,
+    });
+    mockHabitSingle.mockResolvedValue({
+      data: { name: "Running" },
+      error: null,
+    });
+    mockStandingUpExisting.mockResolvedValueOnce({
+      data: { id: "wide-stale-row", return_date: "2026-08-12" },
+      error: null,
+    });
+    mockStandingUpExisting.mockResolvedValueOnce({ data: null, error: null });
+    mockObservationInsert.mockResolvedValueOnce({
+      data: {
+        id: "obs-jul29",
+        user_id: "user-1",
+        ...PAYLOAD,
+        date: "2026-07-29",
+      },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useUpsertBuildObservation("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate({ ...PAYLOAD, date: "2026-07-29" });
+    });
+
+    await waitFor(() =>
+      expect(mockStandingUpUpdate).toHaveBeenCalledWith(
+        {
+          track_type: "build",
+          track_name: "Running",
+          protocol: "drift",
+          fall_date: "2026-06-21",
+          return_date: "2026-07-29",
+          gap_days: 38,
+        },
+        "wide-stale-row",
+      ),
+    );
+    expect(mockStandingUpInsert).toHaveBeenCalledWith({
+      user_id: "user-1",
+      habit_id: "habit-1",
+      track_type: "build",
+      track_name: "Running",
+      protocol: "drift",
+      fall_date: "2026-07-30",
+      return_date: "2026-08-12",
+      gap_days: 13,
+    });
   });
 });

@@ -109,68 +109,130 @@ export function useUpsertBuildObservation(userId: string) {
           .limit(1)
           .maybeSingle();
 
-        if (!previous) return;
+        if (previous) {
+          const fallDate = format(
+            addDays(parseISO(previous.date), 1),
+            "yyyy-MM-dd",
+          );
 
-        const fallDate = format(
-          addDays(parseISO(previous.date), 1),
-          "yyyy-MM-dd",
-        );
-        if (fallDate >= data.date) return;
+          if (fallDate < data.date) {
+            const { data: existing } = await supabase
+              .from("standing_up_log")
+              .select("id, return_date")
+              .eq("user_id", userId)
+              .eq("habit_id", data.habit_id)
+              .eq("fall_date", fallDate)
+              .maybeSingle();
 
-        const { data: existing } = await supabase
-          .from("standing_up_log")
-          .select("id, return_date")
+            // A row already exactly matching this episode — nothing to do.
+            // Otherwise the existing row is either stale-wide (an earlier
+            // date was just backfilled into its middle — needs shrinking)
+            // or stale-narrow (the original #29 self-heal case — needs
+            // extending); both are corrected by writing the same values
+            // below.
+            if (!existing || existing.return_date !== data.date) {
+              const { data: habit } = await supabase
+                .from("habits")
+                .select("name")
+                .eq("id", data.habit_id)
+                .single();
+
+              if (habit) {
+                const gapDays = differenceInDays(
+                  parseISO(data.date),
+                  parseISO(fallDate),
+                );
+                const protocol: "slip" | "drift" =
+                  gapDays === 1 ? "slip" : "drift";
+
+                if (existing) {
+                  // A stale row for this fall date — correct it in place
+                  // rather than leaving it silently wrong.
+                  await supabase
+                    .from("standing_up_log")
+                    .update({
+                      track_type: "build",
+                      track_name: habit.name,
+                      protocol,
+                      fall_date: fallDate,
+                      return_date: data.date,
+                      gap_days: gapDays,
+                    })
+                    .eq("id", existing.id);
+                } else {
+                  await supabase.from("standing_up_log").insert({
+                    user_id: userId,
+                    habit_id: data.habit_id,
+                    track_type: "build",
+                    track_name: habit.name,
+                    protocol,
+                    fall_date: fallDate,
+                    return_date: data.date,
+                    gap_days: gapDays,
+                  });
+                }
+              }
+            }
+          }
+        }
+
+        const { data: next } = await supabase
+          .from("build_observations")
+          .select("date")
           .eq("user_id", userId)
           .eq("habit_id", data.habit_id)
-          .eq("fall_date", fallDate)
+          .gt("date", data.date)
+          .order("date", { ascending: true })
+          .limit(1)
           .maybeSingle();
 
-        // A row already exactly matching this episode — nothing to do.
-        // Otherwise the existing row is either stale-wide (an earlier date
-        // was just backfilled into its middle — needs shrinking) or
-        // stale-narrow (the original #29 self-heal case — needs
-        // extending); both are corrected by writing the same values below.
-        if (existing && existing.return_date === data.date) return;
+        if (next) {
+          const nextFallDate = format(
+            addDays(parseISO(data.date), 1),
+            "yyyy-MM-dd",
+          );
 
-        const { data: habit } = await supabase
-          .from("habits")
-          .select("name")
-          .eq("id", data.habit_id)
-          .single();
+          if (nextFallDate < next.date) {
+            const { data: nextExisting } = await supabase
+              .from("standing_up_log")
+              .select("id")
+              .eq("user_id", userId)
+              .eq("habit_id", data.habit_id)
+              .eq("fall_date", nextFallDate)
+              .maybeSingle();
 
-        if (!habit) return;
+            // Only insert when nothing exists yet for this fall date — this
+            // gap can only ever have been created going forward from
+            // data.date, so it's already correct by construction whenever
+            // a row exists.
+            if (!nextExisting) {
+              const { data: nextHabit } = await supabase
+                .from("habits")
+                .select("name")
+                .eq("id", data.habit_id)
+                .single();
 
-        const gapDays = differenceInDays(
-          parseISO(data.date),
-          parseISO(fallDate),
-        );
-        const protocol: "slip" | "drift" = gapDays === 1 ? "slip" : "drift";
+              if (nextHabit) {
+                const nextGapDays = differenceInDays(
+                  parseISO(next.date),
+                  parseISO(nextFallDate),
+                );
+                const nextProtocol: "slip" | "drift" =
+                  nextGapDays === 1 ? "slip" : "drift";
 
-        if (existing) {
-          // A stale row for this fall date, written before this fix shipped —
-          // correct it in place rather than leaving it silently wrong.
-          await supabase
-            .from("standing_up_log")
-            .update({
-              track_type: "build",
-              track_name: habit.name,
-              protocol,
-              fall_date: fallDate,
-              return_date: data.date,
-              gap_days: gapDays,
-            })
-            .eq("id", existing.id);
-        } else {
-          await supabase.from("standing_up_log").insert({
-            user_id: userId,
-            habit_id: data.habit_id,
-            track_type: "build",
-            track_name: habit.name,
-            protocol,
-            fall_date: fallDate,
-            return_date: data.date,
-            gap_days: gapDays,
-          });
+                await supabase.from("standing_up_log").insert({
+                  user_id: userId,
+                  habit_id: data.habit_id,
+                  track_type: "build",
+                  track_name: nextHabit.name,
+                  protocol: nextProtocol,
+                  fall_date: nextFallDate,
+                  return_date: next.date,
+                  gap_days: nextGapDays,
+                });
+              }
+            }
+          }
         }
 
         queryClient.invalidateQueries({
