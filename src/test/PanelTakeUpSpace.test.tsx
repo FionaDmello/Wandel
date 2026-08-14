@@ -251,6 +251,25 @@ describe("PanelTakeUpSpace", () => {
     expect(screen.getByText("Notice")).toBeInTheDocument();
   });
 
+  it("clicking the in-progress card in the entries log continues the draft", () => {
+    const draftEntry: TakeUpSpaceEntry = { ...makeEntry(5), status: "draft" };
+    draftData = draftEntry;
+    entriesData = [draftEntry];
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByText("In progress — tap to continue."));
+    expect(screen.getByText("tus-logger")).toBeInTheDocument();
+  });
+
+  it("the in-progress card in the entries log does not continue the draft while discarding", () => {
+    const draftEntry: TakeUpSpaceEntry = { ...makeEntry(5), status: "draft" };
+    draftData = draftEntry;
+    entriesData = [draftEntry];
+    mockAbandonIsPending = true;
+    render(<PanelTakeUpSpace userId="user-1" date="2026-07-24" />);
+    fireEvent.click(screen.getByText("In progress — tap to continue."));
+    expect(screen.queryByText("tus-logger")).toBeNull();
+  });
+
   it("shows Discarding… on the Discard button while a mutation is pending", () => {
     draftData = { ...makeEntry(5), status: "draft" };
     mockAbandonIsPending = true;

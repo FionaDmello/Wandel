@@ -66,6 +66,10 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
     filters.tagNames.length > 0 ||
     filters.noTags;
 
+  function handleContinueDraft() {
+    if (draft && !discardPending) setActiveEntry(draft);
+  }
+
   function handleDiscard() {
     if (!draft) return;
     abandonDraft.mutate(draft.id);
@@ -125,7 +129,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
             <button
               type="button"
               disabled={discardPending}
-              onClick={() => setActiveEntry(draft)}
+              onClick={handleContinueDraft}
               className="font-sans text-[12px] text-plum font-medium disabled:opacity-50"
             >
               Continue
@@ -167,7 +171,7 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
 
       <TakeUpSpaceLog
         entries={filteredEntries}
-        onContinueDraft={() => {}}
+        onContinueDraft={handleContinueDraft}
         onAddToCost={setCostEditorEntry}
       />
 
