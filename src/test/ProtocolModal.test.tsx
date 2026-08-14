@@ -200,4 +200,89 @@ describe("ProtocolModal", () => {
 
     expect(screen.queryByText("different content")).not.toBeInTheDocument();
   });
+
+  it("closes on Escape key", () => {
+    const onClose = vi.fn();
+    render(
+      <ProtocolModal onClose={onClose}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    act(() => {
+      vi.advanceTimersByTime(380);
+    });
+
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(screen.queryByText("content")).not.toBeInTheDocument();
+  });
+
+  it("does nothing on Escape when dismissible is false", () => {
+    const onClose = vi.fn();
+    render(
+      <ProtocolModal onClose={onClose} dismissible={false}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    act(() => {
+      vi.advanceTimersByTime(380);
+    });
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByText("content")).toBeInTheDocument();
+  });
+
+  it("ignores Escape while an IME composition is in progress", () => {
+    const onClose = vi.fn();
+    render(
+      <ProtocolModal onClose={onClose}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+
+    fireEvent.keyDown(document, { key: "Escape", isComposing: true });
+
+    act(() => {
+      vi.advanceTimersByTime(380);
+    });
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("calls onClose exactly once when Escape is pressed twice in quick succession", () => {
+    const onClose = vi.fn();
+    render(
+      <ProtocolModal onClose={onClose}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    act(() => {
+      vi.advanceTimersByTime(380);
+    });
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("removes the Escape key listener on unmount", () => {
+    const removeSpy = vi.spyOn(document, "removeEventListener");
+    const { unmount } = render(
+      <ProtocolModal onClose={vi.fn()}>
+        <p>content</p>
+      </ProtocolModal>,
+    );
+
+    unmount();
+
+    expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+    removeSpy.mockRestore();
+  });
 });

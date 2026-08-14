@@ -32,11 +32,25 @@ export function ProtocolModal({
   }, [onClose]);
 
   const dismiss = useCallback(() => {
-    if (!dismissible) return;
+    if (!dismissible || dismissing) return;
     setVisible(false);
     setDismissing(true);
     setTimeout(finishDismiss, 380);
-  }, [dismissible, finishDismiss]);
+  }, [dismissible, dismissing, finishDismiss]);
+
+  // Local keydown handlers elsewhere in the app (e.g. JobsConfig's inline
+  // "add job" input) don't stopPropagation on Escape, so a future component
+  // nested inside a ProtocolModal that adds its own Escape handling would
+  // trigger both this dismiss and its own — worth checking for if that
+  // ever becomes a real consumer.
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Escape" || e.isComposing) return;
+      dismiss();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [dismiss]);
 
   function handleTouchStart(e: React.TouchEvent) {
     if (sheetRef.current) sheetRef.current.style.transition = "none";
