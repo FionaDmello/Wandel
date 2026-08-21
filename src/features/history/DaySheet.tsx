@@ -74,7 +74,7 @@ export function DaySheet({
   return (
     <>
       <div
-        className="fixed inset-0 bg-plum/40 z-[200]"
+        className="fixed inset-0 bg-plum/40 z-[200] touch-none"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -85,7 +85,7 @@ export function DaySheet({
         aria-modal="true"
         aria-label={displayDate}
         tabIndex={-1}
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] max-h-[80dvh] overflow-y-auto pb-[env(safe-area-inset-bottom,0px)]"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] max-h-[80dvh] overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom,0px)]"
       >
         <div className="flex items-center justify-between px-6 pt-5 pb-2">
           <p className="font-serif italic text-[18px] text-plum">

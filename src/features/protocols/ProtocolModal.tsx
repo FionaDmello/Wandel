@@ -105,7 +105,7 @@ export function ProtocolModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-[300] bg-plum/35"
+        className="fixed inset-0 z-[300] bg-plum/35 touch-none"
         aria-hidden="true"
         onClick={dismiss}
       />
@@ -119,7 +119,7 @@ export function ProtocolModal({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[301] bg-canvas rounded-t-[22px] max-h-[90dvh] overflow-y-auto transition-protocol-sheet ${
+        className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[301] bg-canvas rounded-t-[22px] max-h-[90dvh] overflow-y-auto overscroll-contain transition-protocol-sheet ${
           visible ? "translate-y-0" : "translate-y-full"
         } ${dismissing ? "pointer-events-none" : ""}`}
       >
