@@ -72,7 +72,7 @@ export function DatePicker({ value, onSelect, onClose }: DatePickerProps) {
   return (
     <>
       <div
-        className="fixed inset-0 bg-plum/40 z-[200]"
+        className="fixed inset-0 bg-plum/40 z-[200] touch-none"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -83,7 +83,7 @@ export function DatePicker({ value, onSelect, onClose }: DatePickerProps) {
         aria-modal="true"
         aria-label="Choose a date"
         tabIndex={-1}
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] pb-[env(safe-area-inset-bottom,0px)]"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-canvas rounded-t-[24px] z-[201] touch-none pb-[env(safe-area-inset-bottom,0px)]"
       >
         <div className="flex items-center justify-between px-6 pt-5 pb-4">
           <IconButton

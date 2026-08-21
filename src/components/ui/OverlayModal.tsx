@@ -37,7 +37,7 @@ export function OverlayModal({ title, onClose, children }: OverlayModalProps) {
   return (
     <>
       <div
-        className="fixed inset-0 z-[400] bg-plum/40 backdrop-blur-sm"
+        className="fixed inset-0 z-[400] bg-plum/40 backdrop-blur-sm touch-none"
         aria-hidden="true"
         onClick={onClose}
       />
@@ -48,7 +48,7 @@ export function OverlayModal({ title, onClose, children }: OverlayModalProps) {
           aria-modal="true"
           aria-label={title}
           tabIndex={-1}
-          className="relative bg-canvas rounded-3xl w-full max-h-[80dvh] overflow-y-auto pointer-events-auto"
+          className="relative bg-canvas rounded-3xl w-full max-h-[80dvh] overflow-y-auto overscroll-contain pointer-events-auto"
         >
           <button
             type="button"
