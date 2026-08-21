@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { ArrowLeft, Settings } from "lucide-react";
 import { useState } from "react";
 
@@ -29,6 +29,7 @@ function HabitContent({ userId, habit }: HabitContentProps) {
   const [confirmingReset, setConfirmingReset] = useState(false);
   const [showSlipModal, setShowSlipModal] = useState(false);
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { date?: string };
 
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdateHabitStatus(userId);
@@ -89,6 +90,7 @@ function HabitContent({ userId, habit }: HabitContentProps) {
                   navigate({
                     to: "/break/$habitId/log",
                     params: { habitId: habit.id },
+                    search: { date: search.date },
                   })
                 }
                 className="bg-teal text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"

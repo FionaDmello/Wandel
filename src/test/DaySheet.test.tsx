@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DaySheet } from "@/features/history/DaySheet";
 import type {
@@ -8,9 +8,15 @@ import type {
   HabitWithConfigs,
 } from "@/types/database";
 
+const navigateMock = vi.fn();
+
 vi.mock("@tanstack/react-router", () => ({
-  useNavigate: () => vi.fn(),
+  useNavigate: () => navigateMock,
 }));
+
+beforeEach(() => {
+  navigateMock.mockClear();
+});
 
 const DEFAULT_PROPS = {
   date: "2026-05-27",
@@ -187,5 +193,39 @@ describe("DaySheet — deactivated habits (#28)", () => {
       />,
     );
     expect(screen.getByText("Nothing logged this day.")).toBeInTheDocument();
+  });
+});
+
+describe("DaySheet — Add it navigates to that habit's journal, keeping the date", () => {
+  it("navigates to /break/$habitId with the date when adding a break habit", () => {
+    render(
+      <DaySheet
+        {...DEFAULT_PROPS}
+        date="2026-05-14"
+        breakHabits={[makeHabit({})]}
+      />,
+    );
+    fireEvent.click(screen.getByText("Add it"));
+    expect(navigateMock).toHaveBeenCalledWith({
+      to: "/break/$habitId",
+      params: { habitId: "habit-1" },
+      search: { date: "2026-05-14" },
+    });
+  });
+
+  it("navigates to /build/$habitId with the date when adding a build habit", () => {
+    render(
+      <DaySheet
+        {...DEFAULT_PROPS}
+        date="2026-05-14"
+        buildHabits={[makeHabit({ category: "build" })]}
+      />,
+    );
+    fireEvent.click(screen.getByText("Add it"));
+    expect(navigateMock).toHaveBeenCalledWith({
+      to: "/build/$habitId",
+      params: { habitId: "habit-1" },
+      search: { date: "2026-05-14" },
+    });
   });
 });
