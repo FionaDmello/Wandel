@@ -9,6 +9,7 @@ import { PausedBanner } from "@/features/break/PausedBanner";
 import { BuildJournal } from "@/features/build/BuildJournal";
 import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
+import { useDateSearchParam } from "@/hooks/useDateSearchParam";
 import {
   useResetBuildHabit,
   useUpdateHabitStatus,
@@ -29,6 +30,7 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
   const [showConfig, setShowConfig] = useState(false);
   const [showSlipModal, setShowSlipModal] = useState(false);
   const navigate = useNavigate();
+  const date = useDateSearchParam();
 
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdateHabitStatus(userId);
@@ -76,19 +78,22 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
         {habit.status === "active" && (
           <>
             <div className="flex justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setShowSlipModal(true)}
-                className="bg-amber text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
-              >
-                I slipped
-              </button>
+              {!date && (
+                <button
+                  type="button"
+                  onClick={() => setShowSlipModal(true)}
+                  className="bg-amber text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
+                >
+                  I slipped
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() =>
                   navigate({
                     to: "/build/$habitId/log",
                     params: { habitId: habit.id },
+                    search: { date },
                   })
                 }
                 className="bg-amber text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"

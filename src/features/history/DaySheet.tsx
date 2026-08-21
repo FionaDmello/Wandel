@@ -38,13 +38,17 @@ export function DaySheet({
     parse(date, "yyyy-MM-dd", new Date()),
     "EEEE, d MMMM",
   );
-  const goTo = (path: string) => {
-    onClose();
-    navigate({ to: path as "/engine" });
-  };
   const goToEngine = () => {
     onClose();
     navigate({ to: "/engine", search: { date } });
+  };
+  const goToBreakHabit = (habitId: string) => {
+    onClose();
+    navigate({ to: "/break/$habitId", params: { habitId }, search: { date } });
+  };
+  const goToBuildHabit = (habitId: string) => {
+    onClose();
+    navigate({ to: "/build/$habitId", params: { habitId }, search: { date } });
   };
 
   const visibleBreakHabits = breakHabits.filter((h) =>
@@ -194,11 +198,7 @@ export function DaySheet({
                     {!isFuture && (
                       <button
                         type="button"
-                        onClick={() =>
-                          goTo(
-                            `/break/${habit.id}/log?date=${date}` as "/break/$habitId/log",
-                          )
-                        }
+                        onClick={() => goToBreakHabit(habit.id)}
                         className="font-sans text-[11px] font-medium text-teal-dark bg-transparent border-none cursor-pointer"
                       >
                         Add it
@@ -248,11 +248,7 @@ export function DaySheet({
                     {!isFuture && (
                       <button
                         type="button"
-                        onClick={() =>
-                          goTo(
-                            `/build/${habit.id}/log?date=${date}` as "/build/$habitId/log",
-                          )
-                        }
+                        onClick={() => goToBuildHabit(habit.id)}
                         className="font-sans text-[11px] font-medium text-amber bg-transparent border-none cursor-pointer"
                       >
                         Add it
