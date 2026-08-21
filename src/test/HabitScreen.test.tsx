@@ -72,4 +72,16 @@ describe("HabitScreen — date threading (#28 follow-up)", () => {
       search: { date: undefined },
     });
   });
+
+  it("hides 'I slipped' when viewing a specific past date, since it can't be backdated", () => {
+    searchDate = "2026-05-14";
+    render(<HabitScreen />);
+    expect(screen.queryByText("I slipped")).not.toBeInTheDocument();
+  });
+
+  it("shows 'I slipped' when visited without a date", () => {
+    searchDate = undefined;
+    render(<HabitScreen />);
+    expect(screen.getByText("I slipped")).toBeInTheDocument();
+  });
 });

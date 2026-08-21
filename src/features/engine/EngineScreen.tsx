@@ -1,4 +1,3 @@
-import { useSearch } from "@tanstack/react-router";
 import { format, isSunday } from "date-fns";
 import { useState } from "react";
 
@@ -10,6 +9,7 @@ import { PanelSelfRespect } from "@/features/engine/PanelSelfRespect";
 import { PanelSelfWorth } from "@/features/engine/PanelSelfWorth";
 import { PanelTakeUpSpace } from "@/features/engine/PanelTakeUpSpace";
 import { WeeklyReviewPrompt } from "@/features/engine/WeeklyReviewPrompt";
+import { useDateSearchParam } from "@/hooks/useDateSearchParam";
 import { useSession } from "@/hooks/useSession";
 import { mostRecentSunday } from "@/hooks/useWeeklyReview";
 import { useWeeklyReviewHistory } from "@/hooks/useWeeklyReviewHistory";
@@ -52,8 +52,8 @@ function EngineContent({ userId, initialLogDate }: EngineContentProps) {
 export function EngineScreen() {
   const { session, loading } = useSession();
   const userId = session?.user.id ?? "";
-  const search = useSearch({ strict: false }) as { date?: string };
-  const initialLogDate = search.date ?? format(new Date(), "yyyy-MM-dd");
+  const date = useDateSearchParam();
+  const initialLogDate = date ?? format(new Date(), "yyyy-MM-dd");
 
   if (loading || !userId) {
     return (

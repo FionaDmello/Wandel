@@ -1,4 +1,4 @@
-import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Settings } from "lucide-react";
 import { useState } from "react";
 
@@ -9,6 +9,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { BreakJournal } from "@/features/break/BreakJournal";
 import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
+import { useDateSearchParam } from "@/hooks/useDateSearchParam";
 import {
   useResetBreakHabit,
   useUpdateHabitStatus,
@@ -29,7 +30,7 @@ function HabitContent({ userId, habit }: HabitContentProps) {
   const [confirmingReset, setConfirmingReset] = useState(false);
   const [showSlipModal, setShowSlipModal] = useState(false);
   const navigate = useNavigate();
-  const search = useSearch({ strict: false }) as { date?: string };
+  const date = useDateSearchParam();
 
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdateHabitStatus(userId);
@@ -77,20 +78,22 @@ function HabitContent({ userId, habit }: HabitContentProps) {
         {habit.status === "active" && (
           <>
             <div className="flex justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setShowSlipModal(true)}
-                className="bg-teal text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
-              >
-                I slipped
-              </button>
+              {!date && (
+                <button
+                  type="button"
+                  onClick={() => setShowSlipModal(true)}
+                  className="bg-teal text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
+                >
+                  I slipped
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() =>
                   navigate({
                     to: "/break/$habitId/log",
                     params: { habitId: habit.id },
-                    search: { date: search.date },
+                    search: { date },
                   })
                 }
                 className="bg-teal text-canvas rounded-full px-4 py-2 font-sans text-[12px] font-medium border-none cursor-pointer"
