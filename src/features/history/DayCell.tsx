@@ -6,7 +6,7 @@ interface DayCellProps {
   date: string;
   day: number;
   hasEngineActivity: boolean;
-  breakCount: number;
+  hasCleanBreakDay: boolean;
   buildCount: number;
   isFuture: boolean;
   onTap: () => void;
@@ -16,12 +16,12 @@ export function DayCell({
   date,
   day,
   hasEngineActivity,
-  breakCount,
+  hasCleanBreakDay,
   buildCount,
   isFuture,
   onTap,
 }: DayCellProps) {
-  const hasData = hasEngineActivity || breakCount > 0 || buildCount > 0;
+  const hasData = hasEngineActivity || hasCleanBreakDay || buildCount > 0;
   const today = format(new Date(), "yyyy-MM-dd");
   const isActualToday = date === today;
 
@@ -32,7 +32,7 @@ export function DayCell({
       aria-label={buildDayCellLabel(
         day,
         hasEngineActivity,
-        breakCount,
+        hasCleanBreakDay,
         buildCount,
       )}
       className={`flex flex-col items-center justify-center gap-[3px] rounded-xl py-2 min-h-[52px] w-full border-none
@@ -50,12 +50,12 @@ export function DayCell({
         {hasEngineActivity && (
           <span className="w-[5px] h-[5px] rounded-full bg-blue" />
         )}
-        {Array.from({ length: breakCount }).map((_, i) => (
-          <span key={i} className="w-[5px] h-[5px] rounded-full bg-teal" />
-        ))}
-        {Array.from({ length: buildCount }).map((_, i) => (
-          <span key={i} className="w-[5px] h-[5px] rounded-full bg-amber" />
-        ))}
+        {hasCleanBreakDay && (
+          <span className="w-[5px] h-[5px] rounded-full bg-teal" />
+        )}
+        {buildCount > 0 && (
+          <span className="w-[5px] h-[5px] rounded-full bg-amber" />
+        )}
       </div>
     </button>
   );

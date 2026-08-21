@@ -1,14 +1,12 @@
 export function buildDayCellLabel(
   day: number,
   hasEngineActivity: boolean,
-  breakCount: number,
+  hasCleanBreakDay: boolean,
   buildCount: number,
 ): string {
   const parts: string[] = [];
   if (hasEngineActivity) parts.push("Engine activity");
-  if (breakCount > 0) {
-    parts.push(`${breakCount} break ${breakCount === 1 ? "entry" : "entries"}`);
-  }
+  if (hasCleanBreakDay) parts.push("Clean day");
   if (buildCount > 0) {
     parts.push(`${buildCount} build ${buildCount === 1 ? "log" : "logs"}`);
   }

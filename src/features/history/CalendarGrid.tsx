@@ -48,6 +48,20 @@ export function CalendarGrid({
     (h) => h.status !== "deactivated" && h.status !== "scheduled",
   );
 
+  // A day is clean only when every eligible habit that already existed by
+  // then has no slip that day — one slip anywhere clears the whole day's dot.
+  // .every() on an empty array is vacuously true, so a day with no eligible
+  // habits yet must be excluded explicitly rather than relying on .every().
+  function isCleanBreakDay(date: string): boolean {
+    const existingEligible = eligibleBreakHabits.filter(
+      (h) => h.created_at.slice(0, 10) <= date,
+    );
+    return (
+      existingEligible.length > 0 &&
+      existingEligible.every((h) => !breakSlippedByDate.get(date)?.has(h.id))
+    );
+  }
+
   // Dates where a build observation was logged (excluding no-longer-valid slip marks)
   const buildHabitsByDate = new Map<string, Set<string>>();
   buildObs.forEach((o) => {
@@ -86,15 +100,7 @@ export function CalendarGrid({
                 date={cell.date}
                 day={cell.day}
                 hasEngineActivity={activitySet.has(cell.date)}
-                breakCount={
-                  isFuture
-                    ? 0
-                    : eligibleBreakHabits.filter(
-                        (h) =>
-                          h.created_at.slice(0, 10) <= cell.date &&
-                          !breakSlippedByDate.get(cell.date)?.has(h.id),
-                      ).length
-                }
+                hasCleanBreakDay={isFuture ? false : isCleanBreakDay(cell.date)}
                 buildCount={buildHabitsByDate.get(cell.date)?.size ?? 0}
                 isFuture={isFuture}
                 onTap={() => onDayTap(cell.date)}

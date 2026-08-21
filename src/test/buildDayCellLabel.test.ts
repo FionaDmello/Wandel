@@ -4,26 +4,25 @@ import { buildDayCellLabel } from "@/features/history/buildDayCellLabel";
 
 describe("buildDayCellLabel", () => {
   it("returns just the day number when there's no activity", () => {
-    expect(buildDayCellLabel(5, false, 0, 0)).toBe("5");
+    expect(buildDayCellLabel(5, false, false, 0)).toBe("5");
   });
 
   it("includes engine activity", () => {
-    expect(buildDayCellLabel(5, true, 0, 0)).toBe("5 — Engine activity");
+    expect(buildDayCellLabel(5, true, false, 0)).toBe("5 — Engine activity");
   });
 
-  it("pluralizes break entries correctly", () => {
-    expect(buildDayCellLabel(5, false, 1, 0)).toBe("5 — 1 break entry");
-    expect(buildDayCellLabel(5, false, 2, 0)).toBe("5 — 2 break entries");
+  it("includes a clean break day", () => {
+    expect(buildDayCellLabel(5, false, true, 0)).toBe("5 — Clean day");
   });
 
   it("pluralizes build logs correctly", () => {
-    expect(buildDayCellLabel(5, false, 0, 1)).toBe("5 — 1 build log");
-    expect(buildDayCellLabel(5, false, 0, 3)).toBe("5 — 3 build logs");
+    expect(buildDayCellLabel(5, false, false, 1)).toBe("5 — 1 build log");
+    expect(buildDayCellLabel(5, false, false, 3)).toBe("5 — 3 build logs");
   });
 
   it("combines all three kinds of activity", () => {
-    expect(buildDayCellLabel(12, true, 1, 2)).toBe(
-      "12 — Engine activity, 1 break entry, 2 build logs",
+    expect(buildDayCellLabel(12, true, true, 2)).toBe(
+      "12 — Engine activity, Clean day, 2 build logs",
     );
   });
 });
