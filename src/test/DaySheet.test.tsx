@@ -177,4 +177,15 @@ describe("DaySheet — deactivated habits (#28)", () => {
     expect(screen.getByText("Nail biting")).toBeInTheDocument();
     expect(screen.getByText("Add it")).toBeInTheDocument();
   });
+
+  it("shows the empty state when the only habits are hidden deactivated ones", () => {
+    render(
+      <DaySheet
+        {...DEFAULT_PROPS}
+        breakHabits={[makeHabit({ status: "deactivated" })]}
+        buildHabits={[makeHabit({ category: "build", status: "deactivated" })]}
+      />,
+    );
+    expect(screen.getByText("Nothing logged this day.")).toBeInTheDocument();
+  });
 });
