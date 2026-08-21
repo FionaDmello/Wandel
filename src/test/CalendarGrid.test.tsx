@@ -53,7 +53,7 @@ describe("CalendarGrid — break clean-day dot", () => {
     );
 
     expect(
-      screen.getByLabelText(buildDayCellLabel(14, false, 1, 0)),
+      screen.getByLabelText(buildDayCellLabel(14, false, true, 0)),
     ).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe("CalendarGrid — break clean-day dot", () => {
     );
 
     expect(
-      screen.getByLabelText(buildDayCellLabel(14, false, 0, 0)),
+      screen.getByLabelText(buildDayCellLabel(14, false, false, 0)),
     ).toBeInTheDocument();
   });
 
@@ -92,7 +92,7 @@ describe("CalendarGrid — break clean-day dot", () => {
     // same month, so it must show no break dot at all regardless of the
     // habit having no slip or urge logged.
     expect(
-      screen.getByLabelText(buildDayCellLabel(25, false, 0, 0)),
+      screen.getByLabelText(buildDayCellLabel(25, false, false, 0)),
     ).toBeInTheDocument();
   });
 
@@ -112,7 +112,96 @@ describe("CalendarGrid — break clean-day dot", () => {
     // TODAY itself (the 20th) is not future, so its dot should compute
     // normally -- the habit has no slip, so it's still clean.
     expect(
-      screen.getByLabelText(buildDayCellLabel(20, false, 1, 0)),
+      screen.getByLabelText(buildDayCellLabel(20, false, true, 0)),
     ).toBeInTheDocument();
+  });
+});
+
+describe("CalendarGrid — dot consolidation (#10)", () => {
+  const HABIT_2: Habit = {
+    ...HABIT,
+    id: "habit-2",
+    name: "Nicotine",
+  };
+
+  it("shows a single clean-day dot when multiple break habits are all clean", () => {
+    render(
+      <CalendarGrid
+        year={2026}
+        month={5}
+        engineActivityDates={[]}
+        breakHabits={[HABIT, HABIT_2]}
+        breakSlipEvents={[]}
+        buildObs={[]}
+        onDayTap={() => {}}
+      />,
+    );
+
+    // Two clean habits: the label carries the boolean, and this cell's own
+    // dot count must stay at 1 regardless of how many habits are clean.
+    const dayCell = screen.getByLabelText(
+      buildDayCellLabel(14, false, true, 0),
+    );
+    expect(dayCell.querySelectorAll(".bg-teal")).toHaveLength(1);
+  });
+
+  it("shows no clean-day dot when only one of several break habits slipped", () => {
+    render(
+      <CalendarGrid
+        year={2026}
+        month={5}
+        engineActivityDates={[]}
+        breakHabits={[HABIT, HABIT_2]}
+        breakSlipEvents={[makeSlipEvent("habit-2", "2026-05-14")]}
+        buildObs={[]}
+        onDayTap={() => {}}
+      />,
+    );
+
+    expect(
+      screen.getByLabelText(buildDayCellLabel(14, false, false, 0)),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a single build dot when multiple build habits are logged the same day", () => {
+    render(
+      <CalendarGrid
+        year={2026}
+        month={5}
+        engineActivityDates={[]}
+        breakHabits={[]}
+        breakSlipEvents={[]}
+        buildObs={[
+          {
+            id: "obs-1",
+            habit_id: "build-habit-1",
+            user_id: "user-1",
+            date: "2026-05-14",
+            sub_type: null,
+            mark_type: "full",
+            mark_label: "Full session",
+            note: null,
+            logged_at: "2026-05-14T09:00:00Z",
+          },
+          {
+            id: "obs-2",
+            habit_id: "build-habit-2",
+            user_id: "user-1",
+            date: "2026-05-14",
+            sub_type: null,
+            mark_type: "full",
+            mark_label: "Full session",
+            note: null,
+            logged_at: "2026-05-14T09:00:00Z",
+          },
+        ]}
+        onDayTap={() => {}}
+      />,
+    );
+
+    const dayCell = screen.getByLabelText(
+      buildDayCellLabel(14, false, false, 2),
+    );
+    expect(dayCell.querySelectorAll(".bg-amber")).toHaveLength(1);
   });
 });
