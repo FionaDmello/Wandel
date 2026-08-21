@@ -2,6 +2,11 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { DaySheet } from "@/features/history/DaySheet";
+import type {
+  BreakObservationWithEmotions,
+  BuildObservation,
+  HabitWithConfigs,
+} from "@/types/database";
 
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => vi.fn(),
@@ -76,5 +81,100 @@ describe("DaySheet", () => {
     buttons[0].focus();
     fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
     expect(buttons[buttons.length - 1]).toHaveFocus();
+  });
+});
+
+function makeHabit(overrides: Partial<HabitWithConfigs>): HabitWithConfigs {
+  return {
+    id: "habit-1",
+    user_id: "user-1",
+    category: "break",
+    name: "Nail biting",
+    status: "active",
+    paused_at: null,
+    sort_order: 0,
+    created_at: "2026-05-01T00:00:00Z",
+    configs: [],
+    ...overrides,
+  };
+}
+
+const BREAK_OBS: BreakObservationWithEmotions = {
+  id: "obs-1",
+  user_id: "user-1",
+  habit_id: "habit-1",
+  job: "Boredom",
+  context: "At my desk",
+  urge_intensity: 6,
+  aftermath: null,
+  logged_at: "2026-05-27T10:00:00Z",
+  emotions: [],
+};
+
+const BUILD_OBS: BuildObservation = {
+  id: "obs-1",
+  habit_id: "habit-1",
+  user_id: "user-1",
+  date: "2026-05-27",
+  sub_type: null,
+  mark_type: "full",
+  mark_label: "Full session",
+  note: null,
+  logged_at: "2026-05-27T10:00:00Z",
+};
+
+describe("DaySheet — deactivated habits (#28)", () => {
+  it("hides a deactivated break habit with no observation that day", () => {
+    render(
+      <DaySheet
+        {...DEFAULT_PROPS}
+        breakHabits={[makeHabit({ status: "deactivated" })]}
+      />,
+    );
+    expect(screen.queryByText("Nail biting")).not.toBeInTheDocument();
+    expect(screen.queryByText("Add it")).not.toBeInTheDocument();
+  });
+
+  it("still shows a deactivated break habit that has a real observation that day", () => {
+    render(
+      <DaySheet
+        {...DEFAULT_PROPS}
+        breakHabits={[makeHabit({ status: "deactivated" })]}
+        breakObs={[BREAK_OBS]}
+      />,
+    );
+    expect(screen.getByText("Nail biting")).toBeInTheDocument();
+    expect(screen.getByText("Boredom")).toBeInTheDocument();
+    expect(screen.queryByText("Add it")).not.toBeInTheDocument();
+  });
+
+  it("hides a deactivated build habit with no observation that day", () => {
+    render(
+      <DaySheet
+        {...DEFAULT_PROPS}
+        buildHabits={[makeHabit({ category: "build", status: "deactivated" })]}
+      />,
+    );
+    expect(screen.queryByText("Nail biting")).not.toBeInTheDocument();
+    expect(screen.queryByText("Add it")).not.toBeInTheDocument();
+  });
+
+  it("still shows a deactivated build habit that has a real observation that day", () => {
+    render(
+      <DaySheet
+        {...DEFAULT_PROPS}
+        buildHabits={[makeHabit({ category: "build", status: "deactivated" })]}
+        buildObs={[BUILD_OBS]}
+      />,
+    );
+    expect(screen.getByText("Nail biting")).toBeInTheDocument();
+    expect(screen.getByText("Full session")).toBeInTheDocument();
+    expect(screen.queryByText("Add it")).not.toBeInTheDocument();
+  });
+
+  it("still shows an active habit with no observation, prompting to add it", () => {
+    render(<DaySheet {...DEFAULT_PROPS} breakHabits={[makeHabit({})]} />);
+    expect(screen.getByText("Nail biting")).toBeInTheDocument();
+    expect(screen.getByText("Add it")).toBeInTheDocument();
   });
 });

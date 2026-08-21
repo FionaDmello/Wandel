@@ -134,6 +134,11 @@ export function DaySheet({
           {/* Break habits */}
           {breakHabits
             .filter((h) => h.status !== "scheduled")
+            .filter(
+              (h) =>
+                h.status !== "deactivated" ||
+                breakObs.some((o) => o.habit_id === h.id),
+            )
             .map((habit) => {
               const obs = breakObs.filter((o) => o.habit_id === habit.id);
               return (
@@ -201,6 +206,11 @@ export function DaySheet({
           {/* Build habits */}
           {buildHabits
             .filter((h) => h.status !== "scheduled")
+            .filter(
+              (h) =>
+                h.status !== "deactivated" ||
+                buildObs.some((o) => o.habit_id === h.id),
+            )
             .map((habit) => {
               const obs = buildObs.filter((o) => o.habit_id === habit.id);
               return (
