@@ -52,7 +52,7 @@ function ReviewContent({ userId }: { userId: string }) {
 
   return (
     <ScreenWrap>
-      <div className="flex flex-col px-6 pt-6 pb-12 gap-8">
+      <div className="flex flex-col px-6 pt-safe-bar pb-12 gap-8">
         <div className="flex items-center justify-between">
           <Link to="/engine" className="font-sans text-sm text-plum">
             ← Engine

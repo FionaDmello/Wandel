@@ -27,7 +27,7 @@ export function SetupScreen() {
   return (
     <ScreenWrap padBottom={false}>
       {step > 0 && (
-        <div className="flex items-center px-5 pt-[14px]">
+        <div className="flex items-center px-5 pt-safe-bar">
           <IconButton onClick={back} ariaLabel="Go back" className="text-muted">
             <ArrowLeft size={18} />
           </IconButton>
