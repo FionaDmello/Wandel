@@ -87,6 +87,10 @@
   padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
 }
 
+@utility pb-tabbar {
+  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+}
+
 @layer components {
   .urge-slider {
     -webkit-appearance: none;
