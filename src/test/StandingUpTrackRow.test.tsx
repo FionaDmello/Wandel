@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { StandingUpSection } from "@/features/history/StandingUpSection";
+import { StandingUpTrackRow } from "@/features/history/StandingUpTrackRow";
 import type { StandingUpEntry } from "@/types/database";
 
 function makeEntry(id: string, gapDays: number): StandingUpEntry {
@@ -11,7 +11,7 @@ function makeEntry(id: string, gapDays: number): StandingUpEntry {
     user_id: "user-1",
     habit_id: null,
     track_type: "engine",
-    track_name: "Mirror",
+    track_name: "Engine",
     fall_date: "2026-05-01",
     return_date: "2026-05-08",
     gap_days: gapDays,
@@ -20,24 +20,25 @@ function makeEntry(id: string, gapDays: number): StandingUpEntry {
   };
 }
 
-describe("StandingUpSection", () => {
-  it("renders nothing when entries is empty", () => {
-    const { container } = render(
-      <StandingUpSection trackName="Mirror" entries={[]} />,
+describe("StandingUpTrackRow", () => {
+  it("shows the bare track name, not prefixed with 'Standing up'", () => {
+    render(
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 3)]} />,
     );
-    expect(container.firstChild).toBeNull();
+    expect(screen.getByText("Engine")).toBeTruthy();
+    expect(screen.queryByText(/Standing up/)).toBeNull();
   });
 
   it("is collapsed by default — dots not visible", () => {
     render(
-      <StandingUpSection trackName="Mirror" entries={[makeEntry("e1", 3)]} />,
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 3)]} />,
     );
     expect(screen.queryByText("3 days")).toBeNull();
   });
 
   it("expands on header click and shows entries", async () => {
     render(
-      <StandingUpSection trackName="Mirror" entries={[makeEntry("e1", 3)]} />,
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 3)]} />,
     );
     await userEvent.click(screen.getByRole("button"));
     expect(screen.getByText("3 days")).toBeTruthy();
@@ -45,7 +46,7 @@ describe("StandingUpSection", () => {
 
   it("shows 'Same day' for gap_days 0", async () => {
     render(
-      <StandingUpSection trackName="Mirror" entries={[makeEntry("e1", 0)]} />,
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 0)]} />,
     );
     await userEvent.click(screen.getByRole("button"));
     expect(screen.getByText("Same day")).toBeTruthy();
@@ -53,7 +54,7 @@ describe("StandingUpSection", () => {
 
   it("shows 'Next morning' for gap_days 1", async () => {
     render(
-      <StandingUpSection trackName="Mirror" entries={[makeEntry("e1", 1)]} />,
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 1)]} />,
     );
     await userEvent.click(screen.getByRole("button"));
     expect(screen.getByText("Next morning")).toBeTruthy();
@@ -61,7 +62,7 @@ describe("StandingUpSection", () => {
 
   it("shows correct summary for a single entry", async () => {
     render(
-      <StandingUpSection trackName="Mirror" entries={[makeEntry("e1", 3)]} />,
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 3)]} />,
     );
     await userEvent.click(screen.getByRole("button"));
     expect(
@@ -75,7 +76,7 @@ describe("StandingUpSection", () => {
       makeEntry("e2", 5),
       makeEntry("e3", 2),
     ];
-    render(<StandingUpSection trackName="Mirror" entries={entries} />);
+    render(<StandingUpTrackRow trackName="Engine" entries={entries} />);
     await userEvent.click(screen.getByRole("button"));
     expect(
       screen.getByText("You stood up 3 times. Fastest return: same day."),
@@ -84,7 +85,7 @@ describe("StandingUpSection", () => {
 
   it("shows fall and return dates when expanded", async () => {
     render(
-      <StandingUpSection trackName="Mirror" entries={[makeEntry("e1", 7)]} />,
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 7)]} />,
     );
     await userEvent.click(screen.getByRole("button"));
     expect(screen.getByText(/1 May.*8 May/)).toBeTruthy();
@@ -92,7 +93,7 @@ describe("StandingUpSection", () => {
 
   it("collapses again on second header click", async () => {
     render(
-      <StandingUpSection trackName="Mirror" entries={[makeEntry("e1", 3)]} />,
+      <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 3)]} />,
     );
     await userEvent.click(screen.getByRole("button"));
     expect(screen.getByText("3 days")).toBeTruthy();
