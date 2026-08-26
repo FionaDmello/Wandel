@@ -3,6 +3,11 @@ import { format, subDays } from "date-fns";
 import type { Habit } from "@/types/database";
 import type { PendingProtocol } from "@/types/protocols";
 
+// Distinct from the bare "Engine" nav tab label (src/constants/tabs.ts) so a
+// screen reader announcing this modal's title isn't indistinguishable from
+// the main Engine screen.
+const ENGINE_TRACK_NAME = "Engine practice";
+
 function countConsecutiveMisses(
   habitId: string,
   category: "break" | "build",
@@ -70,7 +75,7 @@ export function detectEngineDrift(
       id: "engine_drift",
       habitId: null,
       trackType: "engine",
-      trackName: "Engine",
+      trackName: ENGINE_TRACK_NAME,
       driftDays: missed,
       currentStep: 0,
     };
@@ -81,7 +86,7 @@ export function detectEngineDrift(
       id: "engine_slip",
       habitId: null,
       trackType: "engine",
-      trackName: "Engine",
+      trackName: ENGINE_TRACK_NAME,
       driftDays: missed,
       currentStep: 0,
     };

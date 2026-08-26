@@ -182,7 +182,8 @@ export function EngineDriftModal({
       {phase === 5 && (
         <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-serif text-[20px] leading-snug text-plum">
-            Is there one small thing you can do for yourself today, beyond that?
+            Is there one small thing you can do for yourself today, beyond your
+            engine?
           </p>
 
           <textarea
