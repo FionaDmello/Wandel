@@ -7,6 +7,7 @@ import { Divider } from "@/components/ui/Divider";
 import { useBreakHabits } from "@/hooks/useBreakHabits";
 import { useBuildHabits } from "@/hooks/useBuildHabits";
 import { useSession } from "@/hooks/useSession";
+import { useSignupDate } from "@/hooks/useSignupDate";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
 import { useWeeklyConsistency } from "@/hooks/useWeeklyConsistency";
 import { computeUnreviewedSundays } from "@/hooks/useWeeklyReview";
@@ -28,6 +29,7 @@ function ReviewContent({ userId }: { userId: string }) {
   const buildHabitsQuery = useBuildHabits(userId);
   const historyQuery = useWeeklyReviewHistory(userId);
   const standingUpQuery = useAllStandingUpEntries(userId);
+  const signupDate = useSignupDate(userId);
 
   const breakHabits = (breakHabitsQuery.data ?? []).filter(
     (h) => h.status === "active",
@@ -40,7 +42,11 @@ function ReviewContent({ userId }: { userId: string }) {
   const standingUpEntries = standingUpQuery.data ?? [];
 
   const reviewedWeekEndings = allReviews.map((r) => r.week_ending);
-  const unreviewedSundays = computeUnreviewedSundays(reviewedWeekEndings, 3);
+  const unreviewedSundays = computeUnreviewedSundays(
+    reviewedWeekEndings,
+    signupDate,
+    new Date(),
+  );
 
   const expandedHistoryReview =
     allReviews.find((r) => r.id === expandedHistoryId) ?? null;

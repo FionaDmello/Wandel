@@ -8,11 +8,10 @@ import { PanelSelfLove } from "@/features/engine/PanelSelfLove";
 import { PanelSelfRespect } from "@/features/engine/PanelSelfRespect";
 import { PanelSelfWorth } from "@/features/engine/PanelSelfWorth";
 import { PanelTakeUpSpace } from "@/features/engine/PanelTakeUpSpace";
-import { WeeklyReviewPrompt } from "@/features/engine/WeeklyReviewPrompt";
+import { WeeklyReviewUrgentPrompt } from "@/features/engine/WeeklyReviewUrgentPrompt";
 import { useDateSearchParam } from "@/hooks/useDateSearchParam";
 import { useSession } from "@/hooks/useSession";
-import { mostRecentSunday } from "@/hooks/useWeeklyReview";
-import { useWeeklyReviewHistory } from "@/hooks/useWeeklyReviewHistory";
+import { mostRecentSunday, useWeeklyReview } from "@/hooks/useWeeklyReview";
 
 interface EngineContentProps {
   userId: string;
@@ -22,12 +21,10 @@ interface EngineContentProps {
 function EngineContent({ userId, initialLogDate }: EngineContentProps) {
   const [logDate, setLogDate] = useState(initialLogDate);
 
-  const reviewHistoryQuery = useWeeklyReviewHistory(userId);
+  const thisWeekReviewQuery = useWeeklyReview(userId);
   const isSundayToday = isSunday(new Date());
   const mostRecentSundayStr = mostRecentSunday();
-  const mostRecentReview = reviewHistoryQuery.data?.[0] ?? null;
-  const isCurrentWeekReviewed =
-    mostRecentReview?.week_ending === mostRecentSundayStr;
+  const isCurrentWeekReviewed = !!thisWeekReviewQuery.data;
 
   return (
     <ScreenWrap>
@@ -38,12 +35,9 @@ function EngineContent({ userId, initialLogDate }: EngineContentProps) {
         <PanelSelfLove userId={userId} date={logDate} />
         <PanelSelfWorth userId={userId} date={logDate} />
         <PanelTakeUpSpace userId={userId} date={logDate} />
-        <WeeklyReviewPrompt
-          mostRecentReview={mostRecentReview}
-          isSundayToday={isSundayToday}
-          isCurrentWeekReviewed={isCurrentWeekReviewed}
-          mostRecentSundayStr={mostRecentSundayStr}
-        />
+        {isSundayToday && !isCurrentWeekReviewed && (
+          <WeeklyReviewUrgentPrompt mostRecentSundayStr={mostRecentSundayStr} />
+        )}
       </div>
     </ScreenWrap>
   );

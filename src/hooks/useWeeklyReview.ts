@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { endOfWeek, format, subDays } from "date-fns";
 
+import { WEEKLY_REVIEW_LOOKBACK_WEEKS } from "@/constants/weeklyReview";
 import { supabase } from "@/lib/supabase";
 import type { WeeklyReview } from "@/types/database";
 
@@ -13,16 +14,21 @@ export function mostRecentSunday(today: Date = new Date()): string {
   return format(subDays(today, today.getDay()), "yyyy-MM-dd");
 }
 
+// Most-recent-first, bounded below by signupDate (never surfaces Sundays
+// before the account existed) and above by today.
 export function computeUnreviewedSundays(
   reviewedWeekEndings: string[],
-  maxWeeks = 12,
+  signupDate: Date,
+  today: Date,
+  maxWeeks: number = WEEKLY_REVIEW_LOOKBACK_WEEKS,
 ): string[] {
-  const today = new Date();
   const results: string[] = [];
   const startDate = subDays(today, today.getDay());
+  const signupDateStr = format(signupDate, "yyyy-MM-dd");
   for (let i = 0; i < maxWeeks; i++) {
     const sunday = subDays(startDate, i * 7);
     const dateStr = format(sunday, "yyyy-MM-dd");
+    if (dateStr < signupDateStr) break;
     if (!reviewedWeekEndings.includes(dateStr)) {
       results.push(dateStr);
     }

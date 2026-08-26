@@ -19,6 +19,7 @@ import { CalendarGrid } from "./CalendarGrid";
 import { DaySheet } from "./DaySheet";
 import { MonthNav } from "./MonthNav";
 import { StandingUpSection } from "./StandingUpSection";
+import { WeeklyReviewSection } from "./WeeklyReviewSection";
 
 interface HistoryContentProps {
   userId: string;
@@ -153,6 +154,10 @@ function HistoryContent({ userId }: HistoryContentProps) {
           ))}
         </div>
       )}
+
+      <div className="px-4 pt-2 pb-4">
+        <WeeklyReviewSection userId={userId} />
+      </div>
 
       {selectedDate && (
         <DaySheet
