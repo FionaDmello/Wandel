@@ -161,7 +161,7 @@ export function ReviewStepper({
     return (
       <div className="flex flex-col gap-6 px-6 pt-3 pb-8">
         <p className="font-serif text-[22px] leading-snug text-plum">
-          How did the mirror practice feel this week?
+          How did you tend your engine this week?
         </p>
         <textarea
           rows={3}
@@ -316,7 +316,7 @@ export function ReviewStepper({
               Actual
             </p>
             <p className="font-sans text-[13px] text-soft">
-              Mirror — {consistencyData.engineMarked}/7 days
+              Engine — {consistencyData.engineMarked}/7 days
             </p>
             {buildHabits.map((h) => (
               <p key={h.id} className="font-sans text-[13px] text-soft">
@@ -355,7 +355,7 @@ export function ReviewStepper({
         {formState.engineResponse && (
           <div className="flex flex-col gap-1">
             <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
-              Mirror
+              Engine
             </p>
             <p className="font-sans text-[13px] text-soft leading-relaxed">
               {formState.engineResponse}

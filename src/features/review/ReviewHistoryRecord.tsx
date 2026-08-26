@@ -57,7 +57,7 @@ export function ReviewHistoryRecord({
           {review.engine_response && (
             <div className="flex flex-col gap-1">
               <p className="font-sans text-[11px] text-violet tracking-wider">
-                Mirror
+                Engine
               </p>
               <p className="font-serif text-[17px] text-plum leading-relaxed">
                 {review.engine_response}
@@ -107,7 +107,7 @@ export function ReviewHistoryRecord({
               {consistencyData && (
                 <div className="flex flex-col gap-1 mt-1">
                   <p className="font-sans text-[13px] text-plum">
-                    Mirror — {consistencyData.engineMarked}/7 days
+                    Engine — {consistencyData.engineMarked}/7 days
                   </p>
                   {buildHabits.map((h) => (
                     <p key={h.id} className="font-sans text-[13px] text-plum">
