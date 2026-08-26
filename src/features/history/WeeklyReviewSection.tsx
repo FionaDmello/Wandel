@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 
 import { ConsistencyDots } from "@/components/ui/ConsistencyDots";
-import { useProfile } from "@/hooks/useProfile";
+import { useSignupDate } from "@/hooks/useSignupDate";
 import { useWeeklyReviewHistory } from "@/hooks/useWeeklyReviewHistory";
 
 import { getOverdueSundays } from "./getOverdueSundays";
@@ -13,14 +13,11 @@ interface WeeklyReviewSectionProps {
 
 export function WeeklyReviewSection({ userId }: WeeklyReviewSectionProps) {
   const historyQuery = useWeeklyReviewHistory(userId);
-  const profileQuery = useProfile(userId);
+  const signupDate = useSignupDate(userId);
 
   const allReviews = historyQuery.data ?? [];
   const mostRecentReview = allReviews[0] ?? null;
   const reviewedWeekEndings = allReviews.map((r) => r.week_ending);
-  const signupDate = profileQuery.data
-    ? parseISO(profileQuery.data.created_at)
-    : new Date();
   const overdueSundays = getOverdueSundays(
     reviewedWeekEndings,
     signupDate,
@@ -28,6 +25,7 @@ export function WeeklyReviewSection({ userId }: WeeklyReviewSectionProps) {
   );
 
   if (overdueSundays.length > 0) {
+    const mostRecentMissed = overdueSundays[0];
     return (
       <div className="bg-card rounded-2xl px-5 py-4 flex flex-col gap-3">
         <div className="flex items-center justify-between">
@@ -39,9 +37,13 @@ export function WeeklyReviewSection({ userId }: WeeklyReviewSectionProps) {
           </p>
         </div>
         <p className="font-serif text-[18px] text-plum leading-snug">
-          {format(parseISO(overdueSundays[0]), "d MMM yyyy")} — not reviewed
+          {format(parseISO(mostRecentMissed), "d MMM yyyy")} — not reviewed
         </p>
-        <Link to="/review" className="font-sans text-[13px] text-amber">
+        <Link
+          to="/review"
+          search={{ weekEnding: mostRecentMissed }}
+          className="font-sans text-[13px] text-amber"
+        >
           Log it →
         </Link>
       </div>

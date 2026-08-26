@@ -6,8 +6,8 @@ import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Divider } from "@/components/ui/Divider";
 import { useBreakHabits } from "@/hooks/useBreakHabits";
 import { useBuildHabits } from "@/hooks/useBuildHabits";
-import { useProfile } from "@/hooks/useProfile";
 import { useSession } from "@/hooks/useSession";
+import { useSignupDate } from "@/hooks/useSignupDate";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
 import { useWeeklyConsistency } from "@/hooks/useWeeklyConsistency";
 import { computeUnreviewedSundays } from "@/hooks/useWeeklyReview";
@@ -29,7 +29,7 @@ function ReviewContent({ userId }: { userId: string }) {
   const buildHabitsQuery = useBuildHabits(userId);
   const historyQuery = useWeeklyReviewHistory(userId);
   const standingUpQuery = useAllStandingUpEntries(userId);
-  const profileQuery = useProfile(userId);
+  const signupDate = useSignupDate(userId);
 
   const breakHabits = (breakHabitsQuery.data ?? []).filter(
     (h) => h.status === "active",
@@ -42,11 +42,6 @@ function ReviewContent({ userId }: { userId: string }) {
   const standingUpEntries = standingUpQuery.data ?? [];
 
   const reviewedWeekEndings = allReviews.map((r) => r.week_ending);
-  // Until the profile loads, assume no history predates today — avoids a
-  // flash of stray unreviewed Sundays before the real signup date is known.
-  const signupDate = profileQuery.data
-    ? parseISO(profileQuery.data.created_at)
-    : new Date();
   const unreviewedSundays = computeUnreviewedSundays(
     reviewedWeekEndings,
     signupDate,
