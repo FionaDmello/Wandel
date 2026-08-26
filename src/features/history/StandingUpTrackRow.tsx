@@ -22,6 +22,8 @@ export function StandingUpTrackRow({
 }: StandingUpTrackRowProps) {
   const [open, setOpen] = useState(false);
 
+  if (entries.length === 0) return null;
+
   return (
     <div>
       <button

@@ -21,6 +21,13 @@ function makeEntry(id: string, gapDays: number): StandingUpEntry {
 }
 
 describe("StandingUpTrackRow", () => {
+  it("renders nothing when entries is empty", () => {
+    const { container } = render(
+      <StandingUpTrackRow trackName="Engine" entries={[]} />,
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
   it("shows the bare track name, not prefixed with 'Standing up'", () => {
     render(
       <StandingUpTrackRow trackName="Engine" entries={[makeEntry("e1", 3)]} />,

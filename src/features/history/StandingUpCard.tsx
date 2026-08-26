@@ -15,7 +15,7 @@ export function StandingUpCard({ tracks }: StandingUpCardProps) {
   if (visibleTracks.length === 0) return null;
 
   return (
-    <div className="bg-card rounded-2xl px-5 py-4 flex flex-col gap-3">
+    <div className="mx-4 mt-2 mb-1 bg-card rounded-2xl px-5 py-4 flex flex-col gap-3">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

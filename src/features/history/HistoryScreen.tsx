@@ -152,9 +152,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
         </div>
       </div>
 
-      <div className="px-4 pt-2 pb-1">
-        <StandingUpCard tracks={standingUpTracks} />
-      </div>
+      <StandingUpCard tracks={standingUpTracks} />
 
       <div className="px-4 pt-2 pb-4">
         <WeeklyReviewSection userId={userId} />
