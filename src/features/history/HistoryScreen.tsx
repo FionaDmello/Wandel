@@ -144,7 +144,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
 
       {(engineStandingUp.length > 0 || habitGroups.length > 0) && (
         <div className="flex flex-col gap-1 px-2 pt-2 pb-1">
-          <StandingUpSection trackName="Mirror" entries={engineStandingUp} />
+          <StandingUpSection trackName="Engine" entries={engineStandingUp} />
           {habitGroups.map((group) => (
             <StandingUpSection
               key={group.habitId}
