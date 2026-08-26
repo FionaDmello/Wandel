@@ -70,7 +70,7 @@ export function detectEngineDrift(
       id: "engine_drift",
       habitId: null,
       trackType: "engine",
-      trackName: "Mirror practice",
+      trackName: "Engine",
       driftDays: missed,
       currentStep: 0,
     };
@@ -81,7 +81,7 @@ export function detectEngineDrift(
       id: "engine_slip",
       habitId: null,
       trackType: "engine",
-      trackName: "Mirror practice",
+      trackName: "Engine",
       driftDays: missed,
       currentStep: 0,
     };

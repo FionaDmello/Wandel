@@ -161,7 +161,7 @@ export function ReviewStepper({
     return (
       <div className="flex flex-col gap-6 px-6 pt-3 pb-8">
         <p className="font-serif text-[22px] leading-snug text-plum">
-          How did the mirror practice feel this week?
+          How did you tend your engine this week?
         </p>
         <textarea
           rows={3}

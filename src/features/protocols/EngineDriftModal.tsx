@@ -163,8 +163,8 @@ export function EngineDriftModal({
       {phase === 4 && (
         <div className="flex flex-col gap-8 px-6 pt-3 pb-12">
           <p className="font-serif text-[20px] leading-snug text-plum">
-            Stand in front of the mirror today. You do not have to say anything.
-            Just look for a few seconds. That counts.
+            Come back to your engine today. Not all of it — just one small
+            piece. That counts.
           </p>
 
           <Button
@@ -174,7 +174,7 @@ export function EngineDriftModal({
             }}
             disabled={isSaving}
           >
-            {isSaving ? "Saving…" : "I stood there."}
+            {isSaving ? "Saving…" : "I am returning."}
           </Button>
         </div>
       )}
@@ -182,8 +182,7 @@ export function EngineDriftModal({
       {phase === 5 && (
         <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-serif text-[20px] leading-snug text-plum">
-            Is there one small thing you can do for yourself today, outside of
-            the mirror?
+            Is there one small thing you can do for yourself today, beyond that?
           </p>
 
           <textarea
