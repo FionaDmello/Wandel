@@ -2,36 +2,47 @@ import { Link } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 
 import { ConsistencyDots } from "@/components/ui/ConsistencyDots";
-import type { WeeklyReview } from "@/types/database";
+import { useProfile } from "@/hooks/useProfile";
+import { useWeeklyReviewHistory } from "@/hooks/useWeeklyReviewHistory";
 
-interface WeeklyReviewPromptProps {
-  mostRecentReview: WeeklyReview | null;
-  isSundayToday: boolean;
-  isCurrentWeekReviewed: boolean;
-  mostRecentSundayStr: string;
+import { getOverdueSundays } from "./getOverdueSundays";
+
+interface WeeklyReviewSectionProps {
+  userId: string;
 }
 
-export function WeeklyReviewPrompt({
-  mostRecentReview,
-  isSundayToday,
-  isCurrentWeekReviewed,
-  mostRecentSundayStr,
-}: WeeklyReviewPromptProps) {
-  if (isSundayToday && !isCurrentWeekReviewed) {
+export function WeeklyReviewSection({ userId }: WeeklyReviewSectionProps) {
+  const historyQuery = useWeeklyReviewHistory(userId);
+  const profileQuery = useProfile(userId);
+
+  const allReviews = historyQuery.data ?? [];
+  const mostRecentReview = allReviews[0] ?? null;
+  const reviewedWeekEndings = allReviews.map((r) => r.week_ending);
+  const signupDate = profileQuery.data
+    ? parseISO(profileQuery.data.created_at)
+    : new Date();
+  const overdueSundays = getOverdueSundays(
+    reviewedWeekEndings,
+    signupDate,
+    new Date(),
+  );
+
+  if (overdueSundays.length > 0) {
     return (
       <div className="bg-card rounded-2xl px-5 py-4 flex flex-col gap-3">
-        <p className="font-sans text-[11px] text-amber uppercase tracking-wider">
-          Weekly review
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="font-sans text-[11px] text-amber uppercase tracking-wider">
+            Weekly review
+          </p>
+          <p className="font-sans text-[11px] text-amber">
+            {overdueSundays.length} missed
+          </p>
+        </div>
         <p className="font-serif text-[18px] text-plum leading-snug">
-          This week deserves a moment of reflection.
+          {format(parseISO(overdueSundays[0]), "d MMM yyyy")} — not reviewed
         </p>
-        <Link
-          to="/review"
-          search={{ weekEnding: mostRecentSundayStr }}
-          className="font-sans text-[13px] text-amber"
-        >
-          Start review →
+        <Link to="/review" className="font-sans text-[13px] text-amber">
+          Log it →
         </Link>
       </div>
     );

@@ -1,0 +1,1 @@
+export const WEEKLY_REVIEW_LOOKBACK_WEEKS = 3;

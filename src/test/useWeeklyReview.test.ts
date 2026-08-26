@@ -3,7 +3,11 @@ import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { currentWeekEnding, useWeeklyReview } from "@/hooks/useWeeklyReview";
+import {
+  computeUnreviewedSundays,
+  currentWeekEnding,
+  useWeeklyReview,
+} from "@/hooks/useWeeklyReview";
 import type { WeeklyReview } from "@/types/database";
 
 const { mockMaybeSingle } = vi.hoisted(() => ({
@@ -54,6 +58,53 @@ describe("currentWeekEnding", () => {
 
   it("returns the upcoming Sunday when today is Saturday", () => {
     expect(currentWeekEnding(new Date(2026, 4, 23))).toBe("2026-05-24");
+  });
+});
+
+describe("computeUnreviewedSundays", () => {
+  // 2026-05-20 is a Wednesday. Most recent Sundays: 05-17, 05-10, 05-03.
+  const TODAY = new Date(2026, 4, 20);
+  const LONG_AGO = new Date(2020, 0, 1);
+
+  it("returns nothing when every recent Sunday is reviewed", () => {
+    const result = computeUnreviewedSundays(
+      ["2026-05-17", "2026-05-10", "2026-05-03"],
+      LONG_AGO,
+      TODAY,
+    );
+    expect(result).toEqual([]);
+  });
+
+  it("returns unreviewed Sundays most-recent-first", () => {
+    const result = computeUnreviewedSundays([], LONG_AGO, TODAY);
+    expect(result).toEqual(["2026-05-17", "2026-05-10", "2026-05-03"]);
+  });
+
+  it("skips only the reviewed Sundays, preserving order", () => {
+    const result = computeUnreviewedSundays(["2026-05-10"], LONG_AGO, TODAY);
+    expect(result).toEqual(["2026-05-17", "2026-05-03"]);
+  });
+
+  it("excludes Sundays before the signup date", () => {
+    // Signed up 2026-05-12 — the 05-10 and 05-03 Sundays predate the account.
+    const result = computeUnreviewedSundays([], new Date(2026, 4, 12), TODAY);
+    expect(result).toEqual(["2026-05-17"]);
+  });
+
+  it("includes a Sunday that falls exactly on the signup date", () => {
+    const result = computeUnreviewedSundays([], new Date(2026, 4, 17), TODAY);
+    expect(result).toEqual(["2026-05-17"]);
+  });
+
+  it("includes today when today is itself an unreviewed Sunday", () => {
+    const sunday = new Date(2026, 4, 17);
+    const result = computeUnreviewedSundays([], LONG_AGO, sunday);
+    expect(result).toEqual(["2026-05-17", "2026-05-10", "2026-05-03"]);
+  });
+
+  it("respects a custom maxWeeks", () => {
+    const result = computeUnreviewedSundays([], LONG_AGO, TODAY, 1);
+    expect(result).toEqual(["2026-05-17"]);
   });
 });
 
