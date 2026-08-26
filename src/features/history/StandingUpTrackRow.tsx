@@ -5,7 +5,7 @@ import { useState } from "react";
 import { formatGapLabel } from "@/features/history/formatGapLabel";
 import type { StandingUpEntry } from "@/types/database";
 
-interface StandingUpSectionProps {
+interface StandingUpTrackRowProps {
   trackName: string;
   entries: StandingUpEntry[];
 }
@@ -16,16 +16,16 @@ function buildSummary(entries: StandingUpEntry[]): string {
   return `You stood up ${count} ${count === 1 ? "time" : "times"}. Fastest return: ${formatGapLabel(fastest).toLowerCase()}.`;
 }
 
-export function StandingUpSection({
+export function StandingUpTrackRow({
   trackName,
   entries,
-}: StandingUpSectionProps) {
+}: StandingUpTrackRowProps) {
   const [open, setOpen] = useState(false);
 
   if (entries.length === 0) return null;
 
   return (
-    <div className="px-4 py-2">
+    <div>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -33,12 +33,12 @@ export function StandingUpSection({
         className="flex items-center justify-between w-full bg-transparent border-none cursor-pointer"
       >
         <span className="font-serif italic text-[16px] text-plum">
-          Standing up — {trackName}
+          {trackName}
         </span>
         {open ? (
-          <ChevronDown className="w-4 h-4 text-muted" />
+          <ChevronDown className="w-4 h-4 text-violet" />
         ) : (
-          <ChevronRight className="w-4 h-4 text-muted" />
+          <ChevronRight className="w-4 h-4 text-violet" />
         )}
       </button>
 
@@ -48,17 +48,17 @@ export function StandingUpSection({
             {entries.map((entry) => (
               <div key={entry.id} className="flex flex-col items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-amber" />
-                <span className="font-sans text-[11px] text-muted">
+                <span className="font-sans text-[11px] text-violet">
                   {formatGapLabel(entry.gap_days)}
                 </span>
-                <span className="font-sans text-[10px] text-soft">
+                <span className="font-sans text-[10px] text-violet">
                   {format(parseISO(entry.fall_date), "d MMM")} →{" "}
                   {format(parseISO(entry.return_date), "d MMM")}
                 </span>
               </div>
             ))}
           </div>
-          <p className="font-sans text-[12px] text-soft">
+          <p className="font-sans text-[12px] text-violet">
             {buildSummary(entries)}
           </p>
         </div>

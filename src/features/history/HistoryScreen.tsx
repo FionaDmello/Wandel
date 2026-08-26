@@ -14,11 +14,12 @@ import { useSession } from "@/hooks/useSession";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
 import { useSyncBreakStandingUp } from "@/hooks/useSyncBreakStandingUp";
 import type { StandingUpEntry } from "@/types/database";
+import type { StandingUpTrack } from "@/types/standingUp";
 
 import { CalendarGrid } from "./CalendarGrid";
 import { DaySheet } from "./DaySheet";
 import { MonthNav } from "./MonthNav";
-import { StandingUpSection } from "./StandingUpSection";
+import { StandingUpCard } from "./StandingUpCard";
 import { WeeklyReviewSection } from "./WeeklyReviewSection";
 
 interface HistoryContentProps {
@@ -79,6 +80,15 @@ function HistoryContent({ userId }: HistoryContentProps) {
     const bRank = activeHabitIds.has(b.habitId) ? 0 : 1;
     return aRank - bRank;
   });
+
+  const standingUpTracks: StandingUpTrack[] = [
+    { id: "engine", trackName: "Engine", entries: engineStandingUp },
+    ...habitGroups.map((group) => ({
+      id: group.habitId,
+      trackName: group.trackName,
+      entries: group.entries,
+    })),
+  ];
 
   const today = format(new Date(), "yyyy-MM-dd");
   const currentYear = now.getFullYear();
@@ -142,18 +152,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
         </div>
       </div>
 
-      {(engineStandingUp.length > 0 || habitGroups.length > 0) && (
-        <div className="flex flex-col gap-1 px-2 pt-2 pb-1">
-          <StandingUpSection trackName="Engine" entries={engineStandingUp} />
-          {habitGroups.map((group) => (
-            <StandingUpSection
-              key={group.habitId}
-              trackName={group.trackName}
-              entries={group.entries}
-            />
-          ))}
-        </div>
-      )}
+      <StandingUpCard tracks={standingUpTracks} />
 
       <div className="px-4 pt-2 pb-4">
         <WeeklyReviewSection userId={userId} />
