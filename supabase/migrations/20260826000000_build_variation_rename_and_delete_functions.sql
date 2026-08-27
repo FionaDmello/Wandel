@@ -5,12 +5,26 @@
 -- variations from ever sharing a name; a one-time backfill cleans up
 -- observations already orphaned by the pre-existing delete bug.
 
--- 1. Prevent two variations (or a rename racing an add) from sharing a name.
+-- 1. De-duplicate any variations that already share a name before adding
+-- the uniqueness constraint below. No DB-level uniqueness existed before
+-- this migration (only a racy client-side check on add), so a stale
+-- duplicate here would otherwise abort the whole migration, including
+-- the functions and backfill below. Keeps the earliest-created row per
+-- (habit_id, sub_type, key), tie-broken on id for a strict total order.
+delete from habit_configs hc
+using habit_configs hc2
+where hc.habit_id = hc2.habit_id
+  and hc.sub_type is not distinct from hc2.sub_type
+  and hc.sub_type is not null
+  and hc.key = hc2.key
+  and (hc.created_at, hc.id) > (hc2.created_at, hc2.id);
+
+-- 2. Prevent two variations (or a rename racing an add) from sharing a name.
 create unique index habit_configs_unique_named_variation
   on habit_configs (habit_id, sub_type, key)
   where sub_type is not null;
 
--- 2. Atomic rename: updates habit_configs (name + values) and
+-- 3. Atomic rename: updates habit_configs (name + values) and
 -- build_observations (name) for the same variation in one transaction.
 -- `security invoker` (the default) means this runs under the calling
 -- user's own permissions — existing RLS policies on habit_configs and
@@ -54,7 +68,7 @@ begin
 end;
 $$;
 
--- 3. Atomic delete: removes a variation's config rows and its
+-- 4. Atomic delete: removes a variation's config rows and its
 -- observations together, closing the pre-existing orphaning bug.
 create or replace function delete_build_variation(
   p_habit_id uuid,
@@ -71,7 +85,7 @@ begin
 end;
 $$;
 
--- 4. One-time cleanup of observations already orphaned by the
+-- 5. One-time cleanup of observations already orphaned by the
 -- pre-existing delete bug, before it's fixed going forward.
 delete from build_observations bo
 where bo.sub_type is not null

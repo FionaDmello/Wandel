@@ -288,6 +288,8 @@ describe("useUpdateBuildSubType", () => {
       "build_observations_month",
       "user-1",
     ]);
+    expect(invalidatedKeys).toContainEqual(["weekly_consistency", "user-1"]);
+    expect(invalidatedKeys).toContainEqual(["build_obs_recent", "user-1"]);
   });
 });
 
@@ -377,5 +379,7 @@ describe("useDeleteBuildSubType", () => {
       "build_observations_month",
       "user-1",
     ]);
+    expect(invalidatedKeys).toContainEqual(["weekly_consistency", "user-1"]);
+    expect(invalidatedKeys).toContainEqual(["build_obs_recent", "user-1"]);
   });
 });

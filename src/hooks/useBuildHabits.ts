@@ -240,6 +240,12 @@ export function useUpdateBuildSubType(userId: string) {
       queryClient.invalidateQueries({
         queryKey: ["build_observations_month", userId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["weekly_consistency", userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["build_obs_recent", userId],
+      });
     },
   });
 }
@@ -272,6 +278,12 @@ export function useDeleteBuildSubType(userId: string) {
       });
       queryClient.invalidateQueries({
         queryKey: ["build_observations_month", userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["weekly_consistency", userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["build_obs_recent", userId],
       });
     },
   });
