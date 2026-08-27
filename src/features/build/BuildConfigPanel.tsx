@@ -13,6 +13,7 @@ import {
 import { useUpdateHabitStatus } from "@/hooks/useHabitStatus";
 import type { HabitConfig, HabitStatus } from "@/types/database";
 
+import { getVariationErrorMessage } from "./getVariationErrorMessage";
 import { VariationConfigStep } from "./VariationConfigStep";
 
 type PanelView =
@@ -65,17 +66,41 @@ export function BuildConfigPanel({
 
   const [view, setView] = useState<PanelView>({ mode: "list" });
   const [confirming, setConfirming] = useState<ConfirmingAction>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const { mutate: updateSubType, isPending: isUpdating } =
-    useUpdateBuildSubType(userId);
-  const { mutate: addSubType, isPending: isAdding } =
-    useAddBuildSubType(userId);
-  const { mutate: deleteSubType, isPending: isDeleting } =
-    useDeleteBuildSubType(userId);
+  const updateMutation = useUpdateBuildSubType(userId);
+  const addMutation = useAddBuildSubType(userId);
+  const deleteMutation = useDeleteBuildSubType(userId);
+  const {
+    mutate: updateSubType,
+    isPending: isUpdating,
+    error: updateError,
+  } = updateMutation;
+  const {
+    mutate: addSubType,
+    isPending: isAdding,
+    error: addError,
+  } = addMutation;
+  const {
+    mutate: deleteSubType,
+    isPending: isDeleting,
+    error: deleteError,
+  } = deleteMutation;
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdateHabitStatus(userId);
 
   const isPending = isUpdating || isAdding || isDeleting || isUpdatingStatus;
+
+  // Each mutation's error state persists until it runs again — switching
+  // views must clear stale errors, or a failure on one variation's form
+  // (e.g. "name already exists") would still show on the next.
+  const changeView = (next: PanelView) => {
+    updateMutation.reset();
+    addMutation.reset();
+    deleteMutation.reset();
+    setConfirmingDelete(false);
+    setView(next);
+  };
 
   const confirmAction = () => {
     if (!confirming) return;
@@ -90,11 +115,57 @@ export function BuildConfigPanel({
 
   if (view.mode === "edit") {
     const st = view.subType;
+    const editProps =
+      st !== null
+        ? {
+            existingNames: [...subTypes.filter((s) => s !== st), habitName],
+            initialValues: {
+              name: st,
+              anchor: get("anchor", st),
+              nonNegotiable: get("non_negotiable", st),
+              minimumVersion: get("minimum_version", st),
+              fullVersion: get("full_version", st),
+            },
+            onNext: (
+              newName: string,
+              values: {
+                anchor: string;
+                nonNegotiable: string;
+                minimumVersion: string;
+                fullVersion: string;
+              },
+            ) => {
+              updateSubType(
+                { habitId, subType: st, newSubType: newName, ...values },
+                { onSuccess: () => changeView({ mode: "list" }) },
+              );
+            },
+          }
+        : {
+            initialValues: {
+              anchor: get("anchor", st),
+              nonNegotiable: get("non_negotiable", st),
+              minimumVersion: get("minimum_version", st),
+              fullVersion: get("full_version", st),
+            },
+            onNext: (values: {
+              anchor: string;
+              nonNegotiable: string;
+              minimumVersion: string;
+              fullVersion: string;
+            }) => {
+              updateSubType(
+                { habitId, subType: null, newSubType: null, ...values },
+                { onSuccess: () => changeView({ mode: "list" }) },
+              );
+            },
+          };
+
     return (
       <ScreenWrap>
         <div className="flex items-center gap-3 px-5 pt-[14px]">
           <IconButton
-            onClick={() => setView({ mode: "list" })}
+            onClick={() => changeView({ mode: "list" })}
             ariaLabel="Back"
             className="text-muted shrink-0"
           >
@@ -107,37 +178,58 @@ export function BuildConfigPanel({
 
         <VariationConfigStep
           habitName={st ?? habitName}
-          initialValues={{
-            anchor: get("anchor", st),
-            nonNegotiable: get("non_negotiable", st),
-            minimumVersion: get("minimum_version", st),
-            fullVersion: get("full_version", st),
-          }}
           submitLabel={isUpdating ? "Saving…" : "Save"}
-          onNext={(values) => {
-            updateSubType(
-              { habitId, subType: st, ...values },
-              { onSuccess: () => setView({ mode: "list" }) },
-            );
-          }}
+          disabled={isPending}
+          serverError={getVariationErrorMessage(updateError)}
+          {...editProps}
         />
 
         {st !== null && (
           <div className="px-8 pb-8">
             <Divider className="my-0 mb-4" />
-            <button
-              type="button"
-              onClick={() =>
-                deleteSubType(
-                  { habitId, subType: st },
-                  { onSuccess: () => setView({ mode: "list" }) },
-                )
-              }
-              disabled={isPending}
-              className="font-sans text-[13px] text-amber bg-transparent border-none cursor-pointer"
-            >
-              Remove this variation
-            </button>
+            {confirmingDelete ? (
+              <div className="flex flex-col gap-3">
+                <p className="font-sans text-[13px] text-plum">
+                  Remove this variation? Its logged history will be deleted too.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      deleteSubType(
+                        { habitId, subType: st },
+                        { onSuccess: () => changeView({ mode: "list" }) },
+                      )
+                    }
+                    disabled={isPending}
+                    className="font-sans text-[13px] font-medium text-amber bg-transparent border-none cursor-pointer"
+                  >
+                    {isDeleting ? "…" : "Confirm"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingDelete(false)}
+                    className="font-sans text-[13px] text-muted bg-transparent border-none cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(true)}
+                disabled={isPending}
+                className="font-sans text-[13px] text-amber bg-transparent border-none cursor-pointer"
+              >
+                Remove this variation
+              </button>
+            )}
+            {deleteError && (
+              <p className="font-sans text-xs text-amber mt-2">
+                {getVariationErrorMessage(deleteError)}
+              </p>
+            )}
           </div>
         )}
       </ScreenWrap>
@@ -149,7 +241,7 @@ export function BuildConfigPanel({
       <ScreenWrap>
         <div className="flex items-center gap-3 px-5 pt-[14px]">
           <IconButton
-            onClick={() => setView({ mode: "list" })}
+            onClick={() => changeView({ mode: "list" })}
             ariaLabel="Back"
             className="text-muted shrink-0"
           >
@@ -164,13 +256,15 @@ export function BuildConfigPanel({
           habitName={habitName}
           existingNames={[...subTypes, habitName]}
           submitLabel={isAdding ? "Adding…" : "Add variation"}
+          disabled={isPending}
+          serverError={getVariationErrorMessage(addError)}
           onNext={(name, values) => {
             addSubType(
               { habitId, subType: name, ...values },
-              { onSuccess: () => setView({ mode: "list" }) },
+              { onSuccess: () => changeView({ mode: "list" }) },
             );
           }}
-          onCancel={() => setView({ mode: "list" })}
+          onCancel={() => changeView({ mode: "list" })}
         />
       </ScreenWrap>
     );
@@ -198,7 +292,7 @@ export function BuildConfigPanel({
               <button
                 key={st}
                 type="button"
-                onClick={() => setView({ mode: "edit", subType: st })}
+                onClick={() => changeView({ mode: "edit", subType: st })}
                 className="flex items-center justify-between px-4 py-3 bg-card rounded-2xl border-l-[3px] border-l-soft text-left border-none cursor-pointer w-full"
               >
                 <span className="font-sans text-[13px] font-medium text-plum">
@@ -210,7 +304,7 @@ export function BuildConfigPanel({
 
             <button
               type="button"
-              onClick={() => setView({ mode: "add" })}
+              onClick={() => changeView({ mode: "add" })}
               className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-card border-l-[3px] border-l-transparent text-plum border-none cursor-pointer"
             >
               <Plus size={13} strokeWidth={2} />
@@ -220,7 +314,7 @@ export function BuildConfigPanel({
         ) : (
           <Button
             variant="ghost"
-            onClick={() => setView({ mode: "edit", subType: null })}
+            onClick={() => changeView({ mode: "edit", subType: null })}
             disabled={isPending}
           >
             Edit config
