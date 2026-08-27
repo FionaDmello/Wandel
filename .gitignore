@@ -38,3 +38,4 @@ product/*
 docs/superpowers/
 docs/design/
 .superpowers/*
+docs/security-audit-*.md
