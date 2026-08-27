@@ -13,6 +13,7 @@ import {
 import { useUpdateHabitStatus } from "@/hooks/useHabitStatus";
 import type { HabitConfig, HabitStatus } from "@/types/database";
 
+import { getVariationErrorMessage } from "./getVariationErrorMessage";
 import { VariationConfigStep } from "./VariationConfigStep";
 
 type PanelView =
@@ -66,12 +67,21 @@ export function BuildConfigPanel({
   const [view, setView] = useState<PanelView>({ mode: "list" });
   const [confirming, setConfirming] = useState<ConfirmingAction>(null);
 
-  const { mutate: updateSubType, isPending: isUpdating } =
-    useUpdateBuildSubType(userId);
-  const { mutate: addSubType, isPending: isAdding } =
-    useAddBuildSubType(userId);
-  const { mutate: deleteSubType, isPending: isDeleting } =
-    useDeleteBuildSubType(userId);
+  const {
+    mutate: updateSubType,
+    isPending: isUpdating,
+    error: updateError,
+  } = useUpdateBuildSubType(userId);
+  const {
+    mutate: addSubType,
+    isPending: isAdding,
+    error: addError,
+  } = useAddBuildSubType(userId);
+  const {
+    mutate: deleteSubType,
+    isPending: isDeleting,
+    error: deleteError,
+  } = useDeleteBuildSubType(userId);
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdateHabitStatus(userId);
 
@@ -90,6 +100,52 @@ export function BuildConfigPanel({
 
   if (view.mode === "edit") {
     const st = view.subType;
+    const editProps =
+      st !== null
+        ? {
+            existingNames: [...subTypes.filter((s) => s !== st), habitName],
+            initialValues: {
+              name: st,
+              anchor: get("anchor", st),
+              nonNegotiable: get("non_negotiable", st),
+              minimumVersion: get("minimum_version", st),
+              fullVersion: get("full_version", st),
+            },
+            onNext: (
+              newName: string,
+              values: {
+                anchor: string;
+                nonNegotiable: string;
+                minimumVersion: string;
+                fullVersion: string;
+              },
+            ) => {
+              updateSubType(
+                { habitId, subType: st, newSubType: newName, ...values },
+                { onSuccess: () => setView({ mode: "list" }) },
+              );
+            },
+          }
+        : {
+            initialValues: {
+              anchor: get("anchor", st),
+              nonNegotiable: get("non_negotiable", st),
+              minimumVersion: get("minimum_version", st),
+              fullVersion: get("full_version", st),
+            },
+            onNext: (values: {
+              anchor: string;
+              nonNegotiable: string;
+              minimumVersion: string;
+              fullVersion: string;
+            }) => {
+              updateSubType(
+                { habitId, subType: null, newSubType: null, ...values },
+                { onSuccess: () => setView({ mode: "list" }) },
+              );
+            },
+          };
+
     return (
       <ScreenWrap>
         <div className="flex items-center gap-3 px-5 pt-[14px]">
@@ -107,19 +163,10 @@ export function BuildConfigPanel({
 
         <VariationConfigStep
           habitName={st ?? habitName}
-          initialValues={{
-            anchor: get("anchor", st),
-            nonNegotiable: get("non_negotiable", st),
-            minimumVersion: get("minimum_version", st),
-            fullVersion: get("full_version", st),
-          }}
           submitLabel={isUpdating ? "Saving…" : "Save"}
-          onNext={(values) => {
-            updateSubType(
-              { habitId, subType: st, ...values },
-              { onSuccess: () => setView({ mode: "list" }) },
-            );
-          }}
+          disabled={isPending}
+          serverError={getVariationErrorMessage(updateError)}
+          {...editProps}
         />
 
         {st !== null && (
@@ -138,6 +185,11 @@ export function BuildConfigPanel({
             >
               Remove this variation
             </button>
+            {deleteError && (
+              <p className="font-sans text-xs text-amber mt-2">
+                {getVariationErrorMessage(deleteError)}
+              </p>
+            )}
           </div>
         )}
       </ScreenWrap>
@@ -164,6 +216,8 @@ export function BuildConfigPanel({
           habitName={habitName}
           existingNames={[...subTypes, habitName]}
           submitLabel={isAdding ? "Adding…" : "Add variation"}
+          disabled={isPending}
+          serverError={getVariationErrorMessage(addError)}
           onNext={(name, values) => {
             addSubType(
               { habitId, subType: name, ...values },

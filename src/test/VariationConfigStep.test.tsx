@@ -162,4 +162,83 @@ describe("VariationConfigStep", () => {
       fullVersion: "60 minute practice",
     });
   });
+
+  it("pre-populates the name field from initialValues.name in edit mode", () => {
+    render(
+      <VariationConfigStep
+        habitName="Workout"
+        existingNames={["Gym"]}
+        initialValues={{ name: "Yoga" }}
+        onNext={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    );
+    expect(screen.getByDisplayValue("Yoga")).toBeInTheDocument();
+  });
+
+  it("does not flag the name as a duplicate when it matches its own current name", () => {
+    const onNext = vi.fn();
+    render(
+      <VariationConfigStep
+        habitName="Workout"
+        existingNames={["Gym"]}
+        initialValues={{ name: "Yoga" }}
+        onNext={onNext}
+        onCancel={vi.fn()}
+      />,
+    );
+    fillConfigFields();
+    fireEvent.click(screen.getByText("Next"));
+    expect(onNext).toHaveBeenCalledWith("Yoga", {
+      anchor: "After morning coffee",
+      nonNegotiable: "5 sun salutations",
+      minimumVersion: "20 minute flow",
+      fullVersion: "60 minute practice",
+    });
+  });
+
+  it("disables the submit button when disabled is true", () => {
+    render(
+      <VariationConfigStep
+        habitName="Workout"
+        onNext={vi.fn()}
+        onCancel={vi.fn()}
+        disabled
+      />,
+    );
+    expect(screen.getByText("Next").closest("button")).toBeDisabled();
+  });
+
+  it("shows serverError when there is no local validation error", () => {
+    render(
+      <VariationConfigStep
+        habitName="Workout"
+        onNext={vi.fn()}
+        onCancel={vi.fn()}
+        serverError="Something went wrong. Please try again."
+      />,
+    );
+    expect(
+      screen.getByText("Something went wrong. Please try again."),
+    ).toBeInTheDocument();
+  });
+
+  it("prefers a local validation error over serverError", () => {
+    const onNext = vi.fn();
+    render(
+      <VariationConfigStep
+        habitName="Workout"
+        existingNames={["Gym"]}
+        onNext={onNext}
+        onCancel={vi.fn()}
+        serverError="Something went wrong. Please try again."
+      />,
+    );
+    fillConfigFields();
+    fireEvent.click(screen.getByText("Next"));
+    expect(screen.getByText("Give this variation a name.")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Something went wrong. Please try again."),
+    ).not.toBeInTheDocument();
+  });
 });

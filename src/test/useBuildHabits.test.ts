@@ -3,13 +3,21 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useAddBuildHabit, useBuildHabits } from "@/hooks/useBuildHabits";
+import {
+  useAddBuildHabit,
+  useBuildHabits,
+  useDeleteBuildSubType,
+  useUpdateBuildSubType,
+} from "@/hooks/useBuildHabits";
 
-const { mockOrder, mockHabitSingle, mockConfigInsert } = vi.hoisted(() => ({
-  mockOrder: vi.fn(),
-  mockHabitSingle: vi.fn(),
-  mockConfigInsert: vi.fn(),
-}));
+const { mockOrder, mockHabitSingle, mockConfigInsert, mockRpc } = vi.hoisted(
+  () => ({
+    mockOrder: vi.fn(),
+    mockHabitSingle: vi.fn(),
+    mockConfigInsert: vi.fn(),
+    mockRpc: vi.fn(),
+  }),
+);
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {
@@ -26,6 +34,7 @@ vi.mock("@/lib/supabase", () => ({
         return { insert: mockConfigInsert };
       }
     },
+    rpc: mockRpc,
   },
 }));
 
@@ -157,5 +166,216 @@ describe("useAddBuildHabit", () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(mockConfigInsert).not.toHaveBeenCalled();
+  });
+});
+
+describe("useUpdateBuildSubType", () => {
+  const PAYLOAD = {
+    habitId: "habit-1",
+    subType: "Yoga",
+    newSubType: "Stretching",
+    anchor: "After coffee",
+    nonNegotiable: "5 sun salutations",
+    minimumVersion: "20 min flow",
+    fullVersion: "60 min session",
+  };
+
+  it("calls the rename_build_variation RPC with the right params", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: null });
+
+    const { result } = renderHook(() => useUpdateBuildSubType("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD);
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockRpc).toHaveBeenCalledWith("rename_build_variation", {
+      p_habit_id: "habit-1",
+      p_old_sub_type: "Yoga",
+      p_new_sub_type: "Stretching",
+      p_anchor: "After coffee",
+      p_non_negotiable: "5 sun salutations",
+      p_minimum_version: "20 min flow",
+      p_full_version: "60 min session",
+    });
+  });
+
+  it("passes null sub_types through for the no-variation default config", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: null });
+
+    const { result } = renderHook(() => useUpdateBuildSubType("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate({ ...PAYLOAD, subType: null, newSubType: null });
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockRpc).toHaveBeenCalledWith(
+      "rename_build_variation",
+      expect.objectContaining({ p_old_sub_type: null, p_new_sub_type: null }),
+    );
+  });
+
+  it("throws when the RPC returns an error", async () => {
+    mockRpc.mockResolvedValue({
+      data: null,
+      error: { code: "23505", message: "duplicate key value" },
+    });
+
+    const { result } = renderHook(() => useUpdateBuildSubType("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD);
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("invalidates every affected cache on success", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: null });
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const invalidateSpy = vi.spyOn(client, "invalidateQueries");
+    const localWrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client }, children);
+
+    const { result } = renderHook(() => useUpdateBuildSubType("user-1"), {
+      wrapper: localWrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PAYLOAD);
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    const invalidatedKeys = invalidateSpy.mock.calls.map(
+      (call) => call[0]?.queryKey,
+    );
+    expect(invalidatedKeys).toContainEqual([
+      "build_habit",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual(["build_habits", "user-1"]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_observation",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_observations_day",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_habit_observations",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_observations_month",
+      "user-1",
+    ]);
+  });
+});
+
+describe("useDeleteBuildSubType", () => {
+  it("calls the delete_build_variation RPC with the right params", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: null });
+
+    const { result } = renderHook(() => useDeleteBuildSubType("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate({ habitId: "habit-1", subType: "Yoga" });
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockRpc).toHaveBeenCalledWith("delete_build_variation", {
+      p_habit_id: "habit-1",
+      p_sub_type: "Yoga",
+    });
+  });
+
+  it("throws when the RPC returns an error", async () => {
+    mockRpc.mockResolvedValue({
+      data: null,
+      error: { message: "DB error" },
+    });
+
+    const { result } = renderHook(() => useDeleteBuildSubType("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate({ habitId: "habit-1", subType: "Yoga" });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("invalidates every affected cache on success", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: null });
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const invalidateSpy = vi.spyOn(client, "invalidateQueries");
+    const localWrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client }, children);
+
+    const { result } = renderHook(() => useDeleteBuildSubType("user-1"), {
+      wrapper: localWrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate({ habitId: "habit-1", subType: "Yoga" });
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    const invalidatedKeys = invalidateSpy.mock.calls.map(
+      (call) => call[0]?.queryKey,
+    );
+    expect(invalidatedKeys).toContainEqual([
+      "build_habit",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual(["build_habits", "user-1"]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_observation",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_observations_day",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_habit_observations",
+      "user-1",
+      "habit-1",
+    ]);
+    expect(invalidatedKeys).toContainEqual([
+      "build_observations_month",
+      "user-1",
+    ]);
   });
 });

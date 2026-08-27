@@ -14,9 +14,11 @@ interface VariationValues {
 
 interface BaseVariationConfigStepProps {
   habitName: string;
-  initialValues?: Partial<VariationValues>;
+  initialValues?: Partial<VariationValues> & { name?: string };
   submitLabel?: string;
   onCancel?: () => void;
+  disabled?: boolean;
+  serverError?: string | null;
 }
 
 interface NamedVariationConfigStepProps extends BaseVariationConfigStepProps {
@@ -39,8 +41,10 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
     initialValues = {},
     submitLabel = "Next",
     onCancel,
+    disabled,
+    serverError,
   } = props;
-  const [name, setName] = useState("");
+  const [name, setName] = useState(initialValues.name ?? "");
   const [anchor, setAnchor] = useState(initialValues.anchor ?? "");
   const [nonNegotiable, setNonNegotiable] = useState(
     initialValues.nonNegotiable ?? "",
@@ -183,9 +187,11 @@ export function VariationConfigStep(props: VariationConfigStepProps) {
         </div>
       </div>
 
-      {error && <p className="font-sans text-xs text-amber">{error}</p>}
+      {(error ?? serverError) && (
+        <p className="font-sans text-xs text-amber">{error ?? serverError}</p>
+      )}
 
-      <Button variant="primary" onClick={handleNext}>
+      <Button variant="primary" onClick={handleNext} disabled={disabled}>
         {submitLabel}
       </Button>
 
