@@ -13,6 +13,8 @@ export interface Database {
           reminder_last_rotated: string | null;
           setup_complete: boolean;
           last_protocol_check: string | null;
+          tour_completed: boolean;
+          habit_intro_seen: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -29,6 +31,8 @@ export interface Database {
           reminder_last_rotated?: string | null;
           setup_complete?: boolean;
           last_protocol_check?: string | null;
+          tour_completed?: boolean;
+          habit_intro_seen?: boolean;
         };
         Relationships: [];
       };

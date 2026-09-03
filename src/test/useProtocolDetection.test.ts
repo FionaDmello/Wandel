@@ -45,6 +45,8 @@ function makeProfile(overrides: Partial<Profile> = {}): Profile {
     reminder_last_rotated: null,
     setup_complete: true,
     last_protocol_check: null,
+    tour_completed: true,
+    habit_intro_seen: true,
     created_at: "",
     updated_at: "",
     ...overrides,
