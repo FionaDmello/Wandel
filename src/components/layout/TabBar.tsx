@@ -14,6 +14,7 @@ export function TabBar() {
           <button
             key={id}
             type="button"
+            data-tour={`tab-${id}`}
             onClick={() => navigate({ to: route })}
             className="flex-1 py-2 pb-[10px] bg-transparent border-none cursor-pointer flex flex-col items-center gap-[3px]"
           >

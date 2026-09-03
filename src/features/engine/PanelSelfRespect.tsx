@@ -31,7 +31,10 @@ export function PanelSelfRespect({ userId, date }: PanelSelfRespectProps) {
   }
 
   return (
-    <div className="relative flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-violet px-5 py-4">
+    <div
+      data-tour="panel-self-respect"
+      className="relative flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-violet px-5 py-4"
+    >
       <PanelHeader
         number={1}
         title="Self-Respect"

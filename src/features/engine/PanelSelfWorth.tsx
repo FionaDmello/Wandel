@@ -23,7 +23,10 @@ export function PanelSelfWorth({ userId, date }: PanelSelfWorthProps) {
   const hasOverflow = entries.length > 6 && !showAll;
 
   return (
-    <div className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-teal px-5 py-4">
+    <div
+      data-tour="panel-self-worth"
+      className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-teal px-5 py-4"
+    >
       <PanelHeader
         number={3}
         title="Self-Worth"

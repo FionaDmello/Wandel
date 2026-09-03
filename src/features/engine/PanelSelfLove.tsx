@@ -43,7 +43,10 @@ export function PanelSelfLove({ userId, date }: PanelSelfLoveProps) {
   const overflow = entries.length - 4;
 
   return (
-    <div className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-amber px-5 py-4">
+    <div
+      data-tour="panel-self-love"
+      className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-amber px-5 py-4"
+    >
       <PanelHeader
         number={2}
         title="Self-Love"

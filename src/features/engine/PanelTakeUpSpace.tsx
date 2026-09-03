@@ -81,7 +81,10 @@ export function PanelTakeUpSpace({ userId, date }: PanelTakeUpSpaceProps) {
   }
 
   return (
-    <div className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-rose px-5 py-4">
+    <div
+      data-tour="panel-take-up-space"
+      className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-rose px-5 py-4"
+    >
       <PanelHeader
         number={4}
         title="Take Up Space"

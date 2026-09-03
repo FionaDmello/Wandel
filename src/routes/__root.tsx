@@ -9,6 +9,7 @@ import {
 import { StatusBar } from "@/components/layout/StatusBar";
 import { TabBar } from "@/components/layout/TabBar";
 import { ProtocolOrchestrator } from "@/features/protocols/ProtocolOrchestrator";
+import { TourOrchestrator } from "@/features/tour/TourOrchestrator";
 import { supabase } from "@/lib/supabase";
 
 const CHROME_HIDDEN_ROUTES = ["/auth", "/setup", "/review"];
@@ -32,6 +33,7 @@ function RootLayout() {
       <Outlet />
       {!hideChrome && <TabBar />}
       {!hideChrome && <ProtocolOrchestrator />}
+      {!hideChrome && <TourOrchestrator />}
     </>
   );
 }
